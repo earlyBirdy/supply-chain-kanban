@@ -21,3 +21,7 @@ Adds agent negotiation, auto-contract triggers, supplier portals, regulatory aut
 # supply chain kanban Demo
 
 Run a local demo showing AI agents detecting constraints, negotiating, and triggering scenarios.
+
+# Supply Chain Kanban – Documentation
+
+This folder contains conceptual and governance documentation for the AI-agent-based supply chain demo.
