@@ -1,0 +1,7 @@
+roi_model:
+  benefits:
+    - avoided_revenue_loss
+    - inventory_reduction
+  costs:
+    - expedite_cost
+    - premium_pricing

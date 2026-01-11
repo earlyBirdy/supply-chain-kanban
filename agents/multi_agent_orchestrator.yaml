@@ -1,0 +1,8 @@
+orchestrator: scm_multi_agent
+agents:
+  - demand_agent
+  - supply_agent
+  - logistics_agent
+coordination:
+  conflict_resolution: weighted_objectives
+  escalation: human_in_loop

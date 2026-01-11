@@ -1,0 +1,6 @@
+adapter: market_index
+sources:
+  - memory_price_index
+  - freight_index
+  - energy_futures
+refresh: daily

@@ -1,0 +1,2 @@
+agent: demand_agent
+objective: forecast_stability
