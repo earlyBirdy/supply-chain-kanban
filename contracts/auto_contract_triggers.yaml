@@ -1,0 +1,10 @@
+auto_contracts:
+  trigger_conditions:
+    - constraint_risk_score > 90
+    - lead_time_variance > threshold
+  actions:
+    - activate_backup_supplier
+    - price_cap_clause
+  legal_guardrails:
+    approval_required: true
+    contract_templates_only: true

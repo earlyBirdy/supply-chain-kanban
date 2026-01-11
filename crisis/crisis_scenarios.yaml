@@ -1,0 +1,7 @@
+crisis_modes:
+  - war_sanctions
+  - climate_disruption
+  - energy_shortage
+actions:
+  - force_constrained_scenario
+  - escalate_exec

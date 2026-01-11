@@ -1,0 +1,4 @@
+{
+  "dashboard": "Crisis Mode Control Room",
+  "tiles": ["Service Survival", "Revenue at Risk", "Supply Loss Map", "Agent Actions"]
+}

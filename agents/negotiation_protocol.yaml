@@ -1,0 +1,9 @@
+protocol: agent_negotiation
+model: game_theory
+agents:
+  - demand_agent
+  - supply_agent
+  - logistics_agent
+mechanism:
+  type: weighted_nash
+  constraints: ibp_policies

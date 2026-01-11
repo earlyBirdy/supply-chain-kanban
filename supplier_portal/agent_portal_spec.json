@@ -1,0 +1,5 @@
+{
+  "portal": "Supplier Agent Portal",
+  "features": ["capacity_commit", "price_signal", "allocation_notice"],
+  "auth": "mutual_tls"
+}
