@@ -1,0 +1,5 @@
+auto_execution:
+  min_risk_score: 85
+  max_financial_impact_usd: 500000
+  approval_required_for:
+    - tier1_customers

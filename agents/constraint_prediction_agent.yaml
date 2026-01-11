@@ -1,17 +1,13 @@
 agent: constraint_prediction_agent
 objective:
-  - detect_emerging_constraints
+  - early_constraint_detection
 monitors:
-  - supply_confidence_decay
-  - demand_pull_acceleration
-  - price_availability_divergence
+  - supply_confidence
+  - demand_acceleration
+  - market_signal_divergence
+learning:
+  cadence: quarterly
+  method: weight_calibration
 outputs:
   - constraint_risk_score
   - recommended_actions
-actions:
-  - run_ibp_scenarios
-  - score_decisions
-  - create_kanban_card
-  - send_slack_alert
-learning:
-  - compare_predicted_vs_actual

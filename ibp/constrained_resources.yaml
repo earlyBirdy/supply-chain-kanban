@@ -1,9 +1,9 @@
-resource_id: generic_component
-category: component
+resource_id: generic_resource
+category: component_logistics_energy
 unit: unit
 price:
   base_price: 1.0
-  volatility_pct: 20
+  volatility_pct: 30
 supply:
   committed_qty: 100000
-  confidence: 0.8
+  confidence: 0.75

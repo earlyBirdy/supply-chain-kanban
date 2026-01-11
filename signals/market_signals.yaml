@@ -1,0 +1,7 @@
+signal_id: generic_market_index
+resource_id: generic_resource
+signal_type: price_index
+frequency: weekly
+baseline: 100
+alert_threshold_pct: 15
+weight: 0.35

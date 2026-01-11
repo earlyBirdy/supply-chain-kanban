@@ -1,0 +1,9 @@
+{
+  "scorecard": "Agent KPIs",
+  "metrics": [
+    "Early Detection Rate",
+    "Decision Accuracy",
+    "Auto-Execution Success",
+    "Human Override Rate"
+  ]
+}

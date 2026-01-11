@@ -1,0 +1,9 @@
+{
+  "dashboard": "Agent Learning QoQ",
+  "charts": [
+    "Prediction Accuracy",
+    "False Positive Rate",
+    "Detection Lead Time",
+    "Signal Weight Drift"
+  ]
+}
