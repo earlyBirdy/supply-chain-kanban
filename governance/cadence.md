@@ -1,0 +1,1 @@
+Weekly planner, Monthly exec
