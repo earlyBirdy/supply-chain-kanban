@@ -1,1 +1,5 @@
-{"component":"ScenarioSimulator"}
+{
+  "component": "ScenarioSimulator",
+  "inputs": ["Demand Adjustment", "Supply Availability", "Price Shock"],
+  "outputs": ["Service Impact", "Cost Impact", "Risk Exposure"]
+}

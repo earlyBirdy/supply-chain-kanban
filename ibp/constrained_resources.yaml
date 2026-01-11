@@ -1,0 +1,9 @@
+resource_id: generic_component
+category: component
+unit: unit
+price:
+  base_price: 1.0
+  volatility_pct: 20
+supply:
+  committed_qty: 100000
+  confidence: 0.8

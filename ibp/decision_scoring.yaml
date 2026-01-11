@@ -1,0 +1,7 @@
+weights:
+  service: 0.4
+  cost: 0.35
+  risk: 0.25
+thresholds:
+  approve: 75
+  review: 55
