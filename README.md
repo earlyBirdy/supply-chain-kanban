@@ -18,6 +18,6 @@ Multi-agent coordination, regulator appendix, live market adapters, ROI tracking
 
 Adds agent negotiation, auto-contract triggers, supplier portals, regulatory automation, crisis simulation.
 
-# Supply Chain Kanban Demo
+# supply chain kanban Demo
 
 Run a local demo showing AI agents detecting constraints, negotiating, and triggering scenarios.
