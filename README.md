@@ -17,3 +17,7 @@ Multi-agent coordination, regulator appendix, live market adapters, ROI tracking
 # supply-chain-kanban v0.5
 
 Adds agent negotiation, auto-contract triggers, supplier portals, regulatory automation, crisis simulation.
+
+# Supply Chain Kanban Demo
+
+Run a local demo showing AI agents detecting constraints, negotiating, and triggering scenarios.

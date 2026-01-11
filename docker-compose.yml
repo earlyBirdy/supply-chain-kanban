@@ -1,0 +1,12 @@
+version: '3'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: demo
+  superset:
+    image: apache/superset
+    ports:
+      - "8088:8088"

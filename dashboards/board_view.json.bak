@@ -1,0 +1,4 @@
+{
+  "dashboard": "Board Supply Chain Risk View",
+  "tiles": ["Revenue Protected", "Service Level", "Risk Exposure Trend", "Agent ROI"]
+}

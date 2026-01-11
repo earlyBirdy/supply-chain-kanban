@@ -1,0 +1,6 @@
+resource_id,signal_type,value,week
+dram_ddr5,price_index,1.00,2025-W01
+dram_ddr5,price_index,1.18,2025-W02
+dram_ddr5,price_index,1.32,2025-W03
+ocean_freight,price_index,1.00,2025-W01
+ocean_freight,price_index,1.22,2025-W03
