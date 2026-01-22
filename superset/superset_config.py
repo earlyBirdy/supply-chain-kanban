@@ -1,0 +1,1 @@
+TALISMAN_ENABLED = False

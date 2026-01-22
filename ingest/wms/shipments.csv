@@ -1,0 +1,2 @@
+shipment_id,order_id,supplier_id,delivered_qty,ordered_qty,delivered_on_time,lead_time_days,period
+SH-9100,SO-3001,SUP_A,40,50,false,28,2025-W04

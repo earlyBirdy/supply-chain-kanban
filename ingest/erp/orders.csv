@@ -1,0 +1,2 @@
+order_id,sku,location,qty,need_date,net_price
+SO-3001,AI-SERVER-01,DC_C,50,2025-02-01,12000

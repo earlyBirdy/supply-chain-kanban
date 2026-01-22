@@ -1,0 +1,2 @@
+record_id,plant_id,sku,input_qty,good_qty,scrap_qty,period
+PR-3,PLANT_1,AI-SERVER-01,60,54,6,2025-W04

@@ -1,0 +1,18 @@
+FROM apache/superset:latest
+
+USER root
+
+# System deps needed to build psycopg2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev
+
+# Install psycopg2 INTO Superset's venv (correct way)
+RUN /app/.venv/bin/python -m pip install --no-cache-dir psycopg2-binary
+
+# Cleanup
+RUN apt-get purge -y gcc \
+ && apt-get autoremove -y \
+ && rm -rf /var/lib/apt/lists/*
+
+USER superset

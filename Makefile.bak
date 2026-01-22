@@ -1,0 +1,16 @@
+demo:
+	docker compose down -v || true
+	docker compose up -d --build
+	sleep 2
+	docker exec -it supply-chain-kanban-v0.6-db-1 psql -U demo -d demo -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+	docker exec -it supply-chain-kanban-v0.6-db-1 psql -U demo -d demo -f /seed/00_schema.sql
+	docker exec -it supply-chain-kanban-v0.6-db-1 psql -U demo -d demo -f /seed/01_seed_demo.sql
+	docker exec -it supply-chain-kanban-v0.6-db-1 psql -U demo -d demo -f /seed/02_views.sql
+	@echo "Demo running. Tail agent logs: make logs"
+	@echo "Open psql: make psql"
+
+logs:
+	docker logs -f supply-chain-kanban-v0.6-agent-1
+
+psql:
+	docker exec -it supply-chain-kanban-v0.6-db-1 psql -U demo -d demo

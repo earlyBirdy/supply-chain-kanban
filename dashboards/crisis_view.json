@@ -1,4 +1,5 @@
 {
-  "dashboard": "Crisis Mode Control Room",
-  "tiles": ["Service Survival", "Revenue at Risk", "Supply Loss Map", "Agent Actions"]
+  "dashboard_title": "Crisis Mode Control Room",
+  "slug": "crisis-mode-control-room",
+  "description": "Crisis tiles: Service Survival, Revenue at Risk, Supply Loss Map, Agent Actions (demo)"
 }

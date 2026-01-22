@@ -1,4 +1,3 @@
-version: '3'
 services:
   db:
     image: postgres:15
@@ -6,9 +5,78 @@ services:
       POSTGRES_USER: demo
       POSTGRES_PASSWORD: demo
       POSTGRES_DB: demo
-  superset:
-    image: apache/superset
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./seed:/seed
+      - ./ingest:/ingest
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d demo -h localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  db_init:
+    image: postgres:15
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./seed:/seed
+    entrypoint: ["/bin/bash", "-lc"]
+    command: >
+      "psql postgresql://demo:demo@db:5432/demo -f /seed/00_schema.sql &&
+       psql postgresql://demo:demo@db:5432/demo -f /seed/01_seed_demo.sql &&
+       psql postgresql://demo:demo@db:5432/demo -f /seed/02_views.sql"
+
+  agent:
+    build:
+      context: ./agent_runtime
     environment:
-      SUPERSET_SECRET_KEY: FjSmrbeilTjbr0dcUo0KAubEYRFLEM+cnUUnQAXG58pYCLa0AHdtwTtQ
+      AGENT_DB_URL: postgresql+psycopg2://demo:demo@db:5432/demo
+      POLL_SECONDS: "60"
+      RISK_CREATE_THRESHOLD: "70"
+      ALERT_THRESHOLD: "85"
+      INGEST_DIR: "/ingest"
+    volumes:
+      - ./ingest:/ingest
+    depends_on:
+      db:
+        condition: service_healthy
+      db_init:
+        condition: service_completed_successfully
+
+  superset:
+    build:
+      context: ./superset
+    image: supply-chain-kanban-superset-ui:local
+    environment:
+      SUPERSET_SECRET_KEY: "dev-secret-key-change-later"
+      SUPERSET_LOAD_EXAMPLES: "no"
     ports:
       - "8088:8088"
+    depends_on:
+      db:
+        condition: service_healthy
+      db_init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8088/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  superset_bootstrap:
+    image: supply-chain-kanban-superset-ui:local
+    environment:
+      SUPERSET_ADMIN_USER: "admin"
+      SUPERSET_ADMIN_PASS: "admin"
+      SUPERSET_ADMIN_EMAIL: "admin@example.com"
+      DEMO_DB_URI: "postgresql+psycopg2://demo:demo@db:5432/demo"
+      DEMO_DB_NAME: "demo"
+    depends_on:
+      superset:
+        condition: service_healthy
+    command: ["bash", "-lc", "superset db upgrade && superset init && python /app/bootstrap_superset.py"]
+    volumes:
+      - ./superset/bootstrap_superset.py:/app/bootstrap_superset.py
