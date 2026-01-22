@@ -1,6 +1,0 @@
-demo:
-	docker compose up -d
-	sleep 20
-	docker exec supply-chain-kanban-db-1 psql -U demo -d demo -f /seed/seed.sql
-	docker exec supply-chain-kanban-superset-1 superset db upgrade
-	docker exec supply-chain-kanban-superset-1 superset init
