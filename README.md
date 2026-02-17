@@ -97,18 +97,6 @@ See `demo/README.md` for a live-demo walkthrough.
 
 Includes UI, Superset, Power BI, Slack alerts, Scenario Simulator.
 
-# supply-chain-kanban v0.2
-
-Adds AI agent logic for constraint pattern prediction (generic, product-agnostic).
-
-# supply-chain-kanban v0.3
-
-Adds market signal ingestion, learning dashboards, audit narratives, and agent KPI scorecards.
-
-# supply-chain-kanban v0.4
-
-Multi-agent coordination, regulator appendix, live market adapters, ROI tracking, board visuals.
-
 # supply-chain-kanban v0.5
 
 Adds agent negotiation, auto-contract triggers, supplier portals, regulatory automation, crisis simulation.
@@ -121,7 +109,7 @@ Run a local demo showing AI agents detecting constraints, negotiating, and trigg
 
 This folder contains conceptual and governance documentation for the AI-agent-based supply chain demo.
 
-# supply-chain-kanban v0.6 — Agent Core (Runnable Demo)
+# supply-chain-kanban v0.9 — Agent Core (Runnable Demo)
 
 This repo is a **minimal, runnable AI-agent core** for supply chain constraint detection.
 It creates **cases**, persists **scenario outputs per case**, runs **ingest adapters** (ERP/MES/WMS),
@@ -183,6 +171,6 @@ Use `POST /actions/execute?dry_run=1` to validate guardrails without writing aud
 - POST `/pending_actions/{pending_id}/execute?dry_run=1`
 
 
-### v13 Enterprise hardening
+### Enterprise hardening
 - **Idempotency scope**: endpoint + subject + card_id (prevents cross-user collisions).
 - **RBAC payload rules (policy.yaml)**: enforce role/risk thresholds based on action payload (e.g. UpdateCardStatus.resolved requires supervisor + risk>=X).
