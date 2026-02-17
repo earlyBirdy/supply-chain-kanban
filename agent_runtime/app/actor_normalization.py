@@ -179,9 +179,11 @@ def _derive_role_from_mappings(policy: Dict[str, Any], values: List[str], claim_
                 elif isinstance(when, list):
                     for w in when:
                         if isinstance(w, str) and fnmatch.fnmatch(v, w):
-                            ok=True; break
+                            ok = True
+                            break
                         if isinstance(w, dict) and _match_any(v, w):
-                            ok=True; break
+                            ok = True
+                            break
                 if ok:
                     candidates.append(role)
                     break

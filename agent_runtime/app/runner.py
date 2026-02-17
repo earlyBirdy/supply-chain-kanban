@@ -1,4 +1,5 @@
-import time, json
+import json
+import time
 from .config import POLL_SECONDS, RISK_CREATE_THRESHOLD, ALERT_THRESHOLD
 from .ingest import run_all as ingest_all
 from .dq import run_blocking_gates

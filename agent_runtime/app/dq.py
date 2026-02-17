@@ -10,13 +10,15 @@ def run_blocking_gates():
     ok=True
     r=one("""SELECT COUNT(*) AS c FROM erp_orders WHERE qty < 0""")
     if r and r["c"]>0:
-        ok=False; _ins("erp_no_negative_qty","BLOCK",False,{"table":"erp_orders"},"Found negative qty",{"count":r["c"]})
+        ok = False
+        _ins("erp_no_negative_qty","BLOCK",False,{"table":"erp_orders"},"Found negative qty",{"count":r["c"]})
     else:
         _ins("erp_no_negative_qty","BLOCK",True,{"table":"erp_orders"},"OK")
 
     r=one("""SELECT COUNT(*) AS c FROM ops_signals WHERE metric='otif' AND (value<0 OR value>1 OR value IS NULL)""")
     if r and r["c"]>0:
-        ok=False; _ins("otif_range_0_1","BLOCK",False,{"table":"ops_signals","metric":"otif"},"Invalid OTIF",{"count":r["c"]})
+        ok = False
+        _ins("otif_range_0_1","BLOCK",False,{"table":"ops_signals","metric":"otif"},"Invalid OTIF",{"count":r["c"]})
     else:
         _ins("otif_range_0_1","BLOCK",True,{"table":"ops_signals","metric":"otif"},"OK")
 

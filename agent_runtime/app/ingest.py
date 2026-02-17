@@ -8,7 +8,8 @@ def _read_csv(path: str):
 
 def ingest_erp():
     df = _read_csv(os.path.join(INGEST_DIR, "erp", "orders.csv"))
-    if df is None or df.empty: return 0
+    if df is None or df.empty:
+        return 0
     n=0
     for _, r in df.iterrows():
         d={k:(None if pd.isna(v) else v) for k,v in r.to_dict().items()}
@@ -24,7 +25,8 @@ def ingest_erp():
 
 def ingest_wms():
     df = _read_csv(os.path.join(INGEST_DIR, "wms", "shipments.csv"))
-    if df is None or df.empty: return 0
+    if df is None or df.empty:
+        return 0
     n=0
     for _, r in df.iterrows():
         d={k:(None if pd.isna(v) else v) for k,v in r.to_dict().items()}
@@ -44,7 +46,8 @@ def ingest_wms():
 
 def ingest_mes():
     df = _read_csv(os.path.join(INGEST_DIR, "mes", "production.csv"))
-    if df is None or df.empty: return 0
+    if df is None or df.empty:
+        return 0
     n=0
     for _, r in df.iterrows():
         d={k:(None if pd.isna(v) else v) for k,v in r.to_dict().items()}

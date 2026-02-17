@@ -19,7 +19,8 @@ def persist_scenarios(case_id: str, risk_score: int):
       ("DoubleHit",0.75,1.40,1.00),
     ]
     for name,sf,pf,df in scenarios:
-        sd=demand*df; ss=supply*sf
+        sd = demand * df
+        ss = supply * sf
         gap=max(0.0, sd-ss)
         rar=gap*price
         ci=(pf-1.0)*sd*(price*0.2 if price else 1.0)

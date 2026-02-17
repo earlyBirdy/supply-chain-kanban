@@ -1,4 +1,6 @@
-import json, requests
+import json
+
+import requests
 from .config import SLACK_WEBHOOK_URL
 from .db import q
 
@@ -21,7 +23,12 @@ def write_recommendations(case_id: str, recs: list):
              VALUES(:cid,:rk,:at,CAST(:ap AS JSONB),:ss,:cs,:rs,:ds)""", cid=case_id,rk=i,at=at,ap=json.dumps(payload),ss=svc,cs=cost,rs=rsk,ds=ds)
 
 def slack_alert(case_id: str, resource_id: str, risk_score: int, top_action: str):
-    if not SLACK_WEBHOOK_URL: return "skipped(no_webhook)"
-    text=f"🚨 Emerging constraint: *{resource_id}* risk={risk_score} case={case_id}\nTop action: `{top_action}`"
-    r=requests.post(SLACK_WEBHOOK_URL, json={"text":text}, timeout=10)
-    return "ok" if r.status_code<300 else f"failed({r.status_code})"
+    if not SLACK_WEBHOOK_URL:
+        return "skipped(no_webhook)"
+    text = (
+        f"🚨 Emerging constraint: *{resource_id}* risk={risk_score} case={case_id}\n"
+        f"Top action: `{top_action}`"
+    )
+    r = requests.post(SLACK_WEBHOOK_URL, json={"text": text}, timeout=10)
+    return "ok" if r.status_code < 300 else f"failed({r.status_code})"
+

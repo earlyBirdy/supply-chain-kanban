@@ -6,7 +6,8 @@ def compute_risk(resource_signals: dict, supplier_otif: dict):
         worst=min(supplier_otif.values())
         supply = 80 if worst<0.90 else 60 if worst<0.95 else 30
     else:
-        worst=None; supply=40
+        worst = None
+        supply = 40
     risk=int(round(0.55*market+0.45*supply))
     conf=0.75 if risk>=70 else 0.6
     ltf=21 if risk>=85 else 45 if risk>=70 else 90

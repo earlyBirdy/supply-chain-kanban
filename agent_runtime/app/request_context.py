@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextvars
-from typing import Optional
 
 _REQUEST_ID: contextvars.ContextVar[str] = contextvars.ContextVar("request_id", default="-")
 

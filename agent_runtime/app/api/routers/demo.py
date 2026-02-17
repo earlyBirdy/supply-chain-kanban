@@ -1,7 +1,9 @@
 from __future__ import annotations
-import os
-from pathlib import Path
+import hashlib
+import json
+import uuid
 
+from pathlib import Path
 
 from typing import Any, Dict, List
 
@@ -22,14 +24,12 @@ from ...policy_store import policy_revision
 
 router = APIRouter()
 
-
 class DemoNovaRunRequest(BaseModel):
     card_id: str = Field(..., description="KanbanCard UUID")
     objective: str = Field("both", description="risk_mitigation | agentic_workflow | both")
     dry_run: bool = Field(True, description="Validate proposed actions without writing audit/DB")
     execute: bool = Field(False, description="If true and dry_run=false, execute first N actions")
     max_execute: int = Field(1, ge=0, le=10, description="Max actions to execute when execute=true")
-
 
 def _load_context(card_id: str) -> Dict[str, Any]:
     card = one("SELECT * FROM v_kanban_cards WHERE card_id=:id", id=card_id)
@@ -56,7 +56,6 @@ def _load_context(card_id: str) -> Dict[str, Any]:
         "case": case or {},
         "signals": {"ops": ops, "market": mkt},
     }
-
 
 @router.post("/nova/run")
 def demo_nova_run(
@@ -140,7 +139,6 @@ class DemoNovaMaterializeRequest(DemoNovaRunRequest):
     dry_run: bool = Field(True, description="Validate proposals without executing; still materializes recs + pending actions.")
     execute: bool = Field(False, description="Optionally auto-execute first N actions (writes audit) - typically false for approval flow.")
 
-
 @router.post("/nova/run_and_materialize")
 def demo_nova_run_and_materialize(
     request: Request,
@@ -162,7 +160,7 @@ def demo_nova_run_and_materialize(
     gen = nova_connector.generate(ctx, objective=req.objective)
 
     policy = load_policy()
-    import uuid, json, hashlib
+
     batch_id = str(uuid.uuid4())
     idem_key = idempotency_key or batch_id
     req_hash = hashlib.sha256(json.dumps(req.model_dump(), sort_keys=True, default=str).encode("utf-8")).hexdigest()
@@ -448,7 +446,6 @@ def demo_nova_run_and_materialize(
         "materialized": {"recommendations": recs, "pending_actions": pend},
     }
 
-
 @router.get("/summary")
 def demo_summary():
     """Quick demo snapshot for UI/debug."""
@@ -476,7 +473,6 @@ def demo_summary():
         },
     }
 
-
 def _exec_sql_script(sql_text: str) -> None:
     """Execute a (simple) SQL script with multiple statements."""
     from ...db import engine
@@ -502,7 +498,6 @@ def _exec_sql_script(sql_text: str) -> None:
         for st in statements:
             conn.exec_driver_sql(st)
 
-
 @router.post("/reset")
 def demo_reset():
     """Reset DB to demo seed. DEV_MODE only."""
@@ -516,9 +511,7 @@ def demo_reset():
     _exec_sql_script(sql_text)
     return {"ok": True, "reset": True}
 
-
 # --- Demo narrative scenarios (v26) ---
-
 
 class DemoScenarioRequest(BaseModel):
     name: str = Field(
@@ -533,7 +526,6 @@ class DemoScenarioRequest(BaseModel):
     auto_approve: bool = Field(True, description="If true, auto-approve the pending action as supervisor")
     auto_execute: bool = Field(True, description="If true, auto-execute the approved action as supervisor")
     include_blocked_attempt: bool = Field(True, description="If true, attempt the action as ui (expected to be blocked)")
-
 
 @router.get("/scenarios")
 def list_demo_scenarios():
@@ -550,7 +542,6 @@ def list_demo_scenarios():
             }
         ],
     }
-
 
 @router.post("/run_scenario")
 def run_demo_scenario(request: Request, req: DemoScenarioRequest):
@@ -597,8 +588,6 @@ def run_demo_scenario(request: Request, req: DemoScenarioRequest):
     }
 
     # Create case + card
-    import uuid
-    import json
 
     resource_id = f"DEMO-RES-{uuid.uuid4().hex[:8]}"
 
