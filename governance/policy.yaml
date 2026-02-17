@@ -1,0 +1,230 @@
+version: '1.0'
+card_status_policy:
+  allowed_transitions:
+    todo:
+    - in_progress
+    - blocked
+    in_progress:
+    - blocked
+    - resolved
+    blocked:
+    - in_progress
+    resolved: []
+  approval_gate:
+    resolve:
+      require_channel: supervisor
+      require_high_risk_case: true
+      high_risk_threshold: 70
+  sla_guardrails:
+    blocked_requires_reason: true
+    resolved_requires_timestamp: true
+action_approval_policy:
+  external_connectors_require_approval: true
+  action_types_require_approval:
+  - ExpediteShipment
+  - TriggerPurchase
+  - RebalanceAllocation
+  - OpenSupplierTicket
+  action_types_no_approval:
+  - UpdateCardStatus
+materialization_policy:
+  on_new_materialize: supersede
+  supersede_statuses:
+  - pending
+  - approved
+pending_action_policy:
+  allowed_transitions:
+    pending:
+    - approved
+    - rejected
+    - canceled
+    - executed
+    - blocked
+    approved:
+    - executed
+    - blocked
+    - canceled
+    rejected: []
+    executed: []
+    blocked: []
+    canceled: []
+  audit_on_violation: true
+idempotency:
+  enabled: true
+  header_name: Idempotency-Key
+rbac:
+  channels:
+    ui: operator
+    supervisor: supervisor
+    system: system
+  permissions:
+    approve:
+      supervisor:
+      - '*'
+      operator: []
+      system:
+      - '*'
+    execute:
+      supervisor:
+      - '*'
+      operator:
+      - UpdateCardStatus
+      system:
+      - '*'
+  constraints:
+    operator_update_cardstatus:
+      deny_new_status:
+      - resolved
+  jwt_claims:
+    role:
+    - role
+    - roles
+    email:
+    - email
+    - preferred_username
+    - upn
+    subject:
+    - sub
+    - user_id
+    - uid
+  action_payload_rules:
+  - action_type: UpdateCardStatus
+    when:
+      new_status: resolved
+    require_roles:
+    - supervisor
+    require_risk_ge: 70
+    reason: Resolving a card is a high-impact operation and requires supervisor role
+      + high-risk case threshold.
+  - action_type: UpdateCardStatus
+    when:
+      new_status:
+      - resolved
+      - blocked
+    require_roles:
+    - supervisor
+    require_risk_ge: 70
+    reason: UpdateCardStatus to resolved/blocked requires supervisor and risk>=threshold
+  - action_type: OpenSupplierTicket
+    when:
+      note:
+        contains: urgent
+      supplier_id:
+        regex: ^SUP-
+    require_roles:
+    - supervisor
+    reason: Urgent supplier tickets require supervisor
+  role_mapping:
+    role_priority:
+    - system
+    - supervisor
+    - operator
+    - ui
+    sources:
+    - claim: groups
+      map:
+        supplychain-ops: operator
+        supplychain-supervisors: supervisor
+    - claim: entitlements
+      map:
+        supplychain:supervisor: supervisor
+        supplychain:operator: operator
+    first_match_wins: true
+    deny:
+      groups:
+      - '*blocked*'
+      - '*suspended*'
+      entitlements: []
+    group_rules:
+    - role: supervisor
+      when:
+        patterns:
+        - '*supplychain-supervisor*'
+        - '*sc-supervisor*'
+        - '*ops-supervisor*'
+    - role: operator
+      when:
+        patterns:
+        - '*supplychain-operator*'
+        - '*sc-operator*'
+        - '*ops-operator*'
+    entitlement_rules: []
+idempotency_policy:
+  ttl_hours: 24
+  cleanup_interval_seconds: 3600
+  require_request_hash_match: true
+audit:
+  request:
+    allowlist_headers:
+    - x-request-id
+    - x-correlation-id
+    - x-trace-id
+    - x-forwarded-for
+    - x-real-ip
+    - user-agent
+    - x-user-id
+    - x-user-email
+    - x-user-role
+    - x-channel
+    - x-amzn-trace-id
+    - x-b3-*
+    - x-ot-span-context
+    - re:^x-amzn-.*$
+    redact_headers:
+    - x-api-key
+    - x-signature
+    - re:.*token.*
+    allowlist_query:
+    - case_id
+    - card_id
+    - pending_id
+    - materialization_id
+    - dry_run
+    - channel
+    header_value_max_len: 256
+    query_value_max_len: 256
+identity:
+  providers:
+    oidc:
+      sub:
+      - sub
+      - user_id
+      - uid
+      email:
+      - email
+      - upn
+      - preferred_username
+      groups:
+      - groups
+      - cognito:groups
+      entitlements:
+      - entitlements
+      - permissions
+      - roles
+      name:
+      - name
+      - given_name
+    saml:
+      sub:
+      - nameid
+      - NameID
+      - subject
+      email:
+      - email
+      - mail
+      - Email
+      groups:
+      - groups
+      - memberOf
+      - Group
+      entitlements:
+      - entitlements
+      - Entitlement
+      name:
+      - displayName
+      - name
+  provider_hint_claims:
+  - iss
+  - idp
+  - provider
+  default_provider: oidc

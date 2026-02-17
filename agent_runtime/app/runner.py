@@ -8,6 +8,7 @@ from .decision import score_decisions
 from .actions import upsert_case, write_recommendations, slack_alert
 from .scenarios import persist_scenarios
 from .db import q, wait_for_db
+from .audit import with_audit
 
 def tick():
     ing=ingest_all()
@@ -36,8 +37,21 @@ def tick():
         if risk >= ALERT_THRESHOLD:
             top=recs[0][0] if recs else "none"
             res=slack_alert(case_id, rid, risk, top)
-            q("""INSERT INTO agent_actions(case_id,channel,action_type,payload,result)
-                 VALUES(:cid,'slack','alert','{}'::jsonb,:res)""", cid=case_id, res=res)
+            pl = with_audit(
+                {},
+                actor={"sub": "system", "role": "system"},
+                request=None,
+                request_path="job:runner",
+                request_method="tick",
+                materialization_id="",
+            )
+            q(
+                """INSERT INTO agent_actions(case_id,channel,action_type,payload,result)
+                     VALUES(:cid,'slack','alert',CAST(:pl AS JSONB),:res)""",
+                cid=case_id,
+                pl=json.dumps(pl, default=str),
+                res=res,
+            )
 
 def main():
     wait_for_db(max_seconds=90)

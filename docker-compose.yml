@@ -2,16 +2,17 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_USER: demo
-      POSTGRES_PASSWORD: demo
-      POSTGRES_DB: demo
+      POSTGRES_USER: ${POSTGRES_USER:-demo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-demo}
+      POSTGRES_DB: ${POSTGRES_DB:-demo}
     ports:
       - "5432:5432"
     volumes:
+      - pgdata:/var/lib/postgresql/data
       - ./seed:/seed
       - ./ingest:/ingest
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U demo -d demo -h localhost"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-demo} -d ${POSTGRES_DB:-demo} -h localhost"]
       interval: 5s
       timeout: 3s
       retries: 30
@@ -21,23 +22,31 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-demo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-demo}
+      POSTGRES_DB: ${POSTGRES_DB:-demo}
     volumes:
       - ./seed:/seed
     entrypoint: ["/bin/bash", "-lc"]
     command: >
-      "psql postgresql://demo:demo@db:5432/demo -f /seed/00_schema.sql &&
-       psql postgresql://demo:demo@db:5432/demo -f /seed/01_seed_demo.sql &&
-       psql postgresql://demo:demo@db:5432/demo -f /seed/02_views.sql"
+      "psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' &&
+       psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/00_schema.sql &&
+       psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/01_seed_demo.sql &&
+       psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/02_views.sql"
 
   agent:
+    profiles: ["agent"]
     build:
       context: ./agent_runtime
+    env_file:
+      - .env
     environment:
-      AGENT_DB_URL: postgresql+psycopg2://demo:demo@db:5432/demo
-      POLL_SECONDS: "60"
-      RISK_CREATE_THRESHOLD: "70"
-      ALERT_THRESHOLD: "85"
-      INGEST_DIR: "/ingest"
+      AGENT_DB_URL: ${AGENT_DB_URL:-postgresql+psycopg2://demo:demo@db:5432/demo}
+      POLL_SECONDS: ${POLL_SECONDS:-60}
+      RISK_CREATE_THRESHOLD: ${RISK_CREATE_THRESHOLD:-70}
+      ALERT_THRESHOLD: ${ALERT_THRESHOLD:-85}
+      INGEST_DIR: /ingest
     volumes:
       - ./ingest:/ingest
     depends_on:
@@ -46,15 +55,56 @@ services:
       db_init:
         condition: service_completed_successfully
 
+  api:
+    build:
+      context: ./agent_runtime
+    env_file:
+      - .env
+    environment:
+      AGENT_DB_URL: ${AGENT_DB_URL:-postgresql+psycopg2://demo:demo@db:5432/demo}
+      ERP_CONNECTOR: mock
+      API_PORT: "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      db_init:
+        condition: service_completed_successfully
+    command: ["bash", "-lc", "uvicorn app.api_main:app --host 0.0.0.0 --port 8000"]
+
+  cleanup:
+    profiles: ["agent"]
+    build:
+      context: ./agent_runtime
+    env_file:
+      - .env
+    environment:
+      AGENT_DB_URL: ${AGENT_DB_URL:-postgresql+psycopg2://demo:demo@db:5432/demo}
+      APP_ENV: ${APP_ENV:-dev}
+    depends_on:
+      db:
+        condition: service_healthy
+      db_init:
+        condition: service_completed_successfully
+    command: ["bash", "-lc", "python -m app.jobs.cleanup_loop"]
+
   superset:
+    profiles: ["ui"]
     build:
       context: ./superset
     image: supply-chain-kanban-superset-ui:local
+    env_file:
+      - .env
     environment:
-      SUPERSET_SECRET_KEY: "dev-secret-key-change-later"
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-dev-secret-key-change-later}
       SUPERSET_LOAD_EXAMPLES: "no"
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
     ports:
       - "8088:8088"
+    volumes:
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py
+      - ./superset/executive_dashboard.json:/app/executive_dashboard.json
     depends_on:
       db:
         condition: service_healthy
@@ -67,16 +117,22 @@ services:
       retries: 30
 
   superset_bootstrap:
+    profiles: ["ui"]
     image: supply-chain-kanban-superset-ui:local
+    env_file:
+      - .env
     environment:
-      SUPERSET_ADMIN_USER: "admin"
-      SUPERSET_ADMIN_PASS: "admin"
-      SUPERSET_ADMIN_EMAIL: "admin@example.com"
-      DEMO_DB_URI: "postgresql+psycopg2://demo:demo@db:5432/demo"
-      DEMO_DB_NAME: "demo"
+      SUPERSET_ADMIN_USER: ${SUPERSET_ADMIN_USER:-admin}
+      SUPERSET_ADMIN_PASS: ${SUPERSET_ADMIN_PASS:-admin}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
+      DEMO_DB_URI: ${DEMO_DB_URI:-postgresql+psycopg2://demo:demo@db:5432/demo}
+      DEMO_DB_NAME: ${DEMO_DB_NAME:-demo}
     depends_on:
       superset:
         condition: service_healthy
     command: ["bash", "-lc", "superset db upgrade && superset init && python /app/bootstrap_superset.py"]
     volumes:
       - ./superset/bootstrap_superset.py:/app/bootstrap_superset.py
+
+volumes:
+  pgdata:

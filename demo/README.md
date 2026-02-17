@@ -1,68 +1,56 @@
-# Supply Chain Kanban – Demo Guide
+# Supply Chain Kanban – Demo Guide (Local)
 
-This demo runs fully locally and shows how AI agents:
-- detect emerging constraints,
-- negotiate trade-offs,
-- recommend governed decisions,
-- and surface results on dashboards.
+This repo is designed to be **one-command demoable**:
+- Postgres seeded with schema + demo data
+- FastAPI Object Graph API (`/docs`)
+- Agent loop that creates/updates cases + recommendations
+- Optional Superset UI bootstrap (dashboards)
 
 ## Prerequisites
 - Docker + Docker Compose
-- Python 3.10+
+- (Optional) Python 3.11+ if you want to run the standalone agent scripts in `/agents`
 
-## Step 1: Start the demo stack
+## 1) Start the demo (API + agent)
+From repo root:
+
 ```bash
-docker compose up -d
+cp .env.example .env
+make demo
 ```
 
-Services started:
-- PostgreSQL (demo data)
-- Apache Superset (dashboards)
+Open:
+- API docs: http://localhost:8000/docs
 
-Superset UI:
-http://localhost:8088
+## 2) Start the demo with Superset UI (optional)
 
-## Step 2: Initialize Superset (one-time)
 ```bash
-docker exec -it supply-chain-kanban-superset-1 superset fab create-admin \
-  --username admin \
-  --firstname Admin \
-  --lastname User \
-  --email admin@example.com \
-  --password admin
-
-docker exec -it supply-chain-kanban-superset-1 superset db upgrade
-docker exec -it supply-chain-kanban-superset-1 superset init
+cp .env.example .env
+make demo-ui
 ```
 
-Login:
-- user: admin
-- password: admin
+Open:
+- Superset UI: http://localhost:8088
 
-## Step 3: Run agent detection demo
-```bash
-python agents/run_agents.py
-```
+Credentials come from `.env`:
+- `SUPERSET_ADMIN_USER`
+- `SUPERSET_ADMIN_PASS`
 
-This simulates agents detecting emerging supply constraints from market price signals (e.g. memory, freight).
+> Superset bootstrap runs automatically via the `superset_bootstrap` container.
+> If the UI looks empty at first, give it a minute, then refresh.
 
-## Step 4: Run agent negotiation demo
-```bash
-python agents/negotiate.py
-```
-
-This simulates demand, supply, and logistics agents negotiating trade-offs using a bounded game-theory approach.
-
-## What to explain during a live demo
-1. Market signals move before ERP data
-2. Agents detect patterns, not products
-3. Decisions are scenario-based and explainable
-4. Humans remain in control (no unsafe automation)
+## 3) What to show in a live demo
+1. **Ontology**: show `/ontology` (or `/ontology/yaml`) and how objects relate
+2. **Cases**: show `/cases` and how cases are created/updated by the agent loop
+3. **Kinetic actions**: run `POST /actions/execute?dry_run=1` to show guardrails
+4. **Governance**: show `GET /governance/policy` and policy hot-reload
+5. **Audit**: show action log tables (or API endpoints, if added in later patches)
 
 ## Common issues
-- Superset shows no charts → datasets not imported yet
-- Connection error → ensure DB hostname is `db`, not `localhost`
-- Health is `starting` → wait ~60 seconds
+- API not ready yet → check `docker compose logs -f api`
+- DB still initializing → check `docker compose logs -f db_init`
+- Superset bootstrap still running → check `docker compose --profile ui logs -f superset_bootstrap`
 
-## Demo scope reminder
-This demo is for behavior and decision logic, not scale or performance.
+## Handy commands
+- Tail logs: `make logs`
+- PSQL: `make psql`
+- Reset DB: `make reset` (removes docker volumes)

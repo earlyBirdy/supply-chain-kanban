@@ -1,33 +1,90 @@
-# Supply Chain Kanban – AI Agent Demo Platform
+# Supply Chain Kanban – Foundry-style Ontology + AI Agents (Demo)
 
-This repository demonstrates how AI agents assist supply chain management by detecting emerging constraints, simulating trade-offs, and supporting governed decisions across demand, supply, logistics, and crisis scenarios.
+Most supply-chain systems see the world as **tables** (ERP rows, WMS rows, MES rows).
+Leaders see the world as **objects**: orders, shipments, plants, suppliers, constrained resources.
+
+This repo is a minimal, runnable demonstration of a **Foundry-like pattern** applied to supply chain:
+
+- **Ontology (Semantic layer):** map fragmented facts into real-world objects + relationships
+- **Kinetic (Execution layer):** turn dashboards into *actions* (typed write-backs) with audit trails
+- **Dynamic (Evolution layer):** evolve the model as new risks/rules appear, without rewriting the whole stack
+
+In short: this is **not** just dashboards. It is an *operational supply-chain object graph*.
 
 ## What this demo shows
-- Early detection of supply risk using market signals (prices, indices)
-- Multi-agent coordination (demand, supply, logistics)
-- Scenario-based decision scoring (service, cost, risk)
-- Human-in-the-loop governance with guardrails
-- Board-ready and regulator-safe visibility
+- Early detection of constraints using market + ops signals
+- Multi-agent case creation, scenario simulation, and ranked recommendations
+- Ontology-driven object model (orders / shipments / production / cases)
+- A minimal Object Graph API (FastAPI)
+- Kinetic actions (execute typed actions, mock ERP connector, auditable action log)
 
 ## What this is NOT
-- Not a production deployment
-- Not connected to real ERP, suppliers, or contracts
-- Not fully autonomous execution
+- Not a production deployment (no HA, no enterprise auth, no full RBAC model)
+- Not connected to real ERP/SAP/Oracle by default (uses a mock connector)
+- Not fully autonomous execution (human-in-the-loop is the default posture)
 
-## Repo structure (simplified)
-- `/demo` – runnable local demo (Docker + Python)
-- `/agents` – agent logic & coordination
-- `/signals` – market signal adapters
-- `/dashboards` – board & crisis views
-- `/governance` – audit & control artifacts
-- `/docs` – architecture, agents, datasets, governance
+## Ontology
+See:
+- `contracts/supply_chain_ontology.yaml`
+- `contracts/supply_chain_ontology.json`
+
+These define:
+- **Object types** (Order, Shipment, ProductionRecord, Case, Recommendation, Action, ...)
+- **Relationships** (Shipment fulfills Order, Case targets Resource, ...)
+- **Action types** (TriggerPurchase, ExpediteShipment, RebalanceAllocation, ...)
+
+## Object Graph API (FastAPI)
+The demo includes a minimal API surface:
+
+- `GET /health`
+- `GET /ontology` (`/json` / `/yaml`)
+- `GET /objects/...` (order, shipment, production, resource)
+- `GET /cases/...` (cases, recommendations, scenarios, actions)
+- `GET /graph/neighbors?...` (lightweight graph expansion)
+- `POST /actions/execute` (typed action execution + audit)
+
+When you run Docker Compose, the API is exposed on port `8000`.
 
 ## Quick start
 ```bash
-cd demo
-docker compose up -d
+cp .env.example .env
+# API + agent (no UI)
+make demo
+
+# Minimal (DB + API only)
+make demo-min
+
+# Optional: include Superset UI
+make demo-ui
+
+# Full demo (UI + agent) + smoke + checklist
+make demo-all
 ```
-Then follow `/demo/README.md`.
+
+- API docs: http://localhost:8000/docs
+- Superset UI: http://localhost:8088 (admin credentials in .env)
+
+Health endpoints:
+- /healthz (liveness, no DB)
+- /health (DB connectivity)
+- /readyz (DB + critical tables / views / extensions)
+
+Error responses are standardized:
+- JSON shape: {"error": {"code", "message", "details"}, "request_id"}
+- Response header: X-Request-Id (echoed or auto-generated)
+
+See `demo/README.md` for a live-demo walkthrough.
+
+
+## Repo structure (simplified)
+- `/demo` – runnable local demo (Docker + Python)
+- `/agent_runtime` – DB schema, ingest, agents, Object Graph API, kinetic execution scaffold
+- `/ingest` – ERP/MES/WMS CSV drop zones (demo)
+- `/seed` – schema + seed data + demo views
+- `/signals` – market signal adapters
+- `/dashboards` – board & crisis views
+- `/governance` – audit & control artifacts
+- `/contracts` – ontology + triggers (schema contracts)
 
 ## Audience
 - Supply chain leaders
@@ -94,3 +151,38 @@ Failures are persisted to `dq_results` and cases are paused for the affected sco
 
 ## Scenario outputs
 For every case, the agent generates Base / SupplyShock / PriceShock / DoubleHit scenarios and persists them to `agent_scenarios`.
+
+
+### Governance policy (hot reload)
+
+Card state machine + approval gates live in `governance/policy.yaml` and are loaded at runtime (mtime-based hot reload).
+
+### Dry-run validation
+
+Use `POST /actions/execute?dry_run=1` to validate guardrails without writing audit rows or mutating the DB.
+
+### Governance API (dev)
+
+- `GET /governance/policy` – returns effective governance policy.
+- `POST /governance/policy` – updates policy (dev only; set `APP_ENV=dev` or `DEV_MODE=1`).
+
+
+## Hackathon Mode (Amazon Nova)
+
+- `POST /demo/nova/run` produces a recommendation + proposed actions for a KanbanCard.
+- Works offline (mock). Set `HACKATHON_MODE=amazon_nova` + `NOVA_MODEL_ID` to enable Bedrock.
+- Use `dry_run=true` to validate proposals against governance without writing.
+
+
+### UI approval flow endpoints
+- POST `/demo/nova/run_and_materialize`
+- GET `/cases/{case_id}/recommendations`
+- GET `/cases/{case_id}/pending_actions`
+- GET `/pending_actions?status=pending`
+- PATCH `/pending_actions/{pending_id}/decision`
+- POST `/pending_actions/{pending_id}/execute?dry_run=1`
+
+
+### v13 Enterprise hardening
+- **Idempotency scope**: endpoint + subject + card_id (prevents cross-user collisions).
+- **RBAC payload rules (policy.yaml)**: enforce role/risk thresholds based on action payload (e.g. UpdateCardStatus.resolved requires supervisor + risk>=X).

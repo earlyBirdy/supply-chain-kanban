@@ -1,49 +1,79 @@
+SHELL := /bin/bash
+
+.PHONY: help demo demo-min demo-ui demo-all seed down reset logs psql status clean test
+
+help:
+	@echo "Targets:"
+	@echo "  make demo       - start API+agent demo (no UI)"
+	@echo "  make demo-min   - start minimal demo (DB+API only)"
+	@echo "  make demo-ui    - start demo + Superset UI (profile ui)"
+	@echo "  make demo-all   - start full demo + run smoke + print checklist"
+	@echo "  make seed       - re-seed demo DB without restarting"
+	@echo "  make logs       - tail agent/api logs"
+	@echo "  make psql       - open psql in db container"
+	@echo "  make status     - show service status + smoke checks"
+	@echo "  make down       - stop services (keep volumes)"
+	@echo "  make reset      - stop + remove volumes (fresh DB)"
+	@echo "  make clean      - remove pycache/pyc/bak/test caches"
+	@echo "  make test       - run unit tests (local python)"
+
+clean:
+	@./scripts/clean.sh
+
 demo:
+	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
+	docker compose down -v || true
+	docker compose --profile agent up -d --build
+	@./scripts/demo_smoke.sh agent
+	@echo "API docs: http://localhost:8000/docs"
+	@echo "Tail logs: make logs"
+
+demo-min:
+	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
 	docker compose down -v || true
 	docker compose up -d --build
-	sleep 2
-	docker compose exec -T db psql -U demo -d demo -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
-	docker compose exec -T db psql -U demo -d demo -f /seed/00_schema.sql
-	docker compose exec -T db psql -U demo -d demo -f /seed/01_seed_demo.sql
-	docker compose exec -T db psql -U demo -d demo -f /seed/02_views.sql
-	@echo "Demo running. Tail agent logs: make logs"
-	@echo "Open psql: make psql"
-
-logs:
-	docker compose logs -f agent
-
-psql:
-	docker compose exec -T db psql -U demo -d demo
-
+	@./scripts/demo_smoke.sh
+	@echo "API docs: http://localhost:8000/docs"
 
 demo-ui:
+	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
 	docker compose down -v || true
-	docker compose up -d --build
-	sleep 2
-	docker compose exec -T db psql -U demo -d demo -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
-	docker compose exec -T db psql -U demo -d demo -f /seed/00_schema.sql
-	docker compose exec -T db psql -U demo -d demo -f /seed/01_seed_demo.sql
-	docker compose exec -T db psql -U demo -d demo -f /seed/02_views.sql
-	docker compose exec -T superset superset db upgrade || true
-	docker compose exec -T superset superset init || true
-	@echo "UI demo: Superset at http://localhost:8088 (login admin/admin)"
-	@echo "Agent logs: make logs"
+	docker compose --profile ui --profile agent up -d --build
+	@./scripts/demo_smoke.sh ui
+	@echo "API docs: http://localhost:8000/docs"
+	@echo "Superset: http://localhost:8088 (login SUPERSET_ADMIN_USER/SUPERSET_ADMIN_PASS from .env)"
 
+demo-all:
+	@$(MAKE) demo-ui
+	@./scripts/demo_checklist.sh
+
+seed:
+	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; \
+	docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seed/01_seed_demo.sql
+	@echo "Re-seeded demo data."
+
+logs:
+	docker compose --profile agent logs -f agent api
+
+psql:
+	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; \
+	docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
+
+down:
+	docker compose down || true
+
+reset:
+	docker compose down -v || true
+	@echo "Removed volumes. Next: make demo, make demo-ui, or make demo-all"
 
 status:
 	@echo "== docker compose ps =="
 	docker compose ps
 	@echo ""
-	@echo "== superset health =="
-	@docker compose exec -T superset curl -sf http://localhost:8088/health && echo "OK" || (echo "Superset health check FAILED"; exit 1)
+	@./scripts/demo_smoke.sh
 	@echo ""
-	@echo "== db ping =="
-	@docker compose exec -T db psql -U demo -d demo -c "select 1;" >/dev/null && echo "DB OK" || (echo "DB check FAILED"; exit 1)
-	@echo ""
-	@echo "== agent logs (last 20 lines) =="
-	@docker compose logs --tail=20 agent
+	@echo "(To include Superset UI checks: ./scripts/demo_smoke.sh ui)"
+	@./scripts/demo_checklist.sh
 
-
-reset-ui:
-	docker compose down -v || true
-	@echo "Removed volumes. Next: make demo-ui"
+test:
+	@PYTHONPATH=agent_runtime pytest -q

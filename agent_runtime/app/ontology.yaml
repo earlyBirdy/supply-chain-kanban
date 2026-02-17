@@ -1,0 +1,514 @@
+version: 0.1
+name: SupplyChainOntology
+description: A minimal, Palantir-Foundry-style ontology for the Supply Chain Kanban
+  demo. It maps canonical facts (ERP/MES/WMS + market/ops signals) into real-world
+  objects, relationships, and executable actions (Kinetic layer) while remaining easy
+  to evolve (Dynamic layer).
+object_types:
+  Resource:
+    description: A constrained resource/material (e.g., memory, freight lane, resin).
+    key: resource_id
+    properties:
+      resource_id:
+        type: string
+      display_name:
+        type: string
+        optional: true
+      category:
+        type: string
+        optional: true
+      criticality:
+        type: string
+        optional: true
+        enum:
+        - low
+        - medium
+        - high
+  SKU:
+    description: Sellable/plan-able item identifier.
+    key: sku
+    properties:
+      sku:
+        type: string
+      family:
+        type: string
+        optional: true
+      description:
+        type: string
+        optional: true
+  Supplier:
+    description: Supplier or upstream partner.
+    key: supplier_id
+    properties:
+      supplier_id:
+        type: string
+      name:
+        type: string
+        optional: true
+      country:
+        type: string
+        optional: true
+      risk_tier:
+        type: string
+        optional: true
+        enum:
+        - tier1
+        - tier2
+        - tier3
+  Plant:
+    description: Manufacturing site.
+    key: plant_id
+    properties:
+      plant_id:
+        type: string
+      name:
+        type: string
+        optional: true
+      location:
+        type: string
+        optional: true
+  Location:
+    description: Demand / fulfillment location.
+    key: location
+    properties:
+      location:
+        type: string
+      region:
+        type: string
+        optional: true
+  Order:
+    description: ERP demand/commit order.
+    key: order_id
+    canonical_table: erp_orders
+    properties:
+      order_id:
+        type: string
+      sku:
+        type: string
+      location:
+        type: string
+      qty:
+        type: number
+      need_date:
+        type: date
+        optional: true
+      net_price:
+        type: number
+        optional: true
+      ts:
+        type: datetime
+        optional: true
+  Shipment:
+    description: WMS shipment record.
+    key: shipment_id
+    canonical_table: wms_shipments
+    properties:
+      shipment_id:
+        type: string
+      order_id:
+        type: string
+        optional: true
+      supplier_id:
+        type: string
+        optional: true
+      delivered_qty:
+        type: number
+      ordered_qty:
+        type: number
+      delivered_on_time:
+        type: boolean
+      lead_time_days:
+        type: number
+        optional: true
+      period:
+        type: string
+        optional: true
+      ts:
+        type: datetime
+        optional: true
+  ProductionRecord:
+    description: MES production output record.
+    key: record_id
+    canonical_table: mes_production
+    properties:
+      record_id:
+        type: string
+      plant_id:
+        type: string
+      sku:
+        type: string
+      input_qty:
+        type: number
+      good_qty:
+        type: number
+      scrap_qty:
+        type: number
+      period:
+        type: string
+        optional: true
+      ts:
+        type: datetime
+        optional: true
+  MarketSignal:
+    description: Exogenous market signal (price, index, lead-time index).
+    key: (resource_id, ts, signal_type)
+    canonical_table: market_signals
+    properties:
+      ts:
+        type: datetime
+      resource_id:
+        type: string
+      signal_type:
+        type: string
+      value:
+        type: number
+      period:
+        type: string
+        optional: true
+  OpsSignal:
+    description: Operational signal (OTIF, backlog, utilization, yield).
+    key: (scope_type, scope_id, ts, metric)
+    canonical_table: ops_signals
+    properties:
+      ts:
+        type: datetime
+      scope_type:
+        type: string
+      scope_id:
+        type: string
+      metric:
+        type: string
+      value:
+        type: number
+      period:
+        type: string
+        optional: true
+  Case:
+    description: AI agent case representing an emerging constraint.
+    key: case_id
+    canonical_table: agent_cases
+    properties:
+      case_id:
+        type: uuid
+      status:
+        type: string
+        enum:
+        - AT_RISK
+        - MITIGATION
+        - RESOLVED
+        - PAUSED
+      owner:
+        type: string
+        optional: true
+      resource_id:
+        type: string
+      scope:
+        type: object
+        optional: true
+      risk_score:
+        type: integer
+      confidence:
+        type: number
+      lead_time_to_failure_days:
+        type: integer
+        optional: true
+      root_signals:
+        type: object
+        optional: true
+      last_observed_period:
+        type: string
+        optional: true
+      created_at:
+        type: datetime
+      updated_at:
+        type: datetime
+  KanbanCard:
+    description: Operational kanban card as a first-class object (Kinetic surface).
+    key: card_id
+    canonical_table: kanban_cards
+    properties:
+      card_id:
+        type: uuid
+      case_id:
+        type: uuid
+        optional: true
+      resource_id:
+        type: string
+      scope:
+        type: object
+      title:
+        type: string
+      description:
+        type: string
+        optional: true
+      status:
+        type: string
+        enum:
+        - todo
+        - in_progress
+        - blocked
+        - resolved
+      priority:
+        type: integer
+        optional: true
+      assignee:
+        type: string
+        optional: true
+      tags:
+        type: array
+        items:
+          type: string
+        optional: true
+      sla_hours:
+        type: integer
+        optional: true
+      sla_due_at:
+        type: datetime
+        optional: true
+      breached:
+        type: boolean
+        optional: true
+      blocked_reason:
+        type: string
+        optional: true
+      last_activity_at:
+        type: datetime
+        optional: true
+      resolved_at:
+        type: datetime
+        optional: true
+      created_at:
+        type: datetime
+      updated_at:
+        type: datetime
+  Recommendation:
+    description: Ranked recommendation for a case.
+    key: rec_id
+    canonical_table: agent_recommendations
+    properties:
+      rec_id:
+        type: uuid
+      case_id:
+        type: uuid
+      rank:
+        type: integer
+      action_type:
+        type: string
+      action_payload:
+        type: object
+      service_score:
+        type: integer
+      cost_score:
+        type: integer
+      risk_score:
+        type: integer
+      decision_score:
+        type: integer
+      created_at:
+        type: datetime
+  Action:
+    description: Executed (or attempted) action triggered by a human/agent.
+    key: action_id
+    canonical_table: agent_actions
+    properties:
+      action_id:
+        type: uuid
+      case_id:
+        type: uuid
+      channel:
+        type: string
+        enum:
+        - ui
+        - api
+        - slack
+        - agent
+      action_type:
+        type: string
+      payload:
+        type: object
+      result:
+        type: string
+        optional: true
+      created_at:
+        type: datetime
+relationships:
+- name: Case_targets_Resource
+  from: Case
+  to: Resource
+  predicate: targets
+  join:
+    from_key: resource_id
+    to_key: resource_id
+- name: Recommendation_for_Case
+  from: Recommendation
+  to: Case
+  predicate: recommends_for
+  join:
+    from_key: case_id
+    to_key: case_id
+- name: Action_for_Case
+  from: Action
+  to: Case
+  predicate: executed_for
+  join:
+    from_key: case_id
+    to_key: case_id
+- name: KanbanCard_represents_Case
+  from: KanbanCard
+  to: Case
+  predicate: represents
+  join:
+    from_key: case_id
+    to_key: case_id
+- name: KanbanCard_about_Resource
+  from: KanbanCard
+  to: Resource
+  predicate: about
+  join:
+    from_key: resource_id
+    to_key: resource_id
+- name: Shipment_fulfills_Order
+  from: Shipment
+  to: Order
+  predicate: fulfills
+  join:
+    from_key: order_id
+    to_key: order_id
+- name: Order_demands_SKU
+  from: Order
+  to: SKU
+  predicate: demands
+  join:
+    from_key: sku
+    to_key: sku
+- name: Order_at_Location
+  from: Order
+  to: Location
+  predicate: ships_to
+  join:
+    from_key: location
+    to_key: location
+- name: Shipment_from_Supplier
+  from: Shipment
+  to: Supplier
+  predicate: sourced_from
+  join:
+    from_key: supplier_id
+    to_key: supplier_id
+- name: Production_at_Plant
+  from: ProductionRecord
+  to: Plant
+  predicate: produced_at
+  join:
+    from_key: plant_id
+    to_key: plant_id
+- name: Production_of_SKU
+  from: ProductionRecord
+  to: SKU
+  predicate: produces
+  join:
+    from_key: sku
+    to_key: sku
+- name: MarketSignal_for_Resource
+  from: MarketSignal
+  to: Resource
+  predicate: signals
+  join:
+    from_key: resource_id
+    to_key: resource_id
+action_types:
+  ExpediteShipment:
+    description: Request expedited shipping for a shipment / lane.
+    payload_schema:
+      shipment_id:
+        type: string
+      expedite_level:
+        type: string
+        enum:
+        - standard
+        - premium
+        - air
+      reason:
+        type: string
+        optional: true
+  RebalanceAllocation:
+    description: Reallocate inventory / supply from one location to another.
+    payload_schema:
+      sku:
+        type: string
+      from_location:
+        type: string
+      to_location:
+        type: string
+      qty:
+        type: number
+      reason:
+        type: string
+        optional: true
+  TriggerPurchase:
+    description: Create or update a purchase request/order in ERP.
+    payload_schema:
+      sku:
+        type: string
+      supplier_id:
+        type: string
+        optional: true
+      qty:
+        type: number
+      need_date:
+        type: date
+        optional: true
+      max_price:
+        type: number
+        optional: true
+      reason:
+        type: string
+        optional: true
+  OpenSupplierTicket:
+    description: Open a supplier portal ticket / escalation.
+    payload_schema:
+      supplier_id:
+        type: string
+      subject:
+        type: string
+      message:
+        type: string
+      severity:
+        type: string
+        enum:
+        - low
+        - medium
+        - high
+  UpdateCardStatus:
+    description: Update a KanbanCard status with SLA policy guardrails.
+    payload_schema:
+      card_id:
+        type: string
+        description: KanbanCard UUID
+      new_status:
+        type: string
+        enum:
+        - todo
+        - in_progress
+        - blocked
+        - resolved
+      blocked_reason:
+        type: string
+        optional: true
+        description: Required when new_status='blocked'.
+      resolved_at:
+        type: datetime
+        optional: true
+        description: Required when new_status='resolved' (ISO 8601).
+      note:
+        type: string
+        optional: true
+governance:
+  guardrails:
+  - name: RequireHumanApprovalAboveThreshold
+    description: For risk_score >= 85, require explicit human approval before executing
+      ERP write-back.
+    params:
+      threshold: 85
+  - name: BlockNegativeQty
+    description: Disallow actions that attempt to move or buy negative quantity.

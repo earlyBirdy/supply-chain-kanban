@@ -1,6 +1,6 @@
-import os, json
+import json
+import os
 from superset.app import create_app
-from superset import security_manager
 from superset.extensions import db
 from superset.models.core import Database, Dashboard, Slice
 from superset.connectors.sqla.models import SqlaTable

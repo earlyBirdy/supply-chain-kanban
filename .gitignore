@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+
+# virtualenvs
+.venv/
+venv/
+
+# local env / secrets
+.env
+
+# editor / OS junk
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+
+# backup artifacts
+*.bak
+*.bak*
+*.tmp
+
+# python tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
