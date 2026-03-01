@@ -7,7 +7,8 @@ help:
 	@echo "  make demo       - start API+agent demo (no UI)"
 	@echo "  make demo-min   - start minimal demo (DB+API only)"
 	@echo "  make demo-ui    - start demo + Superset UI (profile ui)"
-	@echo "  make demo-all   - start full demo + run smoke + print checklist"
+	@echo "  make demo-all   - start full demo + run smoke + print checklist
+	@echo "  make demo-live  - start Gemini Live demo (api + orchestrator + web + optional news_monitor)""
 	@echo "  make seed       - re-seed demo DB without restarting"
 	@echo "  make logs       - tail agent/api logs"
 	@echo "  make psql       - open psql in db container"
@@ -42,6 +43,16 @@ demo-ui:
 	@./scripts/demo_smoke.sh ui
 	@echo "API docs: http://localhost:8000/docs"
 	@echo "Superset: http://localhost:8088 (login SUPERSET_ADMIN_USER/SUPERSET_ADMIN_PASS from .env)"
+
+demo-live:
+	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
+	docker compose down -v || true
+	docker compose --profile live up -d --build
+	@./scripts/demo_smoke.sh
+	@echo "API docs: http://localhost:8000/docs"
+	@echo "Live orchestrator: http://localhost:8081/healthz"
+	@echo "Web demo: http://localhost:8080"
+	@echo "Trigger scenario (optional): curl -X POST http://localhost:8000/demo/run_scenario -H 'Content-Type: application/json' -d '{"name":"memory_leakage_news_burst","risk_score":86}'"
 
 demo-all:
 	@$(MAKE) demo-ui
