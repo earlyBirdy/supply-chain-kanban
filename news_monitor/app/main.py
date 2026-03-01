@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import os
-import sys
 import time
-from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import requests
 from dotenv import load_dotenv

@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 import json
-import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from ...config import DEV_MODE
 from ...db import all, one, q
-from ...auth import get_actor, get_channel
-from ...audit import with_audit
 
 router = APIRouter()
 
@@ -84,8 +81,6 @@ def ingest_news(request: Request, req: NewsIngestRequest):
 
     Dedupe policy: url is UNIQUE.
     """
-    channel = get_channel(request, default="system")
-    actor = get_actor(request, channel=channel)
 
     inserted = 0
     skipped = 0
@@ -118,9 +113,6 @@ def check_now(request: Request, topic: str = "memory"):
     """DEV_MODE helper: insert a small deterministic sample burst."""
     if not DEV_MODE:
         raise HTTPException(status_code=403, detail="news/check-now is disabled (DEV_MODE=0)")
-
-    channel = get_channel(request, default="ui")
-    actor = get_actor(request, channel=channel)
 
     now = datetime.now(timezone.utc)
 
