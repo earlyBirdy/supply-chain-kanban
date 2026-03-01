@@ -129,6 +129,18 @@ CREATE TABLE IF NOT EXISTS agent_scenarios (
 
 
 -- Materialization batches (idempotent UI-safe)
+-- Materializations (required by pending_actions.materialization_id)
+CREATE TABLE IF NOT EXISTS materializations (
+  materialization_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
+  endpoint TEXT NOT NULL DEFAULT '',
+  subject TEXT NOT NULL DEFAULT '',
+  idempotency_key TEXT NOT NULL DEFAULT '',
+  request_hash TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_materializations_idem ON materializations(endpoint, subject, idempotency_key);
+
 CREATE TABLE IF NOT EXISTS pending_actions (
   pending_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
   case_id UUID NOT NULL REFERENCES agent_cases(case_id) ON DELETE CASCADE,

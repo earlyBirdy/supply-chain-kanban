@@ -38,23 +38,14 @@ INSERT INTO wms_shipments(shipment_id, order_id, supplier_id, delivered_qty, ord
 ('SH-9001', 'SO-1001', 'SUP_A', 100, 100, TRUE,  14, '2025-W03'),
 ('SH-9002', 'SO-1002', 'SUP_A', 60,  80,  FALSE, 21, '2025-W03');
 
-INSERT INTO mes_production,
-  kanban_cards,
-  agent_cases,
-  agent_scenarios,
-  agent_recommendations,
-  agent_actions,
-  idempotency_keys,
-  agent_predictions,
-  dq_results(record_id, plant_id, sku, input_qty, good_qty, scrap_qty, period) VALUES
+INSERT INTO mes_production(record_id, plant_id, sku, input_qty, good_qty, scrap_qty, period) VALUES
 ('PR-1', 'PLANT_1', 'AI-SERVER-01', 120, 112, 8, '2025-W03'),
 ('PR-2', 'PLANT_1', 'PC-STD-01',    600, 585, 15,'2025-W03');
-
 
 -- Demo case (AI agent output) + mapped Kanban card
 INSERT INTO agent_cases(case_id, status, owner, resource_id, scope, risk_score, confidence, lead_time_to_failure_days, root_signals, last_observed_period)
 VALUES (
-  gen_random_uuid(),
+  (md5(random()::text || clock_timestamp()::text)::uuid),
   'AT_RISK',
   'planner@demo',
   'dram_ddr5',
