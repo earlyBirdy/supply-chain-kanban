@@ -38,6 +38,7 @@ from .api.routers import (
     objects,
     ontology,
     pending_actions,
+    news,
 )
 
 
@@ -158,6 +159,12 @@ def create_app() -> FastAPI:
     app.include_router(audit_view.router, prefix="/audit", tags=["audit"])
     app.include_router(governance.router, prefix="/governance", tags=["governance"])
     app.include_router(maintenance.router, prefix="/maintenance", tags=["maintenance"])
+    app.include_router(news.router, prefix="/news", tags=["news"])
     app.include_router(demo.router, prefix="/demo", tags=["demo"])
 
     return app
+
+
+# Uvicorn default entrypoint (docker-compose uses app.api_main:app)
+# Keeping this module-level symbol avoids needing --factory in dev/demo.
+app = create_app()

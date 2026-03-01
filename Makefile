@@ -7,8 +7,8 @@ help:
 	@echo "  make demo       - start API+agent demo (no UI)"
 	@echo "  make demo-min   - start minimal demo (DB+API only)"
 	@echo "  make demo-ui    - start demo + Superset UI (profile ui)"
-	@echo "  make demo-all   - start full demo + run smoke + print checklist
-	@echo "  make demo-live  - start Gemini Live demo (api + orchestrator + web + optional news_monitor)""
+	@echo "  make demo-all   - start full demo + run smoke + print checklist"
+	@echo "  make demo-live  - start Gemini Live demo (api + orchestrator + web + optional news_monitor)"
 	@echo "  make seed       - re-seed demo DB without restarting"
 	@echo "  make logs       - tail agent/api logs"
 	@echo "  make psql       - open psql in db container"
@@ -19,13 +19,13 @@ help:
 	@echo "  make test       - run unit tests (local python)"
 
 clean:
-	@./scripts/clean.sh
+	@bash ./scripts/clean.sh
 
 demo:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
 	docker compose down -v || true
 	docker compose --profile agent up -d --build
-	@./scripts/demo_smoke.sh agent
+	@bash ./scripts/demo_smoke.sh agent
 	@echo "API docs: http://localhost:8000/docs"
 	@echo "Tail logs: make logs"
 
@@ -48,7 +48,7 @@ demo-live:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
 	docker compose down -v || true
 	docker compose --profile live up -d --build
-	@./scripts/demo_smoke.sh
+	@bash ./scripts/demo_smoke.sh live
 	@echo "API docs: http://localhost:8000/docs"
 	@echo "Live orchestrator: http://localhost:8081/healthz"
 	@echo "Web demo: http://localhost:8080"
@@ -56,7 +56,7 @@ demo-live:
 
 demo-all:
 	@$(MAKE) demo-ui
-	@./scripts/demo_checklist.sh
+	@bash ./scripts/demo_checklist.sh
 
 seed:
 	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; \

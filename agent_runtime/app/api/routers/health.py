@@ -41,7 +41,7 @@ def readyz():
     critical_views: list[str] = []
 
     # Extensions required by the schema.
-    critical_extensions = ["pgcrypto"]
+    critical_extensions = []
 
     missing_tables: list[str] = []
     missing_views: list[str] = []

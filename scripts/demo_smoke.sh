@@ -20,6 +20,8 @@ if [[ "$MODE" == "ui" ]]; then
   COMPOSE=(docker compose --profile ui --profile agent)
 elif [[ "$MODE" == "agent" ]]; then
   COMPOSE=(docker compose --profile agent)
+elif [[ "$MODE" == "live" ]]; then
+  COMPOSE=(docker compose --profile live)
 fi
 
 echo "== Smoke: docker compose ps =="
@@ -34,10 +36,33 @@ echo "== Smoke: API /health =="
 "${COMPOSE[@]}" exec -T api python - <<'PY'
 import urllib.request
 import json
+import time
+import urllib.error
+
+BASE = 'http://localhost:8000'
+
+def wait_ready(path: str = '/healthz', timeout_s: int = 45):
+    """Wait until the API is accepting connections.
+
+    This avoids flakiness when containers have just started.
+    """
+    deadline = time.time() + timeout_s
+    last_err = None
+    while time.time() < deadline:
+        try:
+            urllib.request.urlopen(BASE + path, timeout=3).read()
+            return
+        except Exception as e:
+            last_err = e
+            time.sleep(1)
+    raise RuntimeError(f"API not ready after {timeout_s}s; last error: {last_err}")
+
 def get(path: str):
-    url = 'http://localhost:8000' + path
+    url = BASE + path
     body = urllib.request.urlopen(url, timeout=5).read().decode('utf-8', 'ignore')
     print(path + ':', body[:200])
+
+wait_ready('/healthz')
 
 get('/healthz')
 get('/health')
@@ -46,7 +71,6 @@ get('/demo/summary')
 get('/demo/scenarios')
 
 # dry-run scenario (no DB writes)
-import urllib.error
 req = urllib.request.Request('http://localhost:8000/demo/run_scenario', data=json.dumps({"dry_run": True}).encode('utf-8'), headers={"Content-Type":"application/json"}, method='POST')
 try:
     body = urllib.request.urlopen(req, timeout=5).read().decode('utf-8', 'ignore')

@@ -30,10 +30,10 @@ services:
       - ./seed:/seed
     entrypoint: ["/bin/bash", "-lc"]
     command: >
-      "psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' &&
-       psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/00_schema.sql &&
-       psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/01_seed_demo.sql &&
-       psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/02_views.sql"
+      "
+       psql -v ON_ERROR_STOP=1 postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/00_schema.sql &&
+       psql -v ON_ERROR_STOP=1 postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/01_seed_demo.sql &&
+       psql -v ON_ERROR_STOP=1 postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB -f /seed/02_views.sql"
 
   agent:
     profiles: ["agent"]
@@ -133,6 +133,43 @@ services:
     command: ["bash", "-lc", "superset db upgrade && superset init && python /app/bootstrap_superset.py"]
     volumes:
       - ./superset/bootstrap_superset.py:/app/bootstrap_superset.py
+
+
+  # Gemini Live demo (scaffold)
+  live_orchestrator:
+    profiles: ["live"]
+    build:
+      context: ./live_orchestrator
+    environment:
+      API_BASE: http://api:8000
+      WS_DEMO_MODE: "1"
+    ports:
+      - "8081:8081"
+    depends_on:
+      api:
+        condition: service_started
+
+  web_demo:
+    profiles: ["live"]
+    build:
+      context: ./web_demo
+    ports:
+      - "8080:80"
+    depends_on:
+      live_orchestrator:
+        condition: service_started
+
+  news_monitor:
+    profiles: ["live"]
+    build:
+      context: ./news_monitor
+    environment:
+      API_BASE: http://api:8000
+      NEWS_TOPIC: memory
+      NEWS_MODE: sample_once
+    depends_on:
+      api:
+        condition: service_started
 
 volumes:
   pgdata:
