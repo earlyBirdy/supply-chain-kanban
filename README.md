@@ -59,6 +59,11 @@ make demo-ui
 
 # Full demo (UI + agent) + smoke + checklist
 make demo-all
+
+# Gemini Live Agent demo (scaffold)
+make demo-live
+# open http://localhost:8080
+
 ```
 
 - API docs: http://localhost:8000/docs
@@ -174,3 +179,37 @@ Use `POST /actions/execute?dry_run=1` to validate guardrails without writing aud
 ### Enterprise hardening
 - **Idempotency scope**: endpoint + subject + card_id (prevents cross-user collisions).
 - **RBAC payload rules (policy.yaml)**: enforce role/risk thresholds based on action payload (e.g. UpdateCardStatus.resolved requires supervisor + risk>=X).
+
+## Gemini Live Agent demo (scaffold)
+
+Quick links:
+- `DEVPOST_3MIN_SCRIPT.md` (3-minute video flow)
+- `NEXT_STEPS.md` (roadmap: real Live API + scheduled news)
+- `GCP_DEPLOYMENT.md` (minimal GCP plan)
+
+
+This repo includes a **deterministic** "Gemini Live Agent" demo option designed for a 3‑minute Devpost video:
+- `news_monitor/` inserts a demo **DRAM/NAND 'leakage'** news burst (DEV_MODE helper)
+- `agent_runtime` exposes `/news/*` endpoints to browse evidence + alerts
+- `/demo/run_scenario` supports `memory_leakage_news_burst` to create:
+  - news evidence items + alert
+  - a case + kanban card
+  - pending actions (safe / dry-run friendly)
+- `live_orchestrator/` provides a websocket bridge (scaffold) to trigger the scenario + fetch evidence
+- `web_demo/` is a static UI that talks to the websocket bridge
+
+**Run locally:**
+```bash
+cp .env.example .env
+make demo-live
+# then open http://localhost:8080
+```
+
+**Trigger the scenario directly (optional):**
+```bash
+curl -X POST http://localhost:8000/demo/run_scenario \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"memory_leakage_news_burst","risk_score":86,"memory_topic":"memory"}'
+```
+
+> Replace the websocket bridge with a real Gemini Live API session later (the scaffold is structured for that).
