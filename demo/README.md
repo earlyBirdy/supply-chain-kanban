@@ -54,3 +54,23 @@ Credentials come from `.env`:
 - Tail logs: `make logs`
 - PSQL: `make psql`
 - Reset DB: `make reset` (removes docker volumes)
+
+
+## Gemini Live Agent demo (scaffold)
+
+This repo also includes a deterministic Gemini Live Agent demo option:
+
+```bash
+cp .env.example .env
+make demo-live
+# open http://localhost:8080
+```
+
+Flow:
+1. Click **Run Memory Leakage Burst**
+2. Click **Refresh Alerts** and **Refresh News**
+3. Open API docs at http://localhost:8000/docs and inspect `/news/*` and `/demo/*`
+
+Docs:
+- `DEVPOST_3MIN_SCRIPT.md`
+- `NEXT_STEPS.md`
