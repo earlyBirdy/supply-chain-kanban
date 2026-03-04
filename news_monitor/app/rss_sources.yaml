@@ -1,0 +1,15 @@
+# Allowlisted RSS sources for NEWS_MODE=rss
+# Keep this list short + reputable for judging/demo reliability.
+sources:
+  - name: "Google News: DRAM price"
+    url: "https://news.google.com/rss/search?q=DRAM%20price%20when%3A7d&hl=en-US&gl=US&ceid=US:en"
+    weight: 1.0
+  - name: "Google News: NAND flash price"
+    url: "https://news.google.com/rss/search?q=NAND%20flash%20price%20when%3A7d&hl=en-US&gl=US&ceid=US:en"
+    weight: 1.0
+  - name: "Google News: HBM supply"
+    url: "https://news.google.com/rss/search?q=HBM%20memory%20supply%20when%3A7d&hl=en-US&gl=US&ceid=US:en"
+    weight: 1.0
+  - name: "Google News: memory leak data center"
+    url: "https://news.google.com/rss/search?q=memory%20leak%20data%20center%20AI%20when%3A30d&hl=en-US&gl=US&ceid=US:en"
+    weight: 0.8

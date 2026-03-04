@@ -142,7 +142,8 @@ services:
       context: ./live_orchestrator
     environment:
       API_BASE: http://api:8000
-      WS_DEMO_MODE: "1"
+      ORCHESTRATOR_MODE: ${ORCHESTRATOR_MODE:-scaffold}
+      GEMINI_LIVE_MODEL: ${GEMINI_LIVE_MODEL:-gemini-live-2.5-flash-native-audio}
     ports:
       - "8081:8081"
     depends_on:
@@ -166,7 +167,8 @@ services:
     environment:
       API_BASE: http://api:8000
       NEWS_TOPIC: memory
-      NEWS_MODE: sample_once
+      NEWS_MODE: ${NEWS_MODE:-deterministic}
+      POLL_SECONDS: ${NEWS_POLL_SECONDS:-30}
     depends_on:
       api:
         condition: service_started

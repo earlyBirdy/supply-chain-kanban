@@ -18,7 +18,26 @@
     .small { font-size: 12px; color:#94a3b8; }
     input { background:#0b1220; border:1px solid #334155; padding:10px 12px; border-radius: 10px; color:#e6edf3;}
     a { color:#93c5fd; }
-  </style>
+  
+    table { width:100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border-bottom: 1px solid #1f2a37; padding: 8px; text-align:left; vertical-align: top; }
+    th { color:#cbd5e1; font-weight:600; }
+    .grid3 { display:grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px;}
+    .pill { display:inline-block; padding:2px 8px; border:1px solid #334155; border-radius:999px; font-size:11px; color:#cbd5e1;}
+    .ok { color:#86efac; }
+    .warn { color:#fbbf24; }
+    .err { color:#f87171; }
+
+.chatbox{border:1px solid #ddd; border-radius:8px; padding:10px; overflow:auto; background:#fff;}
+.msg{padding:8px 10px; border-radius:8px; margin:8px 0; border:1px solid #eee;}
+.msg .role{font-weight:600; margin-bottom:6px;}
+.msg.user{background:#fafafa;}
+.msg.model{background:#fdfdfd;}
+.msg .content h3{margin:8px 0 6px; font-size:14px;}
+.msg .content ul,.msg .content ol{margin:6px 0 6px 22px;}
+.msg .content code{background:#f3f3f3; padding:1px 4px; border-radius:4px;}
+.msg .content a{word-break:break-all;}
+</style>
 </head>
 <body>
   <header>
@@ -34,16 +53,64 @@
       <div class="row">
         <label class="small">Topic:</label>
         <input id="topic" value="memory" />
+        <button id="btnVideo">🎬 Video Mode (1-click)</button>
         <button id="btnBurst">Run 3-min Demo Scenario: Memory Leakage Burst</button>
-        <button id="btnNews">Refresh News</button>
+        <button id="btnCases">Refresh Cases</button>
         <button id="btnAlerts">Refresh Alerts</button>
+        <button id="btnNews">Refresh News</button>
       </div>
       <p class="small">
         This scaffold uses a websocket bridge that triggers deterministic backend flows.
         Replace the websocket logic with the Gemini Live API session later.
       </p>
+
+      <h2 style="margin-top:14px;">Gemini Live Chat</h2>
+      <div class="row">
+        <span class="badge" id="geminiStatus">Gemini: not connected</span>
+        <span class="small">Tip: set <code>ORCHESTRATOR_MODE=gemini_live</code> + credentials to use real Gemini Live.</span>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <input id="prompt" style="flex:1; min-width:260px;" placeholder="Ask: Any DRAM/NAND leakage signals for AI data centers this week?"/>
+        <button id="btnSend">Send</button>
+      </div>
+      <div id="chat" class="chatbox" style="max-height:260px;"></div>
+
+      <h2 style="margin-top:14px;">Grounded Evidence (latest answer)</h2>
+      <div class="small">Structured citations returned by the orchestrator (title + ts + score + url). Use labels like <code>[A1]</code>, <code>[N2]</code> in the response.</div>
+      <div id="grounded" class="card" style="margin-top:8px; background:#0b1220;"></div>
+
       <h2 style="margin-top:14px;">Agent Output</h2>
       <pre id="out"></pre>
+      <div class="grid3">
+        <div>
+          <h2 style="margin-top:8px;">Cases</h2>
+          <div class="small">Latest cases (from <code>/cases</code>)</div>
+          <div id="casesStatus" class="small"></div>
+          <table id="casesTable">
+            <thead><tr><th>Updated</th><th>Case</th><th>Status</th><th>Summary</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div>
+          <h2 style="margin-top:8px;">Alerts</h2>
+          <div class="small">Top alerts (from <code>/news/alerts</code>)</div>
+          <div id="alertsStatus" class="small"></div>
+          <table id="alertsTable">
+            <thead><tr><th>TS</th><th>Severity</th><th>Title</th><th>Source</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div>
+          <h2 style="margin-top:8px;">News Evidence</h2>
+          <div class="small">Evidence items (from <code>/news/items</code>)</div>
+          <div id="newsStatus" class="small"></div>
+          <table id="newsTable">
+            <thead><tr><th>TS</th><th>Score</th><th>Title</th><th>Source</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
     </section>
 
     <aside class="card">
