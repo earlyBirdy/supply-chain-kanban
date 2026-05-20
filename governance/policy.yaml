@@ -1,5 +1,22 @@
-version: '1.0'
+version: '1.1'
+control_plane:
+  canonical: true
+  revision: 1
+  ontology_contract: contracts/supply_chain_ontology.yaml
+  action_catalog_contract: contracts/action_catalog.yaml
+  lifecycle_contract: contracts/lifecycle_model.yaml
+  manifest: contracts/control_plane_manifest.yaml
+policy_model:
+  objective: All operator and agent mutations must flow through typed actions, lifecycle
+    state machines, RBAC, and audit.
+  operating_modes:
+    suggest: AI can score, summarize, and propose actions without mutating state.
+    approve: A human or system authority can approve a pending action according to
+      RBAC.
+    execute: Only typed actions may mutate state; all executions must be auditable
+      and idempotent.
 card_status_policy:
+  source_of_truth: contracts/lifecycle_model.yaml#objects.kanban_card
   allowed_transitions:
     todo:
     - in_progress
@@ -19,6 +36,7 @@ card_status_policy:
     blocked_requires_reason: true
     resolved_requires_timestamp: true
 action_approval_policy:
+  source_of_truth: contracts/action_catalog.yaml
   external_connectors_require_approval: true
   action_types_require_approval:
   - ExpediteShipment
@@ -27,12 +45,48 @@ action_approval_policy:
   - OpenSupplierTicket
   action_types_no_approval:
   - UpdateCardStatus
+  connector_policies:
+    erp:
+      approval_required: true
+      approve_roles:
+      - supervisor
+      - system
+      execute_roles:
+      - supervisor
+      - system
+      require_case_risk_gte: 20
+      narrative: ERP writeback represents a system-of-record change and always requires
+        governed supervisor approval.
+    supplier_portal:
+      approval_required: true
+      approve_roles:
+      - supervisor
+      - system
+      execute_roles:
+      - supervisor
+      - system
+      require_case_risk_gte: 20
+      narrative: Supplier-facing escalations are external commitments and require
+        supervisor approval.
+    ticketing:
+      approval_required: true
+      approve_roles:
+      - supervisor
+      - system
+      execute_roles:
+      - operator
+      - supervisor
+      - system
+      require_case_risk_gte: 0
+      narrative: Internal ticketing may be executed by operators after approval, but
+        the approval stays governed.
 materialization_policy:
   on_new_materialize: supersede
   supersede_statuses:
   - pending
   - approved
 pending_action_policy:
+  source_of_truth: contracts/lifecycle_model.yaml#objects.pending_action
   allowed_transitions:
     pending:
     - approved
@@ -53,22 +107,48 @@ idempotency:
   enabled: true
   header_name: Idempotency-Key
 rbac:
+  model:
+    roles:
+      observer:
+        description: Read-only role; may inspect cases and audit but not approve or
+          execute.
+      operator:
+        description: Can move low-risk work through operational states and execute
+          low-impact actions.
+      supervisor:
+        description: Can approve and execute governed actions, including high-impact
+          state changes.
+      system:
+        description: Trusted service role for orchestrations, replay, and maintenance.
+    channel_defaults:
+      ui: operator
+      api: operator
+      slack: operator
+      supervisor: supervisor
+      agent: system
+      system: system
   channels:
     ui: operator
+    api: operator
+    slack: operator
     supervisor: supervisor
+    agent: system
     system: system
   permissions:
     approve:
+      observer: []
+      operator: []
       supervisor:
       - '*'
-      operator: []
       system:
       - '*'
     execute:
-      supervisor:
-      - '*'
+      observer: []
       operator:
       - UpdateCardStatus
+      - CreateOpsTicket
+      supervisor:
+      - '*'
       system:
       - '*'
   constraints:
@@ -119,16 +199,19 @@ rbac:
     - system
     - supervisor
     - operator
+    - observer
     - ui
     sources:
     - claim: groups
       map:
         supplychain-ops: operator
         supplychain-supervisors: supervisor
+        supplychain-observers: observer
     - claim: entitlements
       map:
         supplychain:supervisor: supervisor
         supplychain:operator: operator
+        supplychain:observer: observer
     first_match_wins: true
     deny:
       groups:
@@ -148,6 +231,11 @@ rbac:
         - '*supplychain-operator*'
         - '*sc-operator*'
         - '*ops-operator*'
+    - role: observer
+      when:
+        patterns:
+        - '*supplychain-observer*'
+        - '*sc-observer*'
     entitlement_rules: []
 idempotency_policy:
   ttl_hours: 24

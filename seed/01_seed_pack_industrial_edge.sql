@@ -75,15 +75,15 @@ INSERT INTO external_data_sources(source_id, label, source_type, trust_tier, own
 -- Cases
 INSERT INTO agent_cases(case_id, status, owner, resource_id, scope, risk_score, confidence, lead_time_to_failure_days, root_signals, last_observed_period, created_at, updated_at)
 VALUES
-('11111111-1111-1111-1111-111111111111', 'AT_RISK', 'planner@demo', 'dram_ddr5',
+('11111111-1111-1111-1111-111111111111', 'AT_RISK', 'materials_mgr@demo', 'dram_ddr5',
  '{"scope_type":"supplier","scope_id":"SUP_A","sku":"AI-SERVER-01","location":"DC_A","supplier_name":"Micron East"}'::jsonb,
- 82, 0.74, 14, '{"signals":["price_index_up","otif_down","spot_availability_down"]}'::jsonb, '2025-W03', now() - interval '28 hours', now() - interval '3 hours'),
+ 63, 0.65, 22, '{"signals":["price_index_up","otif_down","spot_availability_down"]}'::jsonb, '2025-W03', now() - interval '28 hours', now() - interval '3 hours'),
 ('22222222-2222-2222-2222-222222222222', 'AT_RISK', 'opslead@demo', 'battery_cells_lfp',
  '{"scope_type":"supplier","scope_id":"SUP_B","sku":"EV-PACK-02","location":"PLANT_2","supplier_name":"Shenzhen LFP Energy"}'::jsonb,
- 91, 0.81, 9, '{"signals":["port_delay_days_up","otif_down","schedule_adherence_down"]}'::jsonb, '2025-W03', now() - interval '41 hours', now() - interval '2 hours'),
-('33333333-3333-3333-3333-333333333333', 'WATCH', 'quality@demo', 'industrial_ethernet_switch',
+ 72, 0.70, 18, '{"signals":["port_delay_days_up","otif_down","schedule_adherence_down"]}'::jsonb, '2025-W03', now() - interval '41 hours', now() - interval '2 hours'),
+('33333333-3333-3333-3333-333333333333', 'WATCH', 'plant_gm@demo', 'industrial_ethernet_switch',
  '{"scope_type":"supplier","scope_id":"SUP_C","sku":"EDGE-SWITCH-8","location":"DC_C","supplier_name":"Orion Edge Components"}'::jsonb,
- 68, 0.72, 21, '{"signals":["regulatory_alert_score_up","quality_ppm_up"]}'::jsonb, '2025-W03', now() - interval '18 hours', now() - interval '1 hour');
+ 89, 0.84, 7, '{"signals":["regulatory_alert_score_up","quality_ppm_up"]}'::jsonb, '2025-W03', now() - interval '18 hours', now() - interval '1 hour');
 
 
 INSERT INTO traceability_events(event_id, case_id, source_id, event_type, object_ref, observed_at, validation_status, evidence_confidence, payload) VALUES
@@ -126,8 +126,8 @@ VALUES
  'Inbound cells are late; rebalancing and supplier escalation needed to protect launch schedule.',
  'in_progress', 1, 'opslead@demo', 24, now() - interval '41 hours', now() - interval '2 hours', now() - interval '2 hours', NULL, NULL),
 ('ccccccc3-cccc-cccc-cccc-ccccccccccc3', '33333333-3333-3333-3333-333333333333', 'industrial_ethernet_switch',
- '{"site":"DC_C","customer_program":"Edge Retrofit"}'::jsonb,
- 'Edge switch compliance follow-up',
+ '{"site":"DC_C","customer_program":"Industrial Edge Retrofit Phase 1"}'::jsonb,
+ 'Industrial edge compliance containment',
  'A regulatory alert and rising quality ppm require an internal coordination ticket and controlled containment.',
  'todo', 3, 'quality@demo', 72, now() - interval '18 hours', now() - interval '1 hour', now() - interval '1 hour', NULL, NULL);
 

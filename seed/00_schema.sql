@@ -52,6 +52,60 @@ CREATE TABLE IF NOT EXISTS mes_production (
   period TEXT
 );
 
+
+-- Transparency evidence layer: external data -> traceability event -> evidence receipt -> optional ledger anchor.
+CREATE TABLE IF NOT EXISTS external_data_sources (
+  source_id TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  source_type TEXT NOT NULL CHECK (source_type IN ('erp','wms','mes','iot','supplier_portal','news','audit','manual')),
+  trust_tier TEXT NOT NULL DEFAULT 'standard' CHECK (trust_tier IN ('high','standard','low')),
+  owner TEXT,
+  validation_method TEXT NOT NULL DEFAULT 'schema_check',
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS traceability_events (
+  event_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
+  case_id UUID REFERENCES agent_cases(case_id) ON DELETE CASCADE,
+  source_id TEXT REFERENCES external_data_sources(source_id) ON DELETE SET NULL,
+  event_type TEXT NOT NULL,
+  object_ref TEXT NOT NULL,
+  observed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  validation_status TEXT NOT NULL DEFAULT 'pending' CHECK (validation_status IN ('verified','cross_checked','pending','rejected')),
+  evidence_confidence NUMERIC NOT NULL DEFAULT 0.50 CHECK (evidence_confidence >= 0 AND evidence_confidence <= 1),
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_traceability_events_case_observed ON traceability_events(case_id, observed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_traceability_events_source ON traceability_events(source_id);
+
+CREATE TABLE IF NOT EXISTS evidence_receipts (
+  receipt_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
+  case_id UUID REFERENCES agent_cases(case_id) ON DELETE CASCADE,
+  trace_event_id UUID REFERENCES traceability_events(event_id) ON DELETE SET NULL,
+  evidence_type TEXT NOT NULL,
+  validation_status TEXT NOT NULL DEFAULT 'pending' CHECK (validation_status IN ('verified','cross_checked','pending','rejected')),
+  confidence_score NUMERIC NOT NULL DEFAULT 0.50 CHECK (confidence_score >= 0 AND confidence_score <= 1),
+  summary TEXT NOT NULL,
+  generated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  receipt_payload JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+CREATE INDEX IF NOT EXISTS idx_evidence_receipts_case_generated ON evidence_receipts(case_id, generated_at DESC);
+
+CREATE TABLE IF NOT EXISTS blockchain_anchors (
+  anchor_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
+  receipt_id UUID REFERENCES evidence_receipts(receipt_id) ON DELETE CASCADE,
+  ledger_name TEXT NOT NULL DEFAULT 'demo-ledger',
+  anchor_status TEXT NOT NULL DEFAULT 'stubbed' CHECK (anchor_status IN ('stubbed','queued','anchored','failed')),
+  tx_ref TEXT NOT NULL DEFAULT '',
+  content_hash TEXT NOT NULL,
+  anchored_at TIMESTAMPTZ,
+  proof_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_blockchain_anchors_receipt ON blockchain_anchors(receipt_id);
+
 -- Agent state
 CREATE TABLE IF NOT EXISTS agent_cases (
   case_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
@@ -213,6 +267,29 @@ CREATE INDEX IF NOT EXISTS idx_idempotency_created ON idempotency_keys(created_a
 
 CREATE INDEX IF NOT EXISTS idx_agent_actions_type_created ON agent_actions(action_type, created_at DESC);
 
+CREATE TABLE IF NOT EXISTS governed_writebacks (
+  writeback_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
+  action_id UUID REFERENCES agent_actions(action_id) ON DELETE SET NULL,
+  case_id UUID REFERENCES agent_cases(case_id) ON DELETE CASCADE,
+  pending_id UUID REFERENCES pending_actions(pending_id) ON DELETE SET NULL,
+  adapter_name TEXT NOT NULL,
+  connector_name TEXT NOT NULL,
+  target_system TEXT NOT NULL,
+  action_type TEXT NOT NULL,
+  status TEXT NOT NULL,
+  external_ref TEXT NOT NULL,
+  policy_gate TEXT NOT NULL DEFAULT '',
+  approval_state TEXT NOT NULL DEFAULT '',
+  connector_family TEXT NOT NULL DEFAULT '',
+  approval_policy TEXT NOT NULL DEFAULT '',
+  receipt_summary TEXT NOT NULL DEFAULT '',
+  request_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  result_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_governed_writebacks_case_created ON governed_writebacks(case_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_governed_writebacks_pending ON governed_writebacks(pending_id, created_at DESC);
+
 CREATE TABLE IF NOT EXISTS dq_results (
   dq_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
   ts TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -252,16 +329,7 @@ CREATE TABLE IF NOT EXISTS agent_recommendations (
 );
 CREATE INDEX IF NOT EXISTS idx_agent_recommendations_case_created ON agent_recommendations(case_id, created_at DESC, rank ASC);
 
-CREATE TABLE IF NOT EXISTS materializations (
-  materialization_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
-  endpoint TEXT NOT NULL DEFAULT '',
-  subject TEXT NOT NULL DEFAULT '',
-  idempotency_key TEXT NOT NULL DEFAULT '',
-  request_hash TEXT NOT NULL DEFAULT '',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  expires_at TIMESTAMPTZ
-);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_materializations_idem ON materializations(endpoint, subject, idempotency_key);
+-- duplicate materializations DDL removed; canonical definition lives above.
 
 -- News evidence (Gemini Live demo)
 CREATE TABLE IF NOT EXISTS news_items (

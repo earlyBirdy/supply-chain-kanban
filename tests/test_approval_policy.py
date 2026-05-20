@@ -16,3 +16,15 @@ def test_approval_not_required_for_explicit_no_list() -> None:
 def test_external_connector_requires_approval_by_default() -> None:
     policy = {"action_approval_policy": {"external_connectors_require_approval": True}}
     assert approval_required_for_action(policy, action_type="ExpediteShipment", payload={}, execution_target="sap") is True
+
+
+
+def test_connector_specific_approval_policy_true() -> None:
+    policy = {
+        "action_approval_policy": {
+            "connector_policies": {
+                "ticketing": {"approval_required": True}
+            }
+        }
+    }
+    assert approval_required_for_action(policy, action_type="CreateOpsTicket", payload={}, execution_target="ticketing.incidents") is True

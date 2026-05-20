@@ -42,3 +42,52 @@ def test_can_execute_payload_rule_enforces_risk_threshold() -> None:
     ok2, reason2 = can_execute(policy, channel="ui", action_type="UpdateCardStatus", payload={"new_status": "resolved"}, case_risk_score=10)
     assert ok2 is False
     assert "payload rule" in reason2
+
+
+
+def test_connector_policy_can_execute_ticketing_for_operator() -> None:
+    from app.rbac import can_execute
+
+    policy = {
+        "rbac": {
+            "permissions": {
+                "execute": {
+                    "operator": ["CreateOpsTicket"]
+                }
+            }
+        },
+        "action_approval_policy": {
+            "connector_policies": {
+                "ticketing": {
+                    "execute_roles": ["operator", "supervisor"]
+                }
+            }
+        }
+    }
+    ok, reason = can_execute(policy, channel="ui", action_type="CreateOpsTicket", role="operator", payload={})
+    assert ok is True
+    assert reason == "ok"
+
+
+def test_connector_policy_blocks_erp_approval_for_operator() -> None:
+    from app.rbac import can_approve
+
+    policy = {
+        "rbac": {
+            "permissions": {
+                "approve": {
+                    "operator": ["ExpediteShipment"]
+                }
+            }
+        },
+        "action_approval_policy": {
+            "connector_policies": {
+                "erp": {
+                    "approve_roles": ["supervisor"]
+                }
+            }
+        }
+    }
+    ok, reason = can_approve(policy, channel="ui", action_type="ExpediteShipment", role="operator", payload={})
+    assert ok is False
+    assert "connector policy" in reason

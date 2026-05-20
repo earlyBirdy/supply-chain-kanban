@@ -1,0 +1,107 @@
+version: 1
+brands:
+  neutral:
+    label: Neutral Enterprise
+    logo_text: Atlas Control
+    logo_mark: AC
+    accent: '#8ec5ff'
+    accent_soft: '#335581'
+    panel_glow: 'rgba(142,197,255,0.24)'
+    surface_top: 'rgba(13,21,38,0.96)'
+    surface_bottom: 'rgba(10,16,29,0.96)'
+    export_stamp: Atlas Control Demo
+  datagrid:
+    label: Data Center Blue
+    logo_text: Atlas Grid
+    logo_mark: AG
+    accent: '#86d0ff'
+    accent_soft: '#305f8f'
+    panel_glow: 'rgba(134,208,255,0.26)'
+    surface_top: 'rgba(10,23,41,0.96)'
+    surface_bottom: 'rgba(8,16,32,0.96)'
+    export_stamp: Atlas Grid Data Center Demo
+  voltstream:
+    label: EV Launch Amber
+    logo_text: VoltStream Ops
+    logo_mark: VS
+    accent: '#ffcb72'
+    accent_soft: '#8a5a18'
+    panel_glow: 'rgba(255,203,114,0.23)'
+    surface_top: 'rgba(34,20,10,0.96)'
+    surface_bottom: 'rgba(23,15,8,0.96)'
+    export_stamp: VoltStream EV Launch Demo
+  edgeforge:
+    label: Industrial Edge Teal
+    logo_text: EdgeForge Control
+    logo_mark: EF
+    accent: '#7ed9c4'
+    accent_soft: '#216b67'
+    panel_glow: 'rgba(126,217,196,0.22)'
+    surface_top: 'rgba(9,26,27,0.96)'
+    surface_bottom: 'rgba(7,18,20,0.96)'
+    export_stamp: EdgeForge Industrial Demo
+seed_packs:
+  portfolio:
+    label: Portfolio Control Tower
+    description: Balanced cross-portfolio seed with memory, EV battery, and industrial edge risks.
+    seed_file: 01_seed_demo.sql
+    default_persona: coo
+    default_theme: data_center
+    default_brand: neutral
+    focus_case_id: '11111111-1111-1111-1111-111111111111'
+    talk_track: Start broad, then zoom into one governed action.
+  data_center:
+    label: Data Center Hardware
+    description: Buyer story around GPU racks, DDR5 supply, and edge network resilience.
+    seed_file: 01_seed_pack_data_center.sql
+    default_persona: vp_supply_chain
+    default_theme: data_center
+    default_brand: datagrid
+    focus_case_id: '11111111-1111-1111-1111-111111111111'
+    talk_track: Lead with executive exposure, then show how expediting protects committed server builds.
+  ev_launch:
+    label: EV Launch Readiness
+    description: Buyer story around launch timing, battery cells, supplier escalation, and governed recovery.
+    seed_file: 01_seed_pack_ev_launch.sql
+    default_persona: coo
+    default_theme: ev_launch
+    default_brand: voltstream
+    focus_case_id: '22222222-2222-2222-2222-222222222222'
+    talk_track: Start with launch risk, then show supplier escalation and writeback confidence.
+  industrial_edge:
+    label: Industrial Edge Retrofit
+    description: Buyer story around compliance containment, supplier quality, and internal ticketed coordination.
+    seed_file: 01_seed_pack_industrial_edge.sql
+    default_persona: plant_gm
+    default_theme: industrial_edge
+    default_brand: edgeforge
+    focus_case_id: '33333333-3333-3333-3333-333333333333'
+    talk_track: Focus on governance, containment, and cross-functional execution.
+demo_scripts:
+  guided_buyer_walkthrough:
+    label: Guided buyer walkthrough
+    steps:
+      - id: executive
+        title: Open Executive Mode
+        ui_action: executive_on
+        narration: Start with the executive story so the buyer sees business impact before system detail.
+      - id: board
+        title: Open the Risk Board
+        ui_action: executive_off
+        narration: Move into the board to show governed work in flight and which lane is under pressure.
+      - id: focus_case
+        title: Focus the Lead Case
+        ui_action: select_focus_case
+        narration: Open the seeded flagship case for this vertical pack and explain why it matters now.
+      - id: pending
+        title: Open Pending Approval
+        ui_action: focus_pending
+        narration: Show that AI does not write directly into systems; it proposes a typed action that still needs approval.
+      - id: simulate
+        title: Run Simulation
+        ui_action: simulate_first_pending
+        narration: Run the preview so the buyer can see downstream impact before writeback.
+      - id: receipt
+        title: Show Receipt and Proof
+        ui_action: focus_receipt
+        narration: End on the governed receipt, connector family, and audit trail to reinforce enterprise trust.

@@ -1,7 +1,23 @@
 {
-  "version": 0.1,
+  "version": "1.0",
   "name": "SupplyChainOntology",
-  "description": "A minimal, Palantir-Foundry-style ontology for the Supply Chain Kanban demo. It maps canonical facts (ERP/MES/WMS + market/ops signals) into real-world objects, relationships, and executable actions (Kinetic layer) while remaining easy to evolve (Dynamic layer).",
+  "description": "Canonical ontology contract for the Supply Chain Kanban enterprise demo. It defines the business objects, relationships, and governed action boundary that AI agents and human operators share.",
+  "contract": {
+    "canonical": true,
+    "revision": 1,
+    "source_of_truth": "contracts/supply_chain_ontology.yaml",
+    "companion_contracts": {
+      "action_catalog": "contracts/action_catalog.yaml",
+      "lifecycle_model": "contracts/lifecycle_model.yaml",
+      "governance_policy": "governance/policy.yaml",
+      "control_plane_manifest": "contracts/control_plane_manifest.yaml"
+    },
+    "runtime": {
+      "ontology_loader": "agent_runtime/app/ontology_store.py",
+      "policy_loader": "agent_runtime/app/policy_store.py",
+      "lifecycle_loader": "agent_runtime/app/lifecycle_store.py"
+    }
+  },
   "object_types": {
     "Resource": {
       "description": "A constrained resource/material (e.g., memory, freight lane, resin).",
@@ -258,6 +274,8 @@
       "description": "AI agent case representing an emerging constraint.",
       "key": "case_id",
       "canonical_table": "agent_cases",
+      "state_field": "status",
+      "lifecycle_ref": "contracts/lifecycle_model.yaml#objects.case",
       "properties": {
         "case_id": {
           "type": "uuid"
@@ -312,6 +330,8 @@
       "description": "Operational kanban card as a first-class object (Kinetic surface).",
       "key": "card_id",
       "canonical_table": "kanban_cards",
+      "state_field": "status",
+      "lifecycle_ref": "contracts/lifecycle_model.yaml#objects.kanban_card",
       "properties": {
         "card_id": {
           "type": "uuid"
@@ -426,6 +446,95 @@
         }
       }
     },
+    "PendingAction": {
+      "description": "Materialized action proposal awaiting approval or execution.",
+      "key": "pending_id",
+      "canonical_table": "pending_actions",
+      "state_field": "status",
+      "lifecycle_ref": "contracts/lifecycle_model.yaml#objects.pending_action",
+      "properties": {
+        "pending_id": {
+          "type": "uuid"
+        },
+        "case_id": {
+          "type": "uuid"
+        },
+        "card_id": {
+          "type": "uuid",
+          "optional": true
+        },
+        "materialization_id": {
+          "type": "uuid",
+          "optional": true
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "executed",
+            "blocked",
+            "canceled"
+          ]
+        },
+        "approval_required": {
+          "type": "boolean"
+        },
+        "action_type": {
+          "type": "string"
+        },
+        "action_payload": {
+          "type": "object"
+        },
+        "rationale": {
+          "type": "string",
+          "optional": true
+        },
+        "rank": {
+          "type": "integer",
+          "optional": true
+        },
+        "approved_by": {
+          "type": "string",
+          "optional": true
+        },
+        "approved_at": {
+          "type": "datetime",
+          "optional": true
+        },
+        "executed_action_id": {
+          "type": "uuid",
+          "optional": true
+        },
+        "execution_result": {
+          "type": "string",
+          "optional": true
+        },
+        "superseded_by": {
+          "type": "uuid",
+          "optional": true
+        },
+        "superseded_at": {
+          "type": "datetime",
+          "optional": true
+        },
+        "canceled_at": {
+          "type": "datetime",
+          "optional": true
+        },
+        "canceled_reason": {
+          "type": "string",
+          "optional": true
+        },
+        "created_at": {
+          "type": "datetime"
+        },
+        "updated_at": {
+          "type": "datetime"
+        }
+      }
+    },
     "Action": {
       "description": "Executed (or attempted) action triggered by a human/agent.",
       "key": "action_id",
@@ -443,7 +552,9 @@
             "ui",
             "api",
             "slack",
-            "agent"
+            "agent",
+            "supervisor",
+            "system"
           ]
         },
         "action_type": {
@@ -458,6 +569,173 @@
         },
         "created_at": {
           "type": "datetime"
+        }
+      }
+    },
+    "AuditEvent": {
+      "description": "Immutable audit event for actions, violations, and policy decisions.",
+      "key": "id",
+      "canonical_table": "audit_log",
+      "properties": {
+        "id": {
+          "type": "uuid"
+        },
+        "ts": {
+          "type": "datetime"
+        },
+        "actor": {
+          "type": "string",
+          "optional": true
+        },
+        "action": {
+          "type": "string"
+        },
+        "entity_type": {
+          "type": "string",
+          "optional": true
+        },
+        "entity_id": {
+          "type": "string",
+          "optional": true
+        },
+        "payload": {
+          "type": "object"
+        }
+      }
+    },
+    "ExternalDataSource": {
+      "description": "Named external source that feeds traceability evidence, such as ERP, WMS, IoT, supplier portal, news, or audit data.",
+      "key": "source_id",
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "source_type": {
+          "type": "string"
+        },
+        "trust_tier": {
+          "type": "string",
+          "enum": [
+            "high",
+            "standard",
+            "low"
+          ]
+        },
+        "validation_method": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string",
+          "optional": true
+        }
+      }
+    },
+    "TraceabilityEvent": {
+      "description": "Case-linked physical or operating event observed from an external data source and validated before buyer-facing use.",
+      "key": "event_id",
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "object_ref": {
+          "type": "string"
+        },
+        "observed_at": {
+          "type": "datetime"
+        },
+        "validation_status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "cross_checked",
+            "pending",
+            "rejected"
+          ]
+        },
+        "evidence_confidence": {
+          "type": "number"
+        },
+        "payload": {
+          "type": "object",
+          "optional": true
+        }
+      }
+    },
+    "EvidenceReceipt": {
+      "description": "Buyer-facing proof summary derived from traceability events with validation status and evidence confidence.",
+      "key": "receipt_id",
+      "properties": {
+        "receipt_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "trace_event_id": {
+          "type": "string",
+          "optional": true
+        },
+        "evidence_type": {
+          "type": "string"
+        },
+        "validation_status": {
+          "type": "string"
+        },
+        "confidence_score": {
+          "type": "number"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "receipt_payload": {
+          "type": "object",
+          "optional": true
+        }
+      }
+    },
+    "BlockchainAnchor": {
+      "description": "Ledger proof stub for anchoring an EvidenceReceipt hash. It proves anchoring intent, not raw-world truth.",
+      "key": "anchor_id",
+      "properties": {
+        "anchor_id": {
+          "type": "string"
+        },
+        "receipt_id": {
+          "type": "string"
+        },
+        "ledger_name": {
+          "type": "string"
+        },
+        "anchor_status": {
+          "type": "string",
+          "enum": [
+            "stubbed",
+            "queued",
+            "anchored",
+            "failed"
+          ]
+        },
+        "tx_ref": {
+          "type": "string"
+        },
+        "content_hash": {
+          "type": "string"
+        },
+        "proof_payload": {
+          "type": "object",
+          "optional": true
         }
       }
     }
@@ -478,6 +756,16 @@
       "from": "Recommendation",
       "to": "Case",
       "predicate": "recommends_for",
+      "join": {
+        "from_key": "case_id",
+        "to_key": "case_id"
+      }
+    },
+    {
+      "name": "PendingAction_for_Case",
+      "from": "PendingAction",
+      "to": "Case",
+      "predicate": "awaits_decision_for",
       "join": {
         "from_key": "case_id",
         "to_key": "case_id"
@@ -582,11 +870,62 @@
         "from_key": "resource_id",
         "to_key": "resource_id"
       }
+    },
+    {
+      "name": "AuditEvent_on_Action",
+      "from": "AuditEvent",
+      "to": "Action",
+      "predicate": "records",
+      "join": {
+        "from_key": "entity_id",
+        "to_key": "action_id"
+      }
+    },
+    {
+      "name": "TraceabilityEvent_from_ExternalDataSource",
+      "from": "TraceabilityEvent",
+      "to": "ExternalDataSource",
+      "predicate": "observed_from",
+      "join": {
+        "from_key": "source_id",
+        "to_key": "source_id"
+      }
+    },
+    {
+      "name": "TraceabilityEvent_for_Case",
+      "from": "TraceabilityEvent",
+      "to": "Case",
+      "predicate": "supports",
+      "join": {
+        "from_key": "case_id",
+        "to_key": "case_id"
+      }
+    },
+    {
+      "name": "EvidenceReceipt_for_TraceabilityEvent",
+      "from": "EvidenceReceipt",
+      "to": "TraceabilityEvent",
+      "predicate": "summarizes",
+      "join": {
+        "from_key": "trace_event_id",
+        "to_key": "event_id"
+      }
+    },
+    {
+      "name": "BlockchainAnchor_for_EvidenceReceipt",
+      "from": "BlockchainAnchor",
+      "to": "EvidenceReceipt",
+      "predicate": "anchors",
+      "join": {
+        "from_key": "receipt_id",
+        "to_key": "receipt_id"
+      }
     }
   ],
   "action_types": {
     "ExpediteShipment": {
       "description": "Request expedited shipping for a shipment / lane.",
+      "catalog_ref": "contracts/action_catalog.yaml#actions.ExpediteShipment",
       "payload_schema": {
         "shipment_id": {
           "type": "string"
@@ -607,6 +946,7 @@
     },
     "RebalanceAllocation": {
       "description": "Reallocate inventory / supply from one location to another.",
+      "catalog_ref": "contracts/action_catalog.yaml#actions.RebalanceAllocation",
       "payload_schema": {
         "sku": {
           "type": "string"
@@ -628,6 +968,7 @@
     },
     "TriggerPurchase": {
       "description": "Create or update a purchase request/order in ERP.",
+      "catalog_ref": "contracts/action_catalog.yaml#actions.TriggerPurchase",
       "payload_schema": {
         "sku": {
           "type": "string"
@@ -655,6 +996,7 @@
     },
     "OpenSupplierTicket": {
       "description": "Open a supplier portal ticket / escalation.",
+      "catalog_ref": "contracts/action_catalog.yaml#actions.OpenSupplierTicket",
       "payload_schema": {
         "supplier_id": {
           "type": "string"
@@ -676,28 +1018,9 @@
       }
     },
     "UpdateCardStatus": {
-      "description": "Update a KanbanCard status with SLA policy guardrails and state-machine rules.",
-      "policy": {
-        "allowed_transitions": {
-          "todo": [
-            "in_progress",
-            "blocked"
-          ],
-          "in_progress": [
-            "blocked",
-            "resolved"
-          ],
-          "blocked": [
-            "in_progress"
-          ],
-          "resolved": []
-        },
-        "approval_gate": {
-          "when_new_status_is": "resolved",
-          "require_channel": "supervisor",
-          "require_case_risk_score_gte": 70
-        }
-      },
+      "description": "Update a KanbanCard status using the canonical lifecycle model and policy guardrails.",
+      "catalog_ref": "contracts/action_catalog.yaml#actions.UpdateCardStatus",
+      "policy_ref": "contracts/lifecycle_model.yaml#objects.kanban_card",
       "payload_schema": {
         "card_id": {
           "type": "string",
@@ -734,14 +1057,11 @@
     "guardrails": [
       {
         "name": "RequireHumanApprovalAboveThreshold",
-        "description": "For risk_score >= 85, require explicit human approval before executing ERP write-back.",
-        "params": {
-          "threshold": 85
-        }
+        "description": "For risk_score >= 85, require explicit human approval before executing typed actions."
       },
       {
-        "name": "BlockNegativeQty",
-        "description": "Disallow actions that attempt to move or buy negative quantity."
+        "name": "TypedActionsOnly",
+        "description": "Agents and humans must mutate operating state only through the action catalog; raw table writes are out of contract."
       }
     ]
   }

@@ -1,0 +1,15 @@
+version: '1.0'
+canonical: true
+sources:
+  ontology: contracts/supply_chain_ontology.yaml
+  ontology_json_mirror: contracts/supply_chain_ontology.json
+  action_catalog: contracts/action_catalog.yaml
+  lifecycle_model: contracts/lifecycle_model.yaml
+  governance_policy: governance/policy.yaml
+generated_or_removed_duplicates:
+  removed_runtime_fallbacks:
+  - agent_runtime/app/ontology.yaml
+  - agent_runtime/app/ontology.json
+  - agent_runtime/governance/policy.yaml
+  schema_deduplications:
+  - 'seed/00_schema.sql: duplicate materializations table removed'

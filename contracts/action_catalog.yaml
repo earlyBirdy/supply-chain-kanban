@@ -1,0 +1,134 @@
+version: '1.0'
+canonical: true
+source_of_truth: contracts/action_catalog.yaml
+purpose: Governed action catalog for all human and agent writeback paths.
+decision_modes:
+  suggest: AI proposes a typed action but does not mutate state.
+  approve: A human or system authority approves a materialized pending action.
+  execute: The system performs a typed action and records audit evidence.
+actions:
+  UpdateCardStatus:
+    target_object: KanbanCard
+    writes_to:
+    - kanban_cards.status
+    - kanban_cards.blocked_reason
+    - kanban_cards.resolved_at
+    connector: local_db
+    decision_mode: execute
+    approval_required: conditional
+    approval_rule: Requires supervisor approval/effective supervisor channel for high-impact
+      transitions defined in governance/policy.yaml and lifecycle model.
+    allowed_roles_to_execute:
+    - operator
+    - supervisor
+    - system
+    allowed_roles_to_approve:
+    - supervisor
+    - system
+    idempotency_scope: case_id + card_id + action_type + payload hash
+    lifecycle_ref: contracts/lifecycle_model.yaml#objects.kanban_card
+    side_effects:
+    - writes audit row
+    - updates Kanban card timestamps
+  ExpediteShipment:
+    target_object: Shipment
+    writes_to:
+    - agent_actions
+    - external_erp_connector
+    connector: erp
+    adapter: governed_writeback
+    target_system: erp.shipments
+    decision_mode: approve
+    approval_required: true
+    allowed_roles_to_execute:
+    - supervisor
+    - system
+    allowed_roles_to_approve:
+    - supervisor
+    - system
+    idempotency_scope: case_id + shipment_id + expedite_level
+    side_effects:
+    - writes audit row
+    - calls ERP connector
+  RebalanceAllocation:
+    target_object: Order
+    writes_to:
+    - agent_actions
+    - external_erp_connector
+    connector: erp
+    adapter: governed_writeback
+    target_system: erp.allocations
+    decision_mode: approve
+    approval_required: true
+    allowed_roles_to_execute:
+    - supervisor
+    - system
+    allowed_roles_to_approve:
+    - supervisor
+    - system
+    idempotency_scope: case_id + sku + from_location + to_location + qty
+    side_effects:
+    - writes audit row
+    - calls ERP connector
+  TriggerPurchase:
+    target_object: Order
+    writes_to:
+    - agent_actions
+    - external_erp_connector
+    connector: erp
+    adapter: governed_writeback
+    target_system: erp.purchase_orders
+    decision_mode: approve
+    approval_required: true
+    allowed_roles_to_execute:
+    - supervisor
+    - system
+    allowed_roles_to_approve:
+    - supervisor
+    - system
+    idempotency_scope: case_id + sku + supplier_id + qty + need_date
+    side_effects:
+    - writes audit row
+    - calls ERP connector
+  OpenSupplierTicket:
+    target_object: Supplier
+    writes_to:
+    - agent_actions
+    - supplier_portal
+    connector: supplier_portal
+    adapter: governed_writeback
+    target_system: supplier.portal
+    decision_mode: approve
+    approval_required: conditional
+    approval_rule: Urgent tickets and high-risk cases require supervisor approval.
+    allowed_roles_to_execute:
+    - supervisor
+    - system
+    allowed_roles_to_approve:
+    - supervisor
+    - system
+    idempotency_scope: case_id + supplier_id + subject
+    side_effects:
+    - writes audit row
+    - opens supplier escalation
+
+  CreateOpsTicket:
+    target_object: Case
+    writes_to:
+    - agent_actions
+    - external_ticketing_connector
+    connector: ticketing
+    adapter: governed_writeback
+    target_system: ticketing.incidents
+    decision_mode: approve
+    approval_required: true
+    allowed_roles_to_execute:
+    - supervisor
+    - system
+    allowed_roles_to_approve:
+    - supervisor
+    - system
+    idempotency_scope: case_id + queue + severity + summary
+    side_effects:
+    - writes audit row
+    - opens ITSM / incident ticket

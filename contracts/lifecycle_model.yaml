@@ -1,0 +1,70 @@
+version: '1.0'
+canonical: true
+source_of_truth: contracts/lifecycle_model.yaml
+objects:
+  case:
+    object_type: Case
+    state_field: status
+    initial_state: AT_RISK
+    terminal_states:
+    - RESOLVED
+    allowed_transitions:
+      AT_RISK:
+      - MITIGATION
+      - PAUSED
+      - RESOLVED
+      MITIGATION:
+      - AT_RISK
+      - PAUSED
+      - RESOLVED
+      PAUSED:
+      - AT_RISK
+      - MITIGATION
+      RESOLVED: []
+  kanban_card:
+    object_type: KanbanCard
+    state_field: status
+    initial_state: todo
+    terminal_states:
+    - resolved
+    allowed_transitions:
+      todo:
+      - in_progress
+      - blocked
+      in_progress:
+      - blocked
+      - resolved
+      blocked:
+      - in_progress
+      resolved: []
+    guardrails:
+      blocked_requires_reason: true
+      resolved_requires_timestamp: true
+      approval_gate:
+        when_new_status_is: resolved
+        require_channel: supervisor
+        require_case_risk_score_gte: 70
+  pending_action:
+    object_type: PendingAction
+    state_field: status
+    initial_state: pending
+    terminal_states:
+    - rejected
+    - executed
+    - blocked
+    - canceled
+    allowed_transitions:
+      pending:
+      - approved
+      - rejected
+      - canceled
+      - executed
+      - blocked
+      approved:
+      - executed
+      - blocked
+      - canceled
+      rejected: []
+      executed: []
+      blocked: []
+      canceled: []

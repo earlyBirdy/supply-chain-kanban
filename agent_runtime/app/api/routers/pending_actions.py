@@ -13,6 +13,7 @@ from ...policy_store import load_policy
 from ...auth import get_actor, get_channel
 from ...rbac import can_approve, can_execute
 from ...audit import with_audit
+from ...lifecycle_store import allowed_transitions as lifecycle_allowed_transitions
 
 router = APIRouter()
 
@@ -23,8 +24,7 @@ def _scoped_idem_key(endpoint: str, subject: str, card_id: str, raw: str) -> str
 
 
 def _pa_transition_allowed(policy: Dict[str, Any], frm: str, to: str) -> bool:
-    pol = (policy or {}).get("pending_action_policy") or {}
-    allowed = pol.get("allowed_transitions") or {}
+    allowed = lifecycle_allowed_transitions("pending_action") or (((policy or {}).get("pending_action_policy") or {}).get("allowed_transitions") or {})
     return to in set(allowed.get(frm, []) or [])
 
 
@@ -390,6 +390,7 @@ def execute_pending_action(
     base_payload = dict(pa.get("action_payload") or {})
     base_payload["_actor"] = actor
     base_payload["materialization_id"] = mid or ""
+    base_payload["pending_id"] = pending_id
     payload = with_audit(base_payload, actor=actor, request=request, materialization_id=mid)
 
     res = execute_action(

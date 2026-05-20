@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
+from .connectors.governed_writeback import connector_family_for_action
+
 
 def approval_required_for_action(
     policy: Dict[str, Any],
@@ -15,9 +17,10 @@ def approval_required_for_action(
     Rules (in order):
       1) action_types_no_approval => False
       2) action_types_require_approval => True
-      3) UpdateCardStatus: resolving inherits card_status_policy approval gate
-      4) external_connectors_require_approval and target != local_db => True
-      5) default => False
+      3) connector-specific policies may force approval
+      4) UpdateCardStatus: resolving inherits card_status_policy approval gate
+      5) external_connectors_require_approval and target != local_db => True
+      6) default => False
     """
     ap = (policy or {}).get("action_approval_policy") or {}
     at = (action_type or "").strip()
@@ -30,12 +33,16 @@ def approval_required_for_action(
     if at in yes_list:
         return True
 
+    family = connector_family_for_action(at)
+    connector_policy = ((ap.get("connector_policies") or {}).get(family) or {})
+    if connector_policy.get("approval_required") is not None:
+        return bool(connector_policy.get("approval_required"))
+
     if at == "UpdateCardStatus":
         ns = str((payload or {}).get("new_status") or "").strip()
         if ns == "resolved":
             gate = ((policy or {}).get("card_status_policy") or {}).get("approval_gate") or {}
             resolve_gate = gate.get("resolve") or {}
-            # If the gate exists (typical), require approval.
             return bool(resolve_gate.get("require_channel") or resolve_gate.get("require_high_risk_case") or True)
         return False
 

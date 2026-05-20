@@ -77,13 +77,13 @@ INSERT INTO agent_cases(case_id, status, owner, resource_id, scope, risk_score, 
 VALUES
 ('11111111-1111-1111-1111-111111111111', 'AT_RISK', 'planner@demo', 'dram_ddr5',
  '{"scope_type":"supplier","scope_id":"SUP_A","sku":"AI-SERVER-01","location":"DC_A","supplier_name":"Micron East"}'::jsonb,
- 82, 0.74, 14, '{"signals":["price_index_up","otif_down","spot_availability_down"]}'::jsonb, '2025-W03', now() - interval '28 hours', now() - interval '3 hours'),
-('22222222-2222-2222-2222-222222222222', 'AT_RISK', 'opslead@demo', 'battery_cells_lfp',
+ 76, 0.71, 17, '{"signals":["price_index_up","otif_down","spot_availability_down"]}'::jsonb, '2025-W03', now() - interval '28 hours', now() - interval '3 hours'),
+('22222222-2222-2222-2222-222222222222', 'AT_RISK', 'launch_pm@demo', 'battery_cells_lfp',
  '{"scope_type":"supplier","scope_id":"SUP_B","sku":"EV-PACK-02","location":"PLANT_2","supplier_name":"Shenzhen LFP Energy"}'::jsonb,
- 91, 0.81, 9, '{"signals":["port_delay_days_up","otif_down","schedule_adherence_down"]}'::jsonb, '2025-W03', now() - interval '41 hours', now() - interval '2 hours'),
-('33333333-3333-3333-3333-333333333333', 'WATCH', 'quality@demo', 'industrial_ethernet_switch',
+ 97, 0.89, 5, '{"signals":["port_delay_days_up","otif_down","schedule_adherence_down"]}'::jsonb, '2025-W03', now() - interval '41 hours', now() - interval '2 hours'),
+('33333333-3333-3333-3333-333333333333', 'WATCH', 'quality_launch@demo', 'industrial_ethernet_switch',
  '{"scope_type":"supplier","scope_id":"SUP_C","sku":"EDGE-SWITCH-8","location":"DC_C","supplier_name":"Orion Edge Components"}'::jsonb,
- 68, 0.72, 21, '{"signals":["regulatory_alert_score_up","quality_ppm_up"]}'::jsonb, '2025-W03', now() - interval '18 hours', now() - interval '1 hour');
+ 61, 0.66, 28, '{"signals":["regulatory_alert_score_up","quality_ppm_up"]}'::jsonb, '2025-W03', now() - interval '18 hours', now() - interval '1 hour');
 
 
 INSERT INTO traceability_events(event_id, case_id, source_id, event_type, object_ref, observed_at, validation_status, evidence_confidence, payload) VALUES
@@ -117,11 +117,11 @@ INSERT INTO kanban_cards(card_id, case_id, resource_id, scope, title, descriptio
 VALUES
 ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '11111111-1111-1111-1111-111111111111', 'dram_ddr5',
  '{"site":"DC_A","customer_program":"AI Rack Q1"}'::jsonb,
- 'DDR5 risk: SUP_A OTIF drop + price spike',
+ 'DDR5 watchlist for charger controllers',
  'Risk score elevated; evaluate expediting shipment SH-9002 and spot-buy coverage for AI server builds.',
  'todo', 2, 'planner@demo', 48, now() - interval '28 hours', now() - interval '3 hours', now() - interval '3 hours', NULL, NULL),
 ('bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '22222222-2222-2222-2222-222222222222', 'battery_cells_lfp',
- '{"site":"PLANT_2","customer_program":"EV Launch Wave 2"}'::jsonb,
+ '{"site":"PLANT_2","customer_program":"EV Launch Critical Path"}'::jsonb,
  'LFP battery cells delayed at port',
  'Inbound cells are late; rebalancing and supplier escalation needed to protect launch schedule.',
  'in_progress', 1, 'opslead@demo', 24, now() - interval '41 hours', now() - interval '2 hours', now() - interval '2 hours', NULL, NULL),

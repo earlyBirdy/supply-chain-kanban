@@ -27,6 +27,17 @@ In short: this is **not** just dashboards. It is an *operational supply-chain ob
 See:
 - `contracts/supply_chain_ontology.yaml`
 - `contracts/supply_chain_ontology.json`
+- `contracts/action_catalog.yaml`
+- `contracts/lifecycle_model.yaml`
+- `contracts/control_plane_manifest.yaml`
+- `governance/policy.yaml`
+
+### Canonical control plane (P0 freeze)
+- **Ontology source of truth**: `contracts/supply_chain_ontology.yaml`
+- **Action catalog**: `contracts/action_catalog.yaml`
+- **Lifecycle/state machines**: `contracts/lifecycle_model.yaml`
+- **RBAC + runtime policy**: `governance/policy.yaml`
+- Runtime fallbacks under `agent_runtime/` were removed so the app loads only these canonical root contracts.
 
 These define:
 - **Object types** (Order, Shipment, ProductionRecord, Case, Recommendation, Action, ...)
@@ -42,6 +53,11 @@ The demo includes a minimal API surface:
 - `GET /cases/...` (cases, recommendations, scenarios, actions)
 - `GET /graph/neighbors?...` (lightweight graph expansion)
 - `POST /actions/execute` (typed action execution + audit)
+- `GET /operator/summary` (operator KPI summary)
+- `GET /operator/board` (Risk Board lanes + enriched cards)
+- `GET /operator/cases/{case_id}` (Case Detail + Pending Approval + Audit Timeline payload)
+- `GET /operator/executive` (executive-mode summary + talking points)
+- `GET /operator/cases/{case_id}/scenario_compare` (comparison table/chart payload)
 
 When you run Docker Compose, the API is exposed on port `8000`.
 
@@ -60,7 +76,7 @@ make demo-ui
 # Full demo (UI + agent) + smoke + checklist
 make demo-all
 
-# Gemini Live Agent demo (scaffold)
+# Operator Surface (primary UI)
 make demo-live
 # open http://localhost:8080
 
@@ -80,6 +96,22 @@ Error responses are standardized:
 
 See `demo/README.md` for a live-demo walkthrough.
 
+
+
+## Operator surface (P1)
+The primary demo UI is now a single operator flow at `http://localhost:8080`:
+- **Risk Board** — grouped Kanban lanes with enriched card state
+- **Case Detail** — selected case, recommendations, scenarios, signals
+- **Pending Approval** — approve / reject / dry-run / execute actions
+- **Audit Timeline** — recent operator and system events for the case
+
+This UI is backed by a small aggregation API:
+- `GET /operator/summary`
+- `GET /operator/board`
+- `GET /operator/cases/{case_id}`
+- `GET /operator/pending`
+
+Use **Run approval scenario** in the UI to generate a fresh case that stops at the approval gate.
 
 ## Repo structure (simplified)
 - `/demo` – runnable local demo (Docker + Python)
@@ -213,3 +245,55 @@ curl -X POST http://localhost:8000/demo/run_scenario \
 ```
 
 > Replace the websocket bridge with a real Gemini Live API session later (the scaffold is structured for that).
+
+
+## P2 operator surface
+
+The primary demo surface now supports:
+- board filters (assignee, approval state, SLA state, min risk)
+- SLA and aging badges directly on each card
+- plain-language approval narrative for non-technical demos
+- simulation before execution
+- governed writeback receipts for external actions
+
+
+## P3 customer-ready demo
+
+This patch adds:
+- an executive mode at the top of the web demo
+- scenario comparison payloads and chart-ready bars
+- richer seeded business data with three realistic cases
+- governed connector packs for ERP, supplier portal, and ticketing
+
+The main demo UI remains `http://localhost:8080`, but now supports both operator and executive storytelling in one surface.
+## P4 Demo Polish
+
+The primary web demo now includes:
+- Executive mode with persona + customer theme framing
+- One-page executive brief export
+- Rich writeback receipts for ERP / supplier portal / ticketing
+- Connector-specific approval policies
+- Cleaner board/card visuals for live demos
+
+
+
+## P5 buyer-tailored packaging
+
+- Vertical seed packs: portfolio, data_center, ev_launch, industrial_edge
+- Brand/theme swap layer driven by `contracts/demo_experience_pack.yaml`
+- Exportable screenshot stills from `/operator/screenshot_manifest` and the web demo export button
+- Scripted guided walkthrough from `/operator/demo_script` and the web demo guide rail
+
+## P6 transparency evidence layer
+
+The operator demo now includes a blockchain-ready evidence layer for supply-chain transparency:
+
+- `ExternalDataSource` registry for ERP, WMS, IoT, supplier portal, news, and audit inputs.
+- `TraceabilityEvent` rows that record real-world operating events before they become proof.
+- `EvidenceReceipt` rows with validation status and evidence confidence scores.
+- `BlockchainAnchor` ledger-proof stubs for demo-safe anchoring without a real chain dependency.
+- `GET /operator/cases/{case_id}/transparency` for case-level data trust context.
+- `GET /operator/transparency_report?case_id=...` for a buyer-facing markdown transparency report.
+
+Repo editing rules are now captured in `RULES.md`.
+

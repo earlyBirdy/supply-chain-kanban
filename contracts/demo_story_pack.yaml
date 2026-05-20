@@ -1,0 +1,58 @@
+version: 1
+personas:
+  coo:
+    label: COO / Operations Leader
+    focus: Revenue exposure, service continuity, decision velocity
+    headline_template: 'Executive view for the COO: where risk threatens service and
+      which governed actions unblock delivery.'
+    talking_style:
+    - Start with revenue at risk and SLA pressure.
+    - Highlight the approval bottleneck, not the technical stack.
+    - End with the governed action already prepared for execution.
+  vp_supply_chain:
+    label: VP Supply Chain
+    focus: Supplier resilience, allocation tradeoffs, procurement mitigation
+    headline_template: 'VP Supply Chain view: prioritize constrained materials, supplier
+      escalation, and allocation choices.'
+    talking_style:
+    - Focus on cross-site balancing and supplier recovery.
+    - Compare scenarios on service, cost, and exposure.
+    - Call out which connector path will carry the approved writeback.
+  plant_gm:
+    label: Plant GM
+    focus: Launch protection, material flow, local execution confidence
+    headline_template: 'Plant GM view: keep the line running and show what approvals
+      still block local execution.'
+    talking_style:
+    - Lead with the next shipment or allocation decision.
+    - Keep language operational and short.
+    - Emphasize audit trail and accountable owner.
+customer_themes:
+  data_center:
+    label: Data Center Hardware
+    summary: AI racks, edge gear, OTIF pressure, and constrained semis.
+    preferred_case_ids:
+    - 11111111-1111-1111-1111-111111111111
+    - 33333333-3333-3333-3333-333333333333
+    color_hint: ice
+    proof_points:
+    - Protect high-margin server shipments under constrained component supply.
+    - Show governed ERP and ticketing writeback with audit-ready evidence.
+  ev_launch:
+    label: EV Launch
+    summary: Battery cell delays, supplier recovery, and launch timing protection.
+    preferred_case_ids:
+    - 22222222-2222-2222-2222-222222222222
+    color_hint: amber
+    proof_points:
+    - Show supplier escalation plus allocation tradeoff in one workflow.
+    - Frame approval gates as launch governance, not extra friction.
+  industrial_edge:
+    label: Industrial / Edge Retrofit
+    summary: Compliance, containment, and service risk across distributed sites.
+    preferred_case_ids:
+    - 33333333-3333-3333-3333-333333333333
+    color_hint: steel
+    proof_points:
+    - Demonstrate controlled containment and internal ticketing.
+    - Show why audit evidence matters for regulated operations.

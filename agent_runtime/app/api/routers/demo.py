@@ -21,6 +21,7 @@ from ...audit import with_audit
 from ...connectors import nova as nova_connector
 from ...config import DEV_MODE
 from ...policy_store import policy_revision
+from ...demo_experience_store import seed_pack_catalog
 
 router = APIRouter()
 
@@ -499,17 +500,21 @@ def _exec_sql_script(sql_text: str) -> None:
             conn.exec_driver_sql(st)
 
 @router.post("/reset")
-def demo_reset():
+def demo_reset(pack: str | None = None):
     """Reset DB to demo seed. DEV_MODE only."""
     if not DEV_MODE:
         raise HTTPException(status_code=403, detail="demo/reset is disabled (DEV_MODE=0)")
     repo_root = Path(__file__).resolve().parents[4]  # .../agent_runtime/app/api/routers -> repo root
-    seed_path = repo_root / "seed" / "01_seed_demo.sql"
+    packs = seed_pack_catalog()
+    pack_key = pack if pack in packs else (pack or 'portfolio')
+    pack_info = packs.get(pack_key, {})
+    seed_file = str(pack_info.get('seed_file') or '01_seed_demo.sql')
+    seed_path = repo_root / 'seed' / seed_file
     if not seed_path.exists():
         raise HTTPException(status_code=500, detail=f"Seed file missing: {seed_path}")
-    sql_text = seed_path.read_text(encoding="utf-8")
+    sql_text = seed_path.read_text(encoding='utf-8')
     _exec_sql_script(sql_text)
-    return {"ok": True, "reset": True}
+    return {"ok": True, "reset": True, "pack": pack_key, "seed_file": seed_file}
 
 # --- Demo narrative scenarios (v26) ---
 

@@ -10,6 +10,10 @@ INGEST_DIR = os.getenv("INGEST_DIR", "/ingest")
 ERP_CONNECTOR = os.getenv("ERP_CONNECTOR", "mock")  # mock | sap | oracle | ...
 ERP_BASE_URL = os.getenv("ERP_BASE_URL", "")
 ERP_API_KEY = os.getenv("ERP_API_KEY", "")
+SUPPLIER_PORTAL_CONNECTOR = os.getenv("SUPPLIER_PORTAL_CONNECTOR", "stub")
+SUPPLIER_PORTAL_BASE_URL = os.getenv("SUPPLIER_PORTAL_BASE_URL", "")
+TICKETING_CONNECTOR = os.getenv("TICKETING_CONNECTOR", "stub")
+TICKETING_BASE_URL = os.getenv("TICKETING_BASE_URL", "")
 
 # API
 API_HOST = os.getenv("API_HOST", "0.0.0.0")

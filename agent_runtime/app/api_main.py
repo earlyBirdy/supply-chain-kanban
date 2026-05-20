@@ -39,6 +39,7 @@ from .api.routers import (
     ontology,
     pending_actions,
     news,
+    operator,
 )
 
 
@@ -160,6 +161,7 @@ def create_app() -> FastAPI:
     app.include_router(governance.router, prefix="/governance", tags=["governance"])
     app.include_router(maintenance.router, prefix="/maintenance", tags=["maintenance"])
     app.include_router(news.router, prefix="/news", tags=["news"])
+    app.include_router(operator.router, prefix="/operator", tags=["operator"])
     app.include_router(demo.router, prefix="/demo", tags=["demo"])
 
     return app
