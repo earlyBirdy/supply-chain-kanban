@@ -53,6 +53,26 @@ CREATE TABLE IF NOT EXISTS mes_production (
 );
 
 
+-- Agent state
+CREATE TABLE IF NOT EXISTS agent_cases (
+  case_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  status TEXT NOT NULL DEFAULT 'AT_RISK',
+  owner TEXT,
+  resource_id TEXT NOT NULL,
+  scope JSONB NOT NULL DEFAULT '{}'::jsonb,
+  risk_score INT NOT NULL,
+  confidence NUMERIC NOT NULL DEFAULT 0.7,
+  lead_time_to_failure_days INT,
+  root_signals JSONB NOT NULL DEFAULT '{}'::jsonb,
+  last_observed_period TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_cases_status ON agent_cases(status);
+CREATE INDEX IF NOT EXISTS idx_agent_cases_resource ON agent_cases(resource_id);
+
+
 -- Transparency evidence layer: external data -> traceability event -> evidence receipt -> optional ledger anchor.
 CREATE TABLE IF NOT EXISTS external_data_sources (
   source_id TEXT PRIMARY KEY,
@@ -105,25 +125,6 @@ CREATE TABLE IF NOT EXISTS blockchain_anchors (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_blockchain_anchors_receipt ON blockchain_anchors(receipt_id);
-
--- Agent state
-CREATE TABLE IF NOT EXISTS agent_cases (
-  case_id UUID PRIMARY KEY DEFAULT (md5(random()::text || clock_timestamp()::text)::uuid),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  status TEXT NOT NULL DEFAULT 'AT_RISK',
-  owner TEXT,
-  resource_id TEXT NOT NULL,
-  scope JSONB NOT NULL DEFAULT '{}'::jsonb,
-  risk_score INT NOT NULL,
-  confidence NUMERIC NOT NULL DEFAULT 0.7,
-  lead_time_to_failure_days INT,
-  root_signals JSONB NOT NULL DEFAULT '{}'::jsonb,
-  last_observed_period TEXT
-);
-
-CREATE INDEX IF NOT EXISTS idx_agent_cases_status ON agent_cases(status);
-CREATE INDEX IF NOT EXISTS idx_agent_cases_resource ON agent_cases(resource_id);
 
 
 -- Kanban (Operational cards as first-class objects)

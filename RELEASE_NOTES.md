@@ -89,3 +89,32 @@ ERP / WMS / TMS / SiteTrack / market signals
   -> receipt + audit / blockchain evidence
   -> Kanban command board / BI reporting view
 ```
+
+
+## Demo-agent startup hardening
+
+### Fixed
+
+```text
+make demo-agent -> db_init exited with status 3
+```
+
+Root cause: `00_schema.sql` created the transparency/evidence tables before `agent_cases`, but those tables declare foreign keys to `agent_cases`. PostgreSQL executes the schema top-to-bottom, so the init container could fail before API, web, and agent services were usable.
+
+### Changed
+
+```text
+data/seed_sql/00_schema.sql
+  Create agent_cases before traceability_events, evidence_receipts, and blockchain_anchors.
+
+tests/test_seed_schema_order.py
+  Add a regression guard so schema tables cannot reference foreign-key targets before those targets are created.
+```
+
+### Note
+
+If Docker itself is not running, start Docker Desktop first. That environment issue appears as:
+
+```text
+Cannot connect to the Docker daemon
+```

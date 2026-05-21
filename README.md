@@ -1,8 +1,8 @@
 # Supply Chain Kanban AI Agent
 
-A professional supply-chain leader-agent that runs as a team lead or department manager: it watches daily operating signals, opens and updates Kanban risk cases, explains business impact, recommends mitigations, routes approvals, executes governed writebacks into existing systems, and keeps evidence for audit.
+A professional supply-chain manager-agent that runs like a team lead or department manager: it watches daily operating signals, opens and updates Kanban risk cases, explains business impact, recommends mitigations, routes approvals, executes governed writebacks into existing systems, and keeps evidence for audit.
 
-Kanban is the **regular supply-chain operations basis** for this repo. It is used every day for planning, purchasing, logistics, supplier follow-up, batches/container tracking, approvals, and exception management. Crisis mode is a dashboard/view on top of the same Kanban model, not a separate product.
+Kanban is the **regular supply-chain operations basis** for this repo. It is used every day for planning, purchasing, logistics, supplier follow-up, container tracking, approvals, and exception management. Crisis mode is a dashboard/view on top of the same Kanban model, not a separate product.
 
 ## Core design concept
 
@@ -301,6 +301,24 @@ make status   # docker status + smoke checks
 
 Detailed runbook: `docs/demo/RUN_LOCAL_UI.md`.
 UI framework decision: `docs/product/UI_FRAMEWORK_DECISION.md`.
+
+### Docker demo troubleshooting
+
+If Docker is not running, `make demo-web` or `make demo-agent` fails before the repo starts:
+
+```text
+Cannot connect to the Docker daemon
+```
+
+Start Docker Desktop first, then rerun the same command.
+
+If `db_init` fails, inspect the init logs first:
+
+```bash
+docker compose logs db_init
+```
+
+The demo database is initialized by `data/seed_sql/00_schema.sql`, `01_seed_demo.sql`, and `02_views.sql`. The schema must create referenced tables before any foreign-key references; `make test` includes a guard for that ordering.
 
 ## Streamlit AI-agent debug cockpit
 
