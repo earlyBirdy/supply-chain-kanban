@@ -13,9 +13,9 @@ contract:
     governance_policy: governance/policy.yaml
     control_plane_manifest: contracts/control_plane_manifest.yaml
   runtime:
-    ontology_loader: agent_runtime/app/ontology_store.py
-    policy_loader: agent_runtime/app/policy_store.py
-    lifecycle_loader: agent_runtime/app/lifecycle_store.py
+    ontology_loader: apps/api/app/ontology_store.py
+    policy_loader: apps/api/app/policy_store.py
+    lifecycle_loader: apps/api/app/lifecycle_store.py
 object_types:
   Resource:
     description: A constrained resource/material (e.g., memory, freight lane, resin).

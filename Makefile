@@ -1,90 +1,89 @@
 SHELL := /bin/bash
 
-.PHONY: help demo demo-min demo-ui demo-all seed down reset logs psql status clean test
+.PHONY: help demo demo-min demo-web demo-agent demo-signals seed down reset logs psql status clean test test-fast debug-ui
 
 help:
 	@echo "Targets:"
-	@echo "  make demo       - start API+agent demo (no UI)"
-	@echo "  make demo-min   - start minimal demo (DB+API only)"
-	@echo "  make demo-ui    - start demo + Superset UI (profile ui)"
-	@echo "  make demo-all   - start full demo + run smoke + print checklist"
-	@echo "  make demo-live  - start Gemini Live demo (api + orchestrator + web + optional news_monitor)"
-	@echo "  make seed       - re-seed demo DB without restarting"
-	@echo "  make logs       - tail agent/api logs"
-	@echo "  make psql       - open psql in db container"
-	@echo "  make status     - show service status + smoke checks"
-	@echo "  make down       - stop services (keep volumes)"
-	@echo "  make reset      - stop + remove volumes (fresh DB)"
-	@echo "  make clean      - remove pycache/pyc/bak/test caches"
-	@echo "  make test       - run unit tests (local python)"
+	@echo "  make demo          - start DB + API + Kanban web board (default demo)"
+	@echo "  make demo-min      - start DB + API"
+	@echo "  make demo-web      - start DB + API + Kanban web board"
+	@echo "  make demo-agent    - start DB + API + background agent"
+	@echo "  make demo-signals  - start optional market signal monitor"
+	@echo "  make seed          - re-seed demo DB without restarting"
+	@echo "  make logs          - tail API/agent logs"
+	@echo "  make psql          - open psql in db container"
+	@echo "  make status        - show service status + smoke checks"
+	@echo "  make down          - stop services"
+	@echo "  make reset         - stop + remove volumes"
+	@echo "  make clean         - remove generated caches"
+	@echo "  make test          - run Python compile checks + pytest"
+	@echo "  make test-fast     - run pytest only"
+	@echo "  make debug-ui      - start Streamlit AI-agent debug cockpit"
 
 clean:
 	@bash ./scripts/clean.sh
 
+# Default browser demo alias.
 demo:
-	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
-	docker compose down -v || true
-	docker compose --profile agent up -d --build
-	@bash ./scripts/demo_smoke.sh agent
-	@echo "API docs: http://localhost:8000/docs"
-	@echo "Tail logs: make logs"
+	@$(MAKE) demo-web
 
 demo-min:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
 	docker compose down -v || true
 	docker compose up -d --build
-	@./scripts/demo_smoke.sh
+	@bash ./scripts/demo_smoke.sh
 	@echo "API docs: http://localhost:8000/docs"
 
-demo-ui:
+demo-web:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
 	docker compose down -v || true
-	docker compose --profile ui --profile agent up -d --build
-	@./scripts/demo_smoke.sh ui
+	docker compose --profile web up -d --build
+	@bash ./scripts/demo_smoke.sh web
 	@echo "API docs: http://localhost:8000/docs"
-	@echo "Superset: http://localhost:8088 (login SUPERSET_ADMIN_USER/SUPERSET_ADMIN_PASS from .env)"
+	@echo "Kanban board: http://localhost:8080"
 
-demo-live:
+demo-agent:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
 	docker compose down -v || true
-	docker compose --profile live up -d --build
-	@bash ./scripts/demo_smoke.sh live
+	docker compose --profile agent --profile web up -d --build
+	@bash ./scripts/demo_smoke.sh web
 	@echo "API docs: http://localhost:8000/docs"
-	@echo "Live orchestrator: http://localhost:8081/healthz"
-	@echo "Web demo: http://localhost:8080"
-	@echo "Trigger scenario (optional): curl -X POST http://localhost:8000/demo/run_scenario -H 'Content-Type: application/json' -d '{"name":"memory_leakage_news_burst","risk_score":86}'"
+	@echo "Kanban board: http://localhost:8080"
 
-demo-all:
-	@$(MAKE) demo-ui
-	@bash ./scripts/demo_checklist.sh
+demo-signals:
+	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
+	docker compose --profile signals up -d --build
+	@echo "Signal monitor started. Tail logs with: docker compose logs -f news_monitor"
 
 seed:
-	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; \
-	docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seed/01_seed_demo.sql
+	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; 	docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seed/01_seed_demo.sql
 	@echo "Re-seeded demo data."
 
 logs:
-	docker compose --profile agent logs -f agent api
+	docker compose logs -f api agent news_monitor
 
 psql:
-	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; \
-	docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
+	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; 	docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
 
 down:
 	docker compose down || true
 
 reset:
 	docker compose down -v || true
-	@echo "Removed volumes. Next: make demo, make demo-ui, or make demo-all"
+	@echo "Removed volumes. Next: make demo-min or make demo-web"
 
 status:
 	@echo "== docker compose ps =="
 	docker compose ps
 	@echo ""
-	@./scripts/demo_smoke.sh
-	@echo ""
-	@echo "(To include Superset UI checks: ./scripts/demo_smoke.sh ui)"
-	@./scripts/demo_checklist.sh
+	@bash ./scripts/demo_smoke.sh
+	@bash ./scripts/demo_checklist.sh
 
 test:
-	@PYTHONPATH=agent_runtime pytest -q
+	@python3 scripts/run_checks.py
+
+test-fast:
+	@PYTHONPATH=apps/api pytest -q
+
+debug-ui:
+	@python3 -m streamlit run apps/debug_ui/streamlit_app.py --server.port 8501

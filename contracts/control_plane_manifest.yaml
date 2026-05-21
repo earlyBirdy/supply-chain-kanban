@@ -8,8 +8,8 @@ sources:
   governance_policy: governance/policy.yaml
 generated_or_removed_duplicates:
   removed_runtime_fallbacks:
-  - agent_runtime/app/ontology.yaml
-  - agent_runtime/app/ontology.json
-  - agent_runtime/governance/policy.yaml
+  - apps/api/app/ontology.yaml
+  - apps/api/app/ontology.json
+  - apps/api/governance/policy.yaml
   schema_deduplications:
   - 'seed/00_schema.sql: duplicate materializations table removed'

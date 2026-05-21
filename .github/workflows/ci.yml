@@ -19,14 +19,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r agent_runtime/requirements.txt -r requirements-dev.txt
+          pip install -r apps/api/requirements.txt -r requirements-dev.txt
 
-      - name: Ruff
+      - name: Python quality gate
         run: |
-          ruff check .
-
-      - name: Pytest
-        env:
-          PYTHONPATH: agent_runtime
-        run: |
-          pytest -q
+          python3 scripts/run_checks.py

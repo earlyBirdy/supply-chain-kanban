@@ -18,7 +18,7 @@ find . -type f -name '*~' -delete 2>/dev/null || true
 find . -type f -name '.DS_Store' -delete 2>/dev/null || true
 
 # Python tooling caches
-rm -rf .ruff_cache .mypy_cache .coverage htmlcov || true
+rm -rf .mypy_cache .coverage htmlcov || true
 
 # Keep the repo root clean
 printf '✅ Clean complete (pycache/pyc/bak/test caches removed)\n'

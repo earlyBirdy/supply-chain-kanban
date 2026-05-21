@@ -9,8 +9,8 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./seed:/seed
-      - ./ingest:/ingest
+      - ./data/seed_sql:/seed
+      - ./data/ingest_samples:/ingest
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-demo} -d ${POSTGRES_DB:-demo} -h localhost"]
       interval: 5s
@@ -27,7 +27,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-demo}
       POSTGRES_DB: ${POSTGRES_DB:-demo}
     volumes:
-      - ./seed:/seed
+      - ./data/seed_sql:/seed
     entrypoint: ["/bin/bash", "-lc"]
     command: >
       "
@@ -38,7 +38,7 @@ services:
   agent:
     profiles: ["agent"]
     build:
-      context: ./agent_runtime
+      context: ./apps/api
     env_file:
       - .env
     environment:
@@ -47,8 +47,15 @@ services:
       RISK_CREATE_THRESHOLD: ${RISK_CREATE_THRESHOLD:-70}
       ALERT_THRESHOLD: ${ALERT_THRESHOLD:-85}
       INGEST_DIR: /ingest
+      GOV_POLICY_PATH: /governance/policy.yaml
+      DEMO_EXPERIENCE_PACK_PATH: /contracts/demo_experience_pack.yaml
+      DEMO_STORY_PACK_PATH: /contracts/demo_story_pack.yaml
+      LIFECYCLE_MODEL_PATH: /contracts/lifecycle_model.yaml
+      ONTOLOGY_PATH: /contracts/supply_chain_ontology.yaml
     volumes:
-      - ./ingest:/ingest
+      - ./data/ingest_samples:/ingest
+      - ./contracts:/contracts:ro
+      - ./operations/governance:/governance
     depends_on:
       db:
         condition: service_healthy
@@ -57,15 +64,24 @@ services:
 
   api:
     build:
-      context: ./agent_runtime
+      context: ./apps/api
     env_file:
       - .env
     environment:
       AGENT_DB_URL: ${AGENT_DB_URL:-postgresql+psycopg2://demo:demo@db:5432/demo}
       ERP_CONNECTOR: mock
       API_PORT: "8000"
+      GOV_POLICY_PATH: /governance/policy.yaml
+      DEMO_EXPERIENCE_PACK_PATH: /contracts/demo_experience_pack.yaml
+      DEMO_STORY_PACK_PATH: /contracts/demo_story_pack.yaml
+      LIFECYCLE_MODEL_PATH: /contracts/lifecycle_model.yaml
+      ONTOLOGY_PATH: /contracts/supply_chain_ontology.yaml
     ports:
       - "8000:8000"
+    volumes:
+      - ./contracts:/contracts:ro
+      - ./operations/governance:/governance
+      - ./data/seed_sql:/seed:ro
     depends_on:
       db:
         condition: service_healthy
@@ -76,12 +92,15 @@ services:
   cleanup:
     profiles: ["agent"]
     build:
-      context: ./agent_runtime
+      context: ./apps/api
     env_file:
       - .env
     environment:
       AGENT_DB_URL: ${AGENT_DB_URL:-postgresql+psycopg2://demo:demo@db:5432/demo}
       APP_ENV: ${APP_ENV:-dev}
+      GOV_POLICY_PATH: /governance/policy.yaml
+    volumes:
+      - ./operations/governance:/governance
     depends_on:
       db:
         condition: service_healthy
@@ -89,81 +108,20 @@ services:
         condition: service_completed_successfully
     command: ["bash", "-lc", "python -m app.jobs.cleanup_loop"]
 
-  superset:
-    profiles: ["ui"]
+  web:
+    profiles: ["web"]
     build:
-      context: ./superset
-    image: supply-chain-kanban-superset-ui:local
-    env_file:
-      - .env
-    environment:
-      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-dev-secret-key-change-later}
-      SUPERSET_LOAD_EXAMPLES: "no"
-      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+      context: ./apps/web
     ports:
-      - "8088:8088"
-    volumes:
-      - ./superset/superset_config.py:/app/pythonpath/superset_config.py
-      - ./superset/executive_dashboard.json:/app/executive_dashboard.json
-    depends_on:
-      db:
-        condition: service_healthy
-      db_init:
-        condition: service_completed_successfully
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8088/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-
-  superset_bootstrap:
-    profiles: ["ui"]
-    image: supply-chain-kanban-superset-ui:local
-    env_file:
-      - .env
-    environment:
-      SUPERSET_ADMIN_USER: ${SUPERSET_ADMIN_USER:-admin}
-      SUPERSET_ADMIN_PASS: ${SUPERSET_ADMIN_PASS:-admin}
-      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@example.com}
-      DEMO_DB_URI: ${DEMO_DB_URI:-postgresql+psycopg2://demo:demo@db:5432/demo}
-      DEMO_DB_NAME: ${DEMO_DB_NAME:-demo}
-    depends_on:
-      superset:
-        condition: service_healthy
-    command: ["bash", "-lc", "superset db upgrade && superset init && python /app/bootstrap_superset.py"]
-    volumes:
-      - ./superset/bootstrap_superset.py:/app/bootstrap_superset.py
-
-
-  # Gemini Live demo (scaffold)
-  live_orchestrator:
-    profiles: ["live"]
-    build:
-      context: ./live_orchestrator
-    environment:
-      API_BASE: http://api:8000
-      ORCHESTRATOR_MODE: ${ORCHESTRATOR_MODE:-scaffold}
-      GEMINI_LIVE_MODEL: ${GEMINI_LIVE_MODEL:-gemini-live-2.5-flash-native-audio}
-    ports:
-      - "8081:8081"
+      - "8080:80"
     depends_on:
       api:
         condition: service_started
 
-  web_demo:
-    profiles: ["live"]
-    build:
-      context: ./web_demo
-    ports:
-      - "8080:80"
-    depends_on:
-      live_orchestrator:
-        condition: service_started
-
   news_monitor:
-    profiles: ["live"]
+    profiles: ["signals"]
     build:
-      context: ./news_monitor
+      context: ./apps/news_monitor
     environment:
       API_BASE: http://api:8000
       NEWS_TOPIC: memory

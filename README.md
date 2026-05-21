@@ -1,299 +1,340 @@
-# Supply Chain Kanban – Foundry-style Ontology + AI Agents (Demo)
+# Supply Chain Kanban AI Agent
 
-Most supply-chain systems see the world as **tables** (ERP rows, WMS rows, MES rows).
-Leaders see the world as **objects**: orders, shipments, plants, suppliers, constrained resources.
+A professional supply-chain manager-agent that runs like a team lead or department manager: it watches daily operating signals, opens and updates Kanban risk cases, explains business impact, recommends mitigations, routes approvals, executes governed writebacks into existing systems, and keeps evidence for audit.
 
-This repo is a minimal, runnable demonstration of a **Foundry-like pattern** applied to supply chain:
+Kanban is the **regular supply-chain operations basis** for this repo. It is used every day for planning, purchasing, logistics, supplier follow-up, container tracking, approvals, and exception management. Crisis mode is a dashboard/view on top of the same Kanban model, not a separate product.
 
-- **Ontology (Semantic layer):** map fragmented facts into real-world objects + relationships
-- **Kinetic (Execution layer):** turn dashboards into *actions* (typed write-backs) with audit trails
-- **Dynamic (Evolution layer):** evolve the model as new risks/rules appear, without rewriting the whole stack
+## Core design concept
 
-In short: this is **not** just dashboards. It is an *operational supply-chain object graph*.
+This repo is different from a normal supply-chain dashboard, BI report, or ERP screen. It is designed as an **AI leader for the supply-chain team**. The agent should behave like a supply-chain team lead or department manager: it checks the operating situation, understands objects and constraints, opens the right Kanban cases, recommends actions, asks for approval when needed, executes typed writebacks, and keeps proof.
 
-## What this demo shows
-- Early detection of constraints using market + ops signals
-- Multi-agent case creation, scenario simulation, and ranked recommendations
-- Ontology-driven object model (orders / shipments / production / cases)
-- A minimal Object Graph API (FastAPI)
-- Kinetic actions (execute typed actions, mock ERP connector, auditable action log)
+Most supply-chain systems see the world as tables:
 
-## What this is NOT
-- Not a production deployment (no HA, no enterprise auth, no full RBAC model)
-- Not connected to real ERP/SAP/Oracle by default (uses a mock connector)
-- Not fully autonomous execution (human-in-the-loop is the default posture)
+```text
+ERP rows
+WMS rows
+MES rows
+TMS rows
+BI rows
+```
 
-## Ontology
-See:
-- `contracts/supply_chain_ontology.yaml`
-- `contracts/supply_chain_ontology.json`
-- `contracts/action_catalog.yaml`
-- `contracts/lifecycle_model.yaml`
-- `contracts/control_plane_manifest.yaml`
-- `governance/policy.yaml`
+Leaders see the world as operational objects:
 
-### Canonical control plane (P0 freeze)
-- **Ontology source of truth**: `contracts/supply_chain_ontology.yaml`
-- **Action catalog**: `contracts/action_catalog.yaml`
-- **Lifecycle/state machines**: `contracts/lifecycle_model.yaml`
-- **RBAC + runtime policy**: `governance/policy.yaml`
-- Runtime fallbacks under `agent_runtime/` were removed so the app loads only these canonical root contracts.
+```text
+orders
+shipments
+containers
+plants
+suppliers
+customers
+parts
+BOM items
+constrained resources
+recovery actions
+approval decisions
+```
 
-These define:
-- **Object types** (Order, Shipment, ProductionRecord, Case, Recommendation, Action, ...)
-- **Relationships** (Shipment fulfills Order, Case targets Resource, ...)
-- **Action types** (TriggerPurchase, ExpediteShipment, RebalanceAllocation, ...)
+This repo is a minimal, runnable demonstration of a **Foundry-like pattern applied to supply chain**:
 
-## Object Graph API (FastAPI)
-The demo includes a minimal API surface:
+```text
+Ontology / semantic layer
+  Map fragmented facts into real-world objects and relationships.
 
-- `GET /health`
-- `GET /ontology` (`/json` / `/yaml`)
-- `GET /objects/...` (order, shipment, production, resource)
-- `GET /cases/...` (cases, recommendations, scenarios, actions)
-- `GET /graph/neighbors?...` (lightweight graph expansion)
-- `POST /actions/execute` (typed action execution + audit)
-- `GET /operator/summary` (operator KPI summary)
-- `GET /operator/board` (Risk Board lanes + enriched cards)
-- `GET /operator/cases/{case_id}` (Case Detail + Pending Approval + Audit Timeline payload)
-- `GET /operator/executive` (executive-mode summary + talking points)
-- `GET /operator/cases/{case_id}/scenario_compare` (comparison table/chart payload)
+Kinetic / execution layer
+  Turn dashboards into actions through typed writebacks, approval gates, receipts, and audit trails.
 
-When you run Docker Compose, the API is exposed on port `8000`.
+Dynamic / evolution layer
+  Evolve the model as new risks, rules, suppliers, products, and constraints appear without rewriting the whole stack.
+```
 
-## Quick start
+In short: this is **not just dashboards**. It is an **operational supply-chain object graph** with AI-agent leadership, Kanban operations, governed execution, and blockchain-ready evidence.
+
+## Blockchain for supply chain
+
+Blockchain is used to strengthen supply-chain trust, transparency, and cross-party evidence. The default architecture keeps the application database as the fast operational store and uses blockchain as an evidence layer for:
+
+```text
+case lifecycle proof
+approval proof
+SiteTrack container checkpoint proof
+ERP/WMS/TMS writeback receipt proof
+supplier commitment proof
+audit and compliance evidence
+```
+
+Advanced mode can use a permissioned blockchain as the append-only operational event ledger, while the application database becomes a read model for Kanban UI, API speed, analytics, and debugging. The key rule is that blockchain must not become a magic database. It still needs trusted external data layers from ERP, WMS, TMS, MES, SiteTrack, supplier portals, IoT, and verified APIs.
+
+## Product loop
+
+```text
+ERP / WMS / TMS / SiteTrack / supplier / market signals
+  -> canonical events
+  -> risk case detection
+  -> AI recommendation
+  -> approval gate
+  -> governed execution
+  -> receipt + audit evidence
+  -> Kanban command board
+```
+
+The system should answer six management questions:
+
+```text
+What happened?
+What is impacted?
+What should we do?
+Who must approve it?
+What system changed?
+Can we prove it later?
+```
+
+## How the AI agent works now
+
+The repo has two AI-agent paths. Both feed the same Kanban command board.
+
+### Path 1 — supply-chain team lead / department manager
+
 ```bash
 cp .env.example .env
-# API + agent (no UI)
-make demo
+make demo-agent
+```
 
-# Minimal (DB + API only)
+Open:
+
+```text
+Kanban command board: http://localhost:8080
+API docs:              http://localhost:8000/docs
+```
+
+Flow:
+
+```text
+ERP / WMS / MES / SiteTrack signals
+  -> risk scoring
+  -> Kanban risk case
+  -> impact analysis
+  -> AI recommendation
+  -> approval gate
+  -> governed writeback
+  -> receipt + audit evidence
+```
+
+Use this when the product should behave like a supply-chain team lead: watch the board, prioritize risk, explain impact, recommend action, escalate approvals, and prove what changed.
+
+### Path 2 — news / market-signal monitor
+
+```bash
+cp .env.example .env
+make demo-web
+make demo-signals
+```
+
+Optional RSS mode:
+
+```bash
+NEWS_MODE=rss NEWS_TOPIC=memory make demo-signals
+```
+
+Open:
+
+```text
+Kanban command board: http://localhost:8080
+News API:             http://localhost:8000/news/items?topic=memory
+News alerts:          http://localhost:8000/news/alerts?topic=memory
+```
+
+Example: AI datacenter RAM lead-time volatility can become a memory supply-risk signal, then a Kanban risk case with impacted orders, recommended supplier/inventory action, approval policy, execution receipt, and audit evidence.
+
+Detailed doc: `docs/product/AI_AGENT_OPERATING_MODEL.md`.
+
+
+## Release notes
+
+This repo now uses release notes instead of patch wording. Current release:
+
+```text
+Release: Supply Chain Kanban AI Agent — Operations Basis
+Status: professional repo structure, Python-only quality gate, Kanban regular-operations model
+```
+
+Highlights:
+
+```text
+- Kanban is defined as the daily supply-chain operations basis.
+- Crisis operations is a dashboard/view over the same Kanban cases.
+- Devpost and Gemini-specific demo content are removed from the professional core.
+- BI is retained as an optional analytics/reporting layer for later ERP-adjacent use.
+- Running commands are documented in README and docs/demo/RUN_LOCAL_UI.md.
+```
+
+Detailed release file: `RELEASE_NOTES.md`.
+
+## Clean repo tree
+
+```text
+apps/
+  api/                         FastAPI runtime, risk cases, actions, approvals, connectors
+  web/                         human Kanban command board
+  news_monitor/                optional market-signal adapter
+  manager_agent_blueprints/    manager-agent behavior and role blueprints
+contracts/                     canonical contracts: actions, lifecycle, ontology, control-plane manifest
+data/
+  seed_sql/                    local demo schema/views/seed packs
+  sample_inputs/               sample CSV inputs
+  ingest_samples/              ERP/WMS/MES sample payloads
+  analytics_sql/               optional SQL models
+operations/
+  dashboards/                  Kanban/crisis dashboard definitions
+  governance/                  policy, cadence, auto-execution rules
+  planning/                    constrained-resource and decision-scoring examples
+  scenarios/                   crisis scenario packs
+  ui_views/                    dashboard/layout specs
+integrations/
+  alerting/                    Slack/alert integration templates
+  market_signals/              market signal adapters and config
+  supplier_portal/             supplier portal spec
+infra/                         deployment notes and cloud scaffolding
+docs/
+  architecture/                architecture and evidence-ledger docs
+  product/                     product scope, Kanban model, agent behavior
+  integrations/                ERP/SSO/SiteTrack integration notes
+  operations/                  data, governance, JSON contracts, removal plan
+  compliance/                  optional compliance references
+  business/                    ROI and business model notes
+  demo/                        demo script and local demo notes
+  assets/                      diagrams and images
+tests/                         API, policy, approval, audit, connector tests
+```
+
+## Core architecture docs
+
+Start here:
+
+- `docs/architecture/ARCHITECTURE.md`
+- `docs/product/KANBAN_OPERATING_MODEL.md`
+- `docs/product/AI_AGENT_OPERATING_MODEL.md`
+- `docs/architecture/BLOCKCHAIN_SITETRACK_ERP_STRATEGY.md`
+- `docs/architecture/BLOCKCHAIN_OPERATIONAL_DATABASE_DECISION.md`
+- `docs/architecture/CANONICAL_CONTROL_PLANE.md`
+- `docs/operations/GOVERNANCE.md`
+- `docs/demo/RUN_LOCAL_UI.md`
+- `docs/product/UI_FRAMEWORK_DECISION.md`
+- `docs/product/DEBUG_UI_DECISION.md`
+
+## What is core
+
+```text
+apps/api/app/api/routers/operator.py          Kanban command-board API
+apps/api/app/api/routers/cases.py             risk case API
+apps/api/app/api/routers/actions.py           governed action API
+apps/api/app/api/routers/pending_actions.py   approval queue API
+apps/api/app/api/routers/governance.py        policy/governance API
+apps/api/app/audit.py                         audit and request-id evidence
+apps/api/app/rbac.py                          role checks
+apps/api/app/approval.py                      approval policy resolution
+apps/api/app/idempotency.py                   safe execution dedupe
+apps/api/app/connectors/                      ERP/WMS/TMS/supplier connector stubs
+contracts/                                    action/lifecycle/ontology contracts
+operations/governance/policy.yaml             runtime policy
+apps/web/public/                              professional Kanban UI
+```
+
+## What was removed from the core
+
+The repo no longer includes Devpost submission copy or model-specific Gemini live scaffolding. BI is **kept for further usage** as an optional integration/analytics layer, similar to ERP/WMS/TMS integrations. BI must stay outside the default operational path, but dashboard specs and analytics SQL are kept for future reporting, executive review, and ERP-adjacent analytics.
+
+## Run locally and open the Kanban dashboard
+
+### Recommended browser demo
+
+```bash
+cp .env.example .env
+make demo-web
+```
+
+Open in your browser:
+
+```text
+Kanban command board: http://localhost:8080
+API docs:              http://localhost:8000/docs
+Health check:          http://localhost:8000/healthz
+Readiness check:       http://localhost:8000/readyz
+```
+
+### API-only mode
+
+```bash
+cp .env.example .env
 make demo-min
-
-# Optional: include Superset UI
-make demo-ui
-
-# Full demo (UI + agent) + smoke + checklist
-make demo-all
-
-# Operator Surface (primary UI)
-make demo-live
-# open http://localhost:8080
-
 ```
 
-- API docs: http://localhost:8000/docs
-- Superset UI: http://localhost:8088 (admin credentials in .env)
+Open:
 
-Health endpoints:
-- /healthz (liveness, no DB)
-- /health (DB connectivity)
-- /readyz (DB + critical tables / views / extensions)
-
-Error responses are standardized:
-- JSON shape: {"error": {"code", "message", "details"}, "request_id"}
-- Response header: X-Request-Id (echoed or auto-generated)
-
-See `demo/README.md` for a live-demo walkthrough.
-
-
-
-## Operator surface (P1)
-The primary demo UI is now a single operator flow at `http://localhost:8080`:
-- **Risk Board** — grouped Kanban lanes with enriched card state
-- **Case Detail** — selected case, recommendations, scenarios, signals
-- **Pending Approval** — approve / reject / dry-run / execute actions
-- **Audit Timeline** — recent operator and system events for the case
-
-This UI is backed by a small aggregation API:
-- `GET /operator/summary`
-- `GET /operator/board`
-- `GET /operator/cases/{case_id}`
-- `GET /operator/pending`
-
-Use **Run approval scenario** in the UI to generate a fresh case that stops at the approval gate.
-
-## Repo structure (simplified)
-- `/demo` – runnable local demo (Docker + Python)
-- `/agent_runtime` – DB schema, ingest, agents, Object Graph API, kinetic execution scaffold
-- `/ingest` – ERP/MES/WMS CSV drop zones (demo)
-- `/seed` – schema + seed data + demo views
-- `/signals` – market signal adapters
-- `/dashboards` – board & crisis views
-- `/governance` – audit & control artifacts
-- `/contracts` – ontology + triggers (schema contracts)
-
-## Audience
-- Supply chain leaders
-- Enterprise architects
-- Risk, audit, and compliance teams
-- System integrators (SI)
-
-
-# supply-chain-kanban v0.1
-
-Includes UI, Superset, Power BI, Slack alerts, Scenario Simulator.
-
-# supply-chain-kanban v0.5
-
-Adds agent negotiation, auto-contract triggers, supplier portals, regulatory automation, crisis simulation.
-
-# supply-chain-kanban demo
-
-Run a local demo showing AI agents detecting constraints, negotiating, and triggering scenarios.
-
-# supply-chain-kanban documentation
-
-This folder contains conceptual and governance documentation for the AI-agent-based supply chain demo.
-
-# supply-chain-kanban v0.9 — Agent Core (Runnable Demo)
-
-This repo is a **minimal, runnable AI-agent core** for supply chain constraint detection.
-It creates **cases**, persists **scenario outputs per case**, runs **ingest adapters** (ERP/MES/WMS),
-enforces **data quality gates**, and can send **Slack alerts**.
-
-## Quick demo
-```bash
-make demo
-make logs
-make psql
-```
-Then in psql:
-```sql
-SELECT resource_id, risk_score, status, updated_at FROM agent_cases ORDER BY updated_at DESC;
-SELECT * FROM agent_scenarios ORDER BY created_at DESC LIMIT 10;
-SELECT * FROM agent_recommendations ORDER BY created_at DESC LIMIT 10;
-SELECT * FROM dq_results ORDER BY ts DESC LIMIT 20;
+```text
+API docs: http://localhost:8000/docs
 ```
 
-## Ingest adapters
-Drop CSV files into `./ingest/erp/`, `./ingest/mes/`, `./ingest/wms/` (examples included).
-The agent ingests and upserts into canonical tables.
+### Manager-agent mode
 
-## Data quality gates
-Before creating/updating cases, the agent runs blocking checks (nulls, ranges, referential).
-Failures are persisted to `dq_results` and cases are paused for the affected scope.
-
-## Scenario outputs
-For every case, the agent generates Base / SupplyShock / PriceShock / DoubleHit scenarios and persists them to `agent_scenarios`.
-
-
-### Governance policy (hot reload)
-
-Card state machine + approval gates live in `governance/policy.yaml` and are loaded at runtime (mtime-based hot reload).
-
-### Dry-run validation
-
-Use `POST /actions/execute?dry_run=1` to validate guardrails without writing audit rows or mutating the DB.
-
-### Governance API (dev)
-
-- `GET /governance/policy` – returns effective governance policy.
-- `POST /governance/policy` – updates policy (dev only; set `APP_ENV=dev` or `DEV_MODE=1`).
-
-
-## Hackathon Mode (Amazon Nova)
-
-- `POST /demo/nova/run` produces a recommendation + proposed actions for a KanbanCard.
-- Works offline (mock). Set `HACKATHON_MODE=amazon_nova` + `NOVA_MODEL_ID` to enable Bedrock.
-- Use `dry_run=true` to validate proposals against governance without writing.
-
-
-### UI approval flow endpoints
-- POST `/demo/nova/run_and_materialize`
-- GET `/cases/{case_id}/recommendations`
-- GET `/cases/{case_id}/pending_actions`
-- GET `/pending_actions?status=pending`
-- PATCH `/pending_actions/{pending_id}/decision`
-- POST `/pending_actions/{pending_id}/execute?dry_run=1`
-
-
-### Enterprise hardening
-- **Idempotency scope**: endpoint + subject + card_id (prevents cross-user collisions).
-- **RBAC payload rules (policy.yaml)**: enforce role/risk thresholds based on action payload (e.g. UpdateCardStatus.resolved requires supervisor + risk>=X).
-
-## Gemini Live Agent demo (scaffold)
-
-Quick links:
-- `DEVPOST_3MIN_SCRIPT.md` (3-minute video flow)
-- `NEXT_STEPS.md` (roadmap: real Live API + scheduled news)
-- `GCP_DEPLOYMENT.md` (minimal GCP plan)
-
-
-This repo includes a **deterministic** "Gemini Live Agent" demo option designed for a 3‑minute Devpost video:
-- `news_monitor/` inserts a demo **DRAM/NAND 'leakage'** news burst (DEV_MODE helper)
-- `agent_runtime` exposes `/news/*` endpoints to browse evidence + alerts
-- `/demo/run_scenario` supports `memory_leakage_news_burst` to create:
-  - news evidence items + alert
-  - a case + kanban card
-  - pending actions (safe / dry-run friendly)
-- `live_orchestrator/` provides a websocket bridge (scaffold) to trigger the scenario + fetch evidence
-- `web_demo/` is a static UI that talks to the websocket bridge
-
-**Run locally:**
 ```bash
 cp .env.example .env
-make demo-live
-# then open http://localhost:8080
+make demo-agent
 ```
 
-**Trigger the scenario directly (optional):**
+Open:
+
+```text
+Kanban command board: http://localhost:8080
+API docs:              http://localhost:8000/docs
+```
+
+Use this when you want the repo to behave more like a supply-chain team lead: the background agent polls signals, updates cases, and creates/recommends governed actions.
+
+### Stop or reset
+
 ```bash
-curl -X POST http://localhost:8000/demo/run_scenario \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"memory_leakage_news_burst","risk_score":86,"memory_topic":"memory"}'
+make down     # stop containers, keep DB volume
+make reset    # stop containers and remove DB volume
+make logs     # tail API/agent/signal logs
+make status   # docker status + smoke checks
 ```
 
-> Replace the websocket bridge with a real Gemini Live API session later (the scaffold is structured for that).
+Detailed runbook: `docs/demo/RUN_LOCAL_UI.md`.
+UI framework decision: `docs/product/UI_FRAMEWORK_DECISION.md`.
+
+## Streamlit AI-agent debug cockpit
+
+Use Streamlit for internal AI-agent debugging, not as the final operator UI.
+
+```bash
+pip install -r requirements-debug.txt
+make debug-ui
+```
+
+Open:
+
+```text
+Streamlit debug cockpit: http://localhost:8501
+```
+
+The Streamlit cockpit reads FastAPI endpoints and is designed for case inspection, recommendation traces, SiteTrack evidence payloads, ERP writeback receipts, and blockchain proof status.
 
 
-## P2 operator surface
+## Quality gate
 
-The primary demo surface now supports:
-- board filters (assignee, approval state, SLA state, min risk)
-- SLA and aging badges directly on each card
-- plain-language approval narrative for non-technical demos
-- simulation before execution
-- governed writeback receipts for external actions
+```bash
+make test
+# runs: python3 scripts/run_checks.py
+```
 
+The local gate uses Python syntax compilation plus pytest so it can run in constrained sandboxes.
 
-## P3 customer-ready demo
+## Design principle
 
-This patch adds:
-- an executive mode at the top of the web demo
-- scenario comparison payloads and chart-ready bars
-- richer seeded business data with three realistic cases
-- governed connector packs for ERP, supplier portal, and ticketing
+Keep the product simple and professional:
 
-The main demo UI remains `http://localhost:8080`, but now supports both operator and executive storytelling in one surface.
-## P4 Demo Polish
+```text
+Signal -> Kanban case -> Recommendation -> Approval -> Execution -> Receipt -> Audit
+```
 
-The primary web demo now includes:
-- Executive mode with persona + customer theme framing
-- One-page executive brief export
-- Rich writeback receipts for ERP / supplier portal / ticketing
-- Connector-specific approval policies
-- Cleaner board/card visuals for live demos
-
-
-
-## P5 buyer-tailored packaging
-
-- Vertical seed packs: portfolio, data_center, ev_launch, industrial_edge
-- Brand/theme swap layer driven by `contracts/demo_experience_pack.yaml`
-- Exportable screenshot stills from `/operator/screenshot_manifest` and the web demo export button
-- Scripted guided walkthrough from `/operator/demo_script` and the web demo guide rail
-
-## P6 transparency evidence layer
-
-The operator demo now includes a blockchain-ready evidence layer for supply-chain transparency:
-
-- `ExternalDataSource` registry for ERP, WMS, IoT, supplier portal, news, and audit inputs.
-- `TraceabilityEvent` rows that record real-world operating events before they become proof.
-- `EvidenceReceipt` rows with validation status and evidence confidence scores.
-- `BlockchainAnchor` ledger-proof stubs for demo-safe anchoring without a real chain dependency.
-- `GET /operator/cases/{case_id}/transparency` for case-level data trust context.
-- `GET /operator/transparency_report?case_id=...` for a buyer-facing markdown transparency report.
-
-Repo editing rules are now captured in `RULES.md`.
-
+Every feature must make that loop faster, safer, or easier for a supply-chain manager to explain.
