@@ -1,8 +1,8 @@
 # Supply Chain Kanban AI Agent
 
-A professional supply-chain manager-agent that runs like a team lead or department manager: it watches daily operating signals, opens and updates Kanban risk cases, explains business impact, recommends mitigations, routes approvals, executes governed writebacks into existing systems, and keeps evidence for audit.
+A professional supply-chain leader-agent that runs as a team lead or department manager: it watches daily operating signals, opens and updates Kanban risk cases, explains business impact, recommends mitigations, routes approvals, executes governed writebacks into existing systems, and keeps evidence for audit.
 
-Kanban is the **regular supply-chain operations basis** for this repo. It is used every day for planning, purchasing, logistics, supplier follow-up, container tracking, approvals, and exception management. Crisis mode is a dashboard/view on top of the same Kanban model, not a separate product.
+Kanban is the **regular supply-chain operations basis** for this repo. It is used every day for planning, purchasing, logistics, supplier follow-up, batches/container tracking, approvals, and exception management. Crisis mode is a dashboard/view on top of the same Kanban model, not a separate product.
 
 ## Core design concept
 
