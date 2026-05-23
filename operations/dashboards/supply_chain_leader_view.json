@@ -1,0 +1,54 @@
+{
+  "dashboard_title": "Supply Chain Leader View Board",
+  "slug": "supply-chain-leader-view",
+  "description": "Regular management board for forecast accuracy, inventory alignment, partner performance, integrated operating-plan actions, approvals, execution receipts, and audit evidence.",
+  "sections": [
+    {
+      "name": "Forecast & Demand Alignment",
+      "metrics": [
+        "forecast_accuracy_pct",
+        "demand_change_risk",
+        "upside_downside_exposure",
+        "customer_commitment_risk"
+      ]
+    },
+    {
+      "name": "Inventory Alignment",
+      "metrics": [
+        "shortage_count",
+        "excess_inventory_value",
+        "safety_stock_breach_count",
+        "constrained_resource_exposure"
+      ]
+    },
+    {
+      "name": "Partner Performance",
+      "metrics": [
+        "otif_pct",
+        "yield_pct",
+        "scrap_pct",
+        "efficiency_pct",
+        "supplier_response_aging"
+      ]
+    },
+    {
+      "name": "Integrated Operating Plan",
+      "metrics": [
+        "demand_planning_actions",
+        "finance_cost_impact",
+        "operations_capacity_constraints",
+        "cross_functional_decision_queue"
+      ]
+    },
+    {
+      "name": "Governed Execution",
+      "metrics": [
+        "approval_blockers",
+        "writebacks_in_progress",
+        "execution_receipts",
+        "audit_evidence_state"
+      ]
+    }
+  ],
+  "kanban_case_rule": "Only open a case when a metric breach requires a management action, approval, or governed writeback."
+}

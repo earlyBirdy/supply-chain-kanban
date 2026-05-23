@@ -27,6 +27,20 @@ API docs:              http://localhost:8000/docs
 
 Use this mode when showing the product as a supply-chain team lead or department manager.
 
+### Supply-chain leader responsibilities
+
+In manager-agent mode, the AI agent drives the daily operating board like a supply-chain team lead. It should continuously check:
+
+```text
+Forecast accuracy and demand-change risk
+Inventory alignment with plan, safety stock, open orders, and constrained resources
+Partner performance metrics: OTIF, yield, scrap, efficiency, responsiveness
+Integrated operating-plan gaps across demand planning, finance, and operations
+Approval blockers, execution aging, receipts, and audit/evidence completeness
+```
+
+The agent should convert these checks into Kanban cases only when there is a management action to take: expedite, reallocate, adjust supplier split, approve premium buy, hold/release inventory, change production priority, update promise date, or request cross-functional review.
+
 ### What the agent does
 
 ```text
@@ -63,7 +77,7 @@ The agent should behave like a professional manager:
 
 ```text
 Observe     - read ERP/WMS/MES/SiteTrack/market signals
-Prioritize  - score severity, urgency, confidence, and customer impact
+Prioritize  - score severity, urgency, confidence, customer impact, inventory exposure, and partner KPI risk
 Explain     - write a short business narrative for the case
 Recommend   - propose mitigation options with tradeoffs
 Escalate    - ask approval when policy requires it

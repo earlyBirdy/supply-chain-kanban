@@ -75,6 +75,7 @@ ERP / WMS / TMS / SiteTrack / supplier / market signals
   -> governed execution
   -> receipt + audit evidence
   -> Kanban command board
+  -> supply-chain leader view: forecast / inventory / partner KPI / IOP alignment
 ```
 
 The system should answer six management questions:
@@ -87,6 +88,23 @@ Who must approve it?
 What system changed?
 Can we prove it later?
 ```
+
+## Supply-chain leader view board
+
+The primary operating surface should feel like a supply-chain team lead's daily control board, not only an exception list. It should help the leader ensure that forecasts, inventory, partners, and operating plans stay aligned.
+
+The board should make these management jobs visible:
+
+```text
+Forecast accuracy and demand-change risk
+Inventory alignment by part, plant, warehouse, and customer commitment
+Supply gap / excess inventory / constrained-resource exposure
+Partner performance: OTIF, yield, scrap, efficiency, responsiveness
+Cross-functional planning actions with demand planning, finance, and operations
+Approval blockers and governed execution receipts
+```
+
+The agent's role is to keep this view current, open Kanban cases when alignment breaks, recommend mitigation actions, and escalate only the cases that need management approval.
 
 ## How the AI agent works now
 

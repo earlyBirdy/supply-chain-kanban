@@ -16,7 +16,35 @@ Which supplier/order/container is at risk?
 What is waiting for approval?
 What action is being executed?
 What evidence proves the update?
+Are forecasts and inventory still aligned?
+Which partner KPI is causing risk?
+Which cross-functional plan needs demand planning, finance, or operations input?
 ```
+
+## Supply-chain leader view
+
+Kanban is the daily operating basis, but the leader view board should also summarize management health across the whole supply chain. It is designed for a supply-chain team lead or department manager who must keep forecast, inventory, partners, and execution aligned.
+
+The leader view should include:
+
+```text
+Forecast alignment
+  demand changes, forecast accuracy, upside/downside exposure
+
+Inventory alignment
+  shortages, excess, safety stock risk, constrained parts, warehouse/plant imbalance
+
+Partner performance
+  OTIF, yield, scrap, efficiency, responsiveness, supplier aging cases
+
+Integrated operating plan
+  demand planning actions, finance cost impact, operations capacity constraints
+
+Execution governance
+  approvals waiting, writebacks in progress, receipts, audit/evidence state
+```
+
+A healthy board does not only show crises. It shows whether the operating plan is still executable.
 
 ## Daily operations card schema
 
@@ -70,6 +98,10 @@ Stabilized
 
 The AI agent should behave like a supply-chain department manager:
 
+- monitor forecast accuracy and demand-change risk
+- check inventory alignment against customer commitments, safety stock, and constrained resources
+- monitor partner KPIs such as OTIF, yield, scrap, efficiency, and response aging
+- connect demand planning, finance, and operations into integrated operating-plan decisions
 - promote cases when risk increases
 - assign or suggest owners
 - explain the decision in business language

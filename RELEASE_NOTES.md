@@ -118,3 +118,23 @@ If Docker itself is not running, start Docker Desktop first. That environment is
 ```text
 Cannot connect to the Docker daemon
 ```
+
+
+## Supply-chain leader view board
+
+### Added
+
+```text
+operations/dashboards/supply_chain_leader_view.json
+```
+
+The repo now documents the Supply Chain AI Agent as a leader view board for regular management, not only crisis handling. The board tracks forecast accuracy, inventory alignment, partner KPIs, integrated operating-plan actions, approvals, governed execution receipts, and audit evidence.
+
+### Updated concept
+
+```text
+Kanban remains the regular operations basis.
+The leader view summarizes management health.
+Cases open only when a metric breach requires action, approval, or governed writeback.
+```
+
