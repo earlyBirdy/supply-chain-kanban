@@ -22,6 +22,7 @@ import uuid
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from .logging_utils import setup_logging
 from .request_context import get_request_id, reset_request_id, set_request_id
@@ -53,6 +54,19 @@ def create_app() -> FastAPI:
             "A minimal Foundry-style API surface: ontology + object graph + kinetic actions. "
             "This is a demo scaffold (not production hardened)."
         ),
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://localhost:8080",
+            "http://127.0.0.1:8080",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     def _error_response(
