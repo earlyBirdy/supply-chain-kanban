@@ -19,6 +19,106 @@ LANE_CONFIG = [
     ("resolved", "Resolved"),
 ]
 
+PRODUCT_MILESTONE_FLOW = [
+    {
+        "key": "commodity_supplier",
+        "label": "Commodity Supplier",
+        "short_label": "Supplier",
+        "owner": "Supply / Commodity",
+        "decision_focus": "Supplier status, OTIF, capacity, ETA, allocation, and cost exposure.",
+    },
+    {
+        "key": "iqc",
+        "label": "IQC",
+        "short_label": "IQC",
+        "owner": "Quality",
+        "decision_focus": "Incoming inspection, material hold, lot disposition, and early containment.",
+    },
+    {
+        "key": "assembly",
+        "label": "Assembly",
+        "short_label": "Assembly",
+        "owner": "Manufacturing",
+        "decision_focus": "Build readiness, constrained resources, WIP blockers, yield, and staffing risk.",
+    },
+    {
+        "key": "test",
+        "label": "Test",
+        "short_label": "Test",
+        "owner": "Manufacturing / Test",
+        "decision_focus": "Functional test capacity, failure trends, retest loops, and recovery actions.",
+    },
+    {
+        "key": "packing",
+        "label": "Packing",
+        "short_label": "Packing",
+        "owner": "Operations",
+        "decision_focus": "Pack-out readiness, label/document blockers, shipment allocation, and cut-off risk.",
+    },
+    {
+        "key": "oqc",
+        "label": "OQC",
+        "short_label": "OQC",
+        "owner": "Quality / Customer",
+        "decision_focus": "Final quality gate, release approval, customer commitment, and shipment confidence.",
+    },
+]
+
+PRODUCT_MILESTONE_LABELS = {row["key"]: row["label"] for row in PRODUCT_MILESTONE_FLOW}
+
+
+def _normalize_milestone(value: Any) -> str:
+    raw = str(value or "").strip().lower().replace(" ", "_").replace("-", "_")
+    aliases = {
+        "supplier": "commodity_supplier",
+        "commodity": "commodity_supplier",
+        "commodity_status": "commodity_supplier",
+        "supplier_status": "commodity_supplier",
+        "incoming_quality_control": "iqc",
+        "incoming_quality": "iqc",
+        "final_oqc": "oqc",
+        "outgoing_quality_control": "oqc",
+        "outgoing_quality": "oqc",
+    }
+    return aliases.get(raw, raw if raw in PRODUCT_MILESTONE_LABELS else "commodity_supplier")
+
+
+def _milestone_from_card(card: Dict[str, Any]) -> str:
+    scope = card.get("scope") or {}
+    if isinstance(scope, dict) and scope.get("product_milestone"):
+        return _normalize_milestone(scope.get("product_milestone"))
+    title = f"{card.get('title') or ''} {card.get('description') or ''} {card.get('resource_id') or ''}".lower()
+    if any(token in title for token in ("oqc", "final quality", "customer release", "release approval")):
+        return "oqc"
+    if any(token in title for token in ("packing", "pack-out", "packout", "label")):
+        return "packing"
+    if "test" in title or "retest" in title:
+        return "test"
+    if any(token in title for token in ("assembly", "build", "wip")):
+        return "assembly"
+    if any(token in title for token in ("iqc", "incoming inspection", "inspection", "containment", "quality ppm")):
+        return "iqc"
+    return "commodity_supplier"
+
+
+def _enrich_product_milestones(cards: List[Dict[str, Any]]) -> None:
+    for card in cards:
+        key = _milestone_from_card(card)
+        card["product_milestone"] = key
+        card["product_milestone_label"] = PRODUCT_MILESTONE_LABELS.get(key, key)
+
+
+def _product_milestone_summary(cards: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    rows = []
+    for milestone in PRODUCT_MILESTONE_FLOW:
+        key = milestone["key"]
+        scoped = [card for card in cards if card.get("product_milestone") == key]
+        high_risk = sum(1 for card in scoped if _safe_num(card.get("case_risk_score")) >= 70)
+        approvals = sum(int(card.get("pending_decisions") or 0) for card in scoped)
+        blocked = sum(int(card.get("blocked_actions") or 0) for card in scoped)
+        rows.append({**milestone, "count": len(scoped), "high_risk": high_risk, "approvals_waiting": approvals, "blocked_actions": blocked})
+    return rows
+
 
 def _lane_buckets(cards: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     grouped: Dict[str, List[Dict[str, Any]]] = {key: [] for key, _ in LANE_CONFIG}
@@ -36,6 +136,7 @@ def _board_filters(cards: List[Dict[str, Any]]) -> Dict[str, Any]:
         "approval_states": sorted({str(card.get("approval_state") or "none") for card in cards}),
         "sla_states": sorted({str(card.get("sla_state") or "unknown") for card in cards}),
         "connector_families": sorted({str(card.get("connector_family") or "none") for card in cards}),
+        "product_milestones": _product_milestone_summary(cards),
     }
 
 
@@ -371,6 +472,7 @@ def operator_board(
     sla_state: Optional[str] = Query(None),
     connector_family: Optional[str] = Query(None),
     risk_min: Optional[int] = Query(None, ge=0, le=100),
+    product_milestone: Optional[str] = Query(None),
 ):
     cards = db_all(
         """
@@ -409,6 +511,8 @@ def operator_board(
 
     for card in cards:
         card["connector_family"] = _connector_family_for(card.get("next_pending_action"))
+    _enrich_product_milestones(cards)
+    product_flow = _product_milestone_summary(cards)
 
     qv = (q or "").strip().lower()
     if qv:
@@ -424,10 +528,20 @@ def operator_board(
         cards = [card for card in cards if str(card.get("sla_state") or "unknown") == sla_state]
     if connector_family and connector_family != "all":
         cards = [card for card in cards if str(card.get("connector_family") or "none") == connector_family]
+    if product_milestone and product_milestone != "all":
+        selected_milestone = _normalize_milestone(product_milestone)
+        cards = [card for card in cards if str(card.get("product_milestone") or "") == selected_milestone]
     if risk_min is not None:
         cards = [card for card in cards if float(card.get("case_risk_score") or 0) >= float(risk_min)]
 
-    return {"ok": True, "lanes": _lane_buckets(cards), "items": cards, "filters": _board_filters(cards)}
+    return {
+        "ok": True,
+        "lanes": _lane_buckets(cards),
+        "items": cards,
+        "filters": _board_filters(cards),
+        "product_flow": product_flow,
+        "selected_product_milestone": product_milestone or "all",
+    }
 
 
 @router.get("/cases/{case_id}")

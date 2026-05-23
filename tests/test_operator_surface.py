@@ -14,15 +14,15 @@ def test_operator_board_shape(monkeypatch: pytest.MonkeyPatch) -> None:
                     'resource_id': 'dram_ddr5', 'priority': 2, 'assignee': 'planner@demo', 'updated_at': '2026-04-01T10:00:00Z',
                     'case_risk_score': 82, 'pending_decisions': 1, 'ready_to_execute': 0, 'blocked_actions': 0,
                     'next_pending_action': 'ExpediteShipment', 'approval_state': 'needs_approval', 'sla_state': 'at_risk',
-                    'age_hours': 12, 'sla_remaining_hours': 4,
+                    'age_hours': 12, 'sla_remaining_hours': 4, 'scope': {'product_milestone': 'commodity_supplier'},
                 },
                 {
                     'card_id': 'k2', 'case_id': 'c2', 'title': 'Supplier escalation', 'description': 'demo', 'status': 'in_progress',
                     'resource_id': 'battery_cells_lfp', 'priority': 1, 'assignee': 'opslead@demo', 'updated_at': '2026-04-01T09:00:00Z',
                     'case_risk_score': 91, 'pending_decisions': 0, 'ready_to_execute': 1, 'blocked_actions': 0,
                     'next_pending_action': 'OpenSupplierTicket', 'approval_state': 'ready', 'sla_state': 'breached',
-                    'age_hours': 20, 'sla_remaining_hours': -2,
-                },
+                    'age_hours': 20, 'sla_remaining_hours': -2, 'scope': {'product_milestone': 'oqc'},
+                }
             ]
         return []
 
@@ -39,6 +39,15 @@ def test_operator_board_shape(monkeypatch: pytest.MonkeyPatch) -> None:
     assert js['lanes'][0]['cards'][0]['case_id'] == 'c1'
     assert 'erp' in js['filters']['connector_families']
     assert 'supplier_portal' in js['filters']['connector_families']
+    assert [row['key'] for row in js['product_flow']] == ['commodity_supplier', 'iqc', 'assembly', 'test', 'packing', 'oqc']
+    assert js['product_flow'][0]['count'] == 1
+    assert js['product_flow'][-1]['count'] == 1
+
+    r = client.get('/operator/board?product_milestone=oqc')
+    assert r.status_code == 200
+    oqc = r.json()
+    assert len(oqc['items']) == 1
+    assert oqc['items'][0]['product_milestone_label'] == 'OQC'
 
 
 def test_operator_case_detail_shape(monkeypatch: pytest.MonkeyPatch) -> None:

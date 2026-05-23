@@ -1,7 +1,7 @@
 {
   "dashboard_title": "Supply Chain Leader View Board",
   "slug": "supply-chain-leader-view",
-  "description": "Regular management board for forecast accuracy, inventory alignment, partner performance, integrated operating-plan actions, approvals, execution receipts, and audit evidence.",
+  "description": "Regular AI leader board for forecast accuracy, inventory alignment, partner performance, product milestone flow, integrated operating-plan actions, approvals, execution receipts, and audit evidence.",
   "sections": [
     {
       "name": "Forecast & Demand Alignment",
@@ -32,6 +32,17 @@
       ]
     },
     {
+      "name": "Product Milestone Flow",
+      "metrics": [
+        "commodity_supplier_status",
+        "iqc_hold_count",
+        "assembly_wip_blockers",
+        "test_failure_queue",
+        "packing_cutoff_risk",
+        "oqc_release_confidence"
+      ]
+    },
+    {
       "name": "Integrated Operating Plan",
       "metrics": [
         "demand_planning_actions",
@@ -50,5 +61,78 @@
       ]
     }
   ],
-  "kanban_case_rule": "Only open a case when a metric breach requires a management action, approval, or governed writeback."
+  "kanban_case_rule": "Only open a case when a product milestone or metric breach requires a management action, approval, or governed writeback before OQC release.",
+  "product_milestone_view": {
+    "selection_rule": "Leaders can select all milestones or one product milestone to focus the Kanban on the selected lifecycle gate.",
+    "flow": [
+      "commodity_supplier",
+      "iqc",
+      "assembly",
+      "test",
+      "packing",
+      "oqc"
+    ],
+    "milestones": [
+      {
+        "key": "commodity_supplier",
+        "label": "Commodity Supplier Status",
+        "decision_focus": [
+          "supplier OTIF",
+          "capacity/ETA commitment",
+          "allocation shortage",
+          "commodity cost exposure"
+        ]
+      },
+      {
+        "key": "iqc",
+        "label": "IQC",
+        "decision_focus": [
+          "incoming inspection hold",
+          "lot disposition",
+          "defect containment",
+          "supplier corrective action"
+        ]
+      },
+      {
+        "key": "assembly",
+        "label": "Assembly",
+        "decision_focus": [
+          "build readiness",
+          "WIP blocker",
+          "line capacity",
+          "yield recovery"
+        ]
+      },
+      {
+        "key": "test",
+        "label": "Test",
+        "decision_focus": [
+          "test capacity",
+          "failure trend",
+          "retest loop",
+          "debug queue"
+        ]
+      },
+      {
+        "key": "packing",
+        "label": "Packing",
+        "decision_focus": [
+          "pack-out readiness",
+          "label/document blocker",
+          "ship cut-off risk",
+          "customer allocation"
+        ]
+      },
+      {
+        "key": "oqc",
+        "label": "OQC",
+        "decision_focus": [
+          "final quality gate",
+          "release approval",
+          "customer commitment confidence",
+          "shipment release evidence"
+        ]
+      }
+    ]
+  }
 }
