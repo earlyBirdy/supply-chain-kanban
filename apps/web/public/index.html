@@ -4,25 +4,30 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Supply Chain Kanban AI Agent</title>
+
   <style>
     :root{
-      --bg:#09111f; --panel:#0d1526; --panel-2:#111c31; --line:#20304a; --text:#e9f1ff; --muted:#9cb0d0;
+      --bg:#07111d; --panel:#0d1526; --panel-2:#101b2e; --line:#20304a; --text:#e9f1ff; --muted:#9cb0d0;
       --accent:#8ec5ff; --accent-soft:#335581; --good:#7dd3a5; --warn:#ffcf70; --bad:#ff8e8e;
-      --panel-glow:rgba(142,197,255,.24); --surface-top:rgba(13,21,38,.96); --surface-bottom:rgba(10,16,29,.96);
+      --panel-glow:rgba(142,197,255,.22); --surface-top:rgba(13,21,38,.96); --surface-bottom:rgba(8,14,26,.96);
       --shadow:0 12px 30px rgba(0,0,0,.28);
     }
-    *{box-sizing:border-box} body{margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif; background:linear-gradient(180deg,#07111d 0%, #0a1322 100%); color:var(--text);} button,select,input,textarea{font:inherit}
-    header{position:sticky; top:0; z-index:5; backdrop-filter:blur(14px); background:rgba(7,11,20,.9); border-bottom:1px solid rgba(255,255,255,.06); padding:16px 20px 18px;} main{padding:18px 20px 32px; display:grid; gap:18px;}
-    .row,.toolbar,.filter-row,.status-row,.selector-row,.lane-head,.card-meta,.tag-row,.section-title,.demo-guide-actions,.header-main,.brand-lockup{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-    .header-main{justify-content:space-between;} .brand-lockup{gap:14px;} .brand-mark{width:44px; height:44px; border-radius:14px; display:grid; place-items:center; font-weight:800; letter-spacing:.04em; background:linear-gradient(135deg,var(--accent-soft),var(--accent)); color:#081019; box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 26px var(--panel-glow);} .brand-title{font-size:24px; font-weight:800;} .subtitle{color:var(--muted); font-size:14px; margin-top:4px;}
-    button,input,select,textarea{border-radius:12px; border:1px solid var(--line); background:#0d1628; color:var(--text); padding:10px 12px;} button{cursor:pointer;} button.primary{background:linear-gradient(135deg,var(--accent-soft),var(--accent)); color:#081019; border:none; font-weight:700;} button.ghost{background:#0d1628;} button.active{box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 0 0 1px var(--accent);} .pill{display:inline-flex; align-items:center; gap:6px; border-radius:999px; background:#0d1628; border:1px solid var(--line); color:var(--muted); padding:6px 10px; font-size:12px;} .pill.ok{color:var(--good); border-color:rgba(125,211,165,.3);} .pill.warn{color:var(--warn); border-color:rgba(255,207,112,.35);} .pill.bad{color:var(--bad); border-color:rgba(255,142,142,.35);}
-    .hero-strip,.summary-card,.lane,.panel,.section,.demo-guide{background:linear-gradient(180deg,var(--surface-top) 0%,var(--surface-bottom) 100%); border:1px solid rgba(255,255,255,.06); border-radius:18px; box-shadow:var(--shadow);} .hero-strip,.demo-guide{padding:14px 16px;} .summary-grid,.exec-grid{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px;} .summary-card{padding:14px 16px;} .summary-card .kicker,.small,.muted{font-size:12px; color:var(--muted);} .summary-card .value{font-size:28px; font-weight:800; margin-top:6px;}
-    .hero-strip{display:flex; justify-content:space-between; gap:14px; align-items:center;} .hero-headline{font-size:17px; font-weight:700;} .hero-sub{font-size:12px; color:var(--muted); margin-top:4px;}
-    .content-grid{display:grid; grid-template-columns:minmax(0,1.45fr) minmax(420px,.95fr); gap:16px; align-items:start;} .board{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; align-items:start;} .lane{padding:12px; min-height:340px;} .lane-title{font-size:14px; font-weight:700;} .lane-body,.detail-stack,.list,.timeline,.exec-grid,.connector-grid{display:grid; gap:10px;} .card{padding:0; cursor:pointer; overflow:hidden; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;} .card:hover{transform:translateY(-2px); border-color:var(--accent-soft);} .card.selected{border-color:var(--accent); box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent), var(--shadow);} .card-top{padding:12px 12px 0; border-top:3px solid var(--accent-soft);} .card.high .card-top{border-top-color:var(--bad);} .card.med .card-top{border-top-color:var(--warn);} .card.low .card-top{border-top-color:var(--good);} .card-title{font-size:14px; font-weight:700; line-height:1.35;} .card-body{color:var(--muted); font-size:12px; margin-top:6px; line-height:1.45; min-height:52px;} .card-bottom{padding:0 12px 12px;} .card-footer{margin-top:8px; display:flex; justify-content:space-between; gap:10px; align-items:center;} .risk{font-size:12px; font-weight:700;} .risk.high{color:var(--bad);} .risk.med{color:var(--warn);} .risk.low{color:var(--good);}
-    .section,.panel{padding:14px;} .section-title h2,.section-title h3{margin:0; font-size:16px;} .detail-stack{position:sticky; top:116px;} .detail-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 12px; margin-top:10px;} .field-label{font-size:12px; color:var(--muted);} .field-value{margin-top:4px; font-size:13px; line-height:1.45;} .empty{padding:12px 14px; color:var(--muted);} .list-card,.timeline-item{padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:#0c1527;} .timeline-item{display:flex; gap:10px; align-items:flex-start;} .timeline-dot{width:9px; height:9px; border-radius:999px; background:var(--accent); margin-top:6px;} .narrative{border-left:3px solid var(--accent-soft); padding-left:12px; margin-top:8px;} .exec-shell{display:none;} .exec-shell.active{display:block;} .exec-grid{grid-template-columns:repeat(3,minmax(0,1fr));} .exec-hero .headline{font-size:18px; font-weight:700; line-height:1.45; margin-top:6px;}
-    .compare-table table{width:100%; border-collapse:collapse;} .compare-table th,.compare-table td{border-top:1px solid var(--line); padding:8px 6px; text-align:left; font-size:12px;} .bar-track{height:10px; border-radius:999px; background:#0b1527; border:1px solid var(--line); overflow:hidden;} .bar-fill{height:100%; background:linear-gradient(90deg,var(--accent-soft) 0%,var(--accent) 100%);} .connector-grid{grid-template-columns:repeat(3,minmax(0,1fr));} .brief-sheet{padding:14px 16px; line-height:1.55; white-space:pre-wrap;}
-    .demo-guide{display:grid; gap:10px;} .flow-toolbar{display:flex; justify-content:space-between; gap:14px; align-items:flex-start; margin:12px 0 14px;} .flow-title{font-weight:800;} .flow-sub{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.45;} .milestone-flow{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px;} .milestone-card{position:relative; padding:12px; border:1px solid var(--line); border-radius:16px; background:#0c1527; cursor:pointer; min-height:150px; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;} .milestone-card:hover{transform:translateY(-2px); border-color:var(--accent-soft);} .milestone-card.active{border-color:var(--accent); box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);} .milestone-card::after{content:'→'; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:800;} .milestone-card:last-child::after{content:'✓'; right:10px; top:12px; transform:none; color:var(--good);} .milestone-card .count{font-size:24px; font-weight:800; margin-top:6px;} .milestone-card .focus{font-size:11px; color:var(--muted); line-height:1.35; margin-top:6px;} .stage-index{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;} .stage-bars{display:grid; gap:5px; margin-top:9px;} .stage-bar{height:5px; border-radius:999px; background:#09111f; border:1px solid var(--line); overflow:hidden;} .stage-bar span{display:block; height:100%; background:linear-gradient(90deg,var(--accent-soft),var(--accent));} .flow-insight{margin-top:12px; padding:12px 14px; border:1px solid var(--line); border-radius:16px; background:#0c1527; display:grid; gap:8px;} .flow-insight-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px;} .flow-insight .field-value{font-size:12px;} .demo-step-title{font-size:16px; font-weight:700;} .demo-step-meta{display:flex; gap:8px; flex-wrap:wrap;} .demo-progress{height:8px; border-radius:999px; background:#0b1527; border:1px solid var(--line); overflow:hidden;} .demo-progress > span{display:block; height:100%; background:linear-gradient(90deg,var(--accent-soft),var(--accent));} .screenshot-list{display:grid; gap:10px;} .screenshot-card{padding:10px 12px; border-radius:14px; border:1px solid var(--line); background:#0c1527;}
-    a{color:var(--accent);} @media (max-width:1250px){ .summary-grid{grid-template-columns:repeat(3,minmax(0,1fr));} .content-grid{grid-template-columns:1fr;} .detail-stack{position:static;} .connector-grid,.exec-grid{grid-template-columns:1fr;} } @media (max-width:900px){ .board,.milestone-flow,.flow-insight-grid{grid-template-columns:1fr;} .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));} .detail-grid{grid-template-columns:1fr;} .header-main{align-items:flex-start;} } @media (max-width:620px){ .summary-grid{grid-template-columns:1fr;} .toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr;} input,select{min-width:0; width:100%;} }
+    *{box-sizing:border-box} body{margin:0; min-height:100vh; font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif; background:linear-gradient(180deg,#060d18 0%, #09111f 100%); color:var(--text);} button,select,input,textarea{font:inherit}
+    header{position:sticky; top:0; z-index:5; backdrop-filter:blur(14px); background:rgba(6,10,18,.94); border-bottom:1px solid rgba(255,255,255,.07); padding:12px 18px 10px;} main{padding:14px 18px 18px; height:calc(100vh - 156px); min-height:720px;}
+    .row,.toolbar,.filter-row,.selector-row,.status-row,.lane-head,.card-meta,.tag-row,.section-title,.demo-guide-actions,.header-main,.brand-lockup{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+    .header-main{justify-content:space-between;} .brand-lockup{gap:12px;} .brand-mark{width:40px; height:40px; border-radius:14px; display:grid; place-items:center; font-weight:900; letter-spacing:.04em; background:linear-gradient(135deg,var(--accent-soft),var(--accent)); color:#081019; box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 26px var(--panel-glow);} .brand-title{font-size:23px; font-weight:850;} .subtitle{color:var(--muted); font-size:13px; margin-top:2px;}
+    button,input,select,textarea{border-radius:12px; border:1px solid var(--line); background:#0d1628; color:var(--text); padding:9px 11px;} button{cursor:pointer;} button.primary{background:linear-gradient(135deg,var(--accent-soft),var(--accent)); color:#081019; border:none; font-weight:800;} button.ghost{background:#0d1628;} button.active{box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 0 0 1px var(--accent);} input{min-width:260px}.pill{display:inline-flex; align-items:center; gap:6px; border-radius:999px; background:#0d1628; border:1px solid var(--line); color:var(--muted); padding:5px 9px; font-size:12px;} .pill.ok{color:var(--good); border-color:rgba(125,211,165,.32);} .pill.warn{color:var(--warn); border-color:rgba(255,207,112,.38);} .pill.bad{color:var(--bad); border-color:rgba(255,142,142,.38);} .small,.muted,.kicker{font-size:12px; color:var(--muted);} a{color:var(--accent)}
+    .toolbar{margin-top:10px}.selector-row,.filter-row{margin-top:8px}.status-row{margin-top:8px}.secondary-action{display:none}.desktop-only{display:inline-flex}.hero-strip,.summary-card,.lane,.panel,.section,.demo-guide{background:linear-gradient(180deg,var(--surface-top) 0%,var(--surface-bottom) 100%); border:1px solid rgba(255,255,255,.07); border-radius:18px; box-shadow:var(--shadow);} .panel,.section{padding:14px;} .section-title{justify-content:space-between}.section-title h2,.section-title h3{margin:0; font-size:16px}.empty{padding:12px 14px; color:var(--muted)}
+    .project-page{display:grid; grid-template-columns:minmax(0,1.36fr) minmax(390px,.64fr); gap:14px; height:100%; min-height:0;} .project-main,.project-side{display:grid; gap:12px; min-height:0}.project-main{grid-template-rows:auto auto auto minmax(0,1fr)} .project-side{grid-template-rows:auto minmax(0,1fr)}
+    .hero-strip{padding:13px 16px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:center}.hero-headline{font-size:18px; font-weight:850; line-height:1.28}.hero-sub{font-size:12px; color:var(--muted); margin-top:4px}.project-name{display:flex; gap:8px; align-items:center; flex-wrap:wrap}.project-name::before{content:'PROJECT'; color:var(--muted); font-size:11px; letter-spacing:.08em;}
+    .summary-grid{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px}.summary-card{padding:12px 14px}.summary-card .value{font-size:26px; font-weight:900; margin-top:4px}.summary-card:nth-child(n+7){display:none}
+    .flow-toolbar{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin:8px 0 12px}.flow-title{font-weight:850; font-size:18px}.flow-sub{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35}.milestone-flow{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px}.milestone-card{position:relative; padding:11px; border:1px solid var(--line); border-radius:16px; background:#0b1425; cursor:pointer; min-height:126px; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}.milestone-card:hover{transform:translateY(-2px); border-color:var(--accent-soft)}.milestone-card.active{border-color:var(--accent); box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent)}.milestone-card::after{content:'→'; position:absolute; right:-9px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:900}.milestone-card:last-child::after{content:'✓'; right:10px; top:10px; transform:none; color:var(--good)}.stage-index{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}.milestone-card .count{font-size:24px; font-weight:900; margin-top:6px}.milestone-card .focus{font-size:11px; color:var(--muted); line-height:1.25; margin-top:5px}.stage-bars{display:grid; gap:5px; margin-top:7px}.stage-bar{height:5px; border-radius:999px; background:#09111f; border:1px solid var(--line); overflow:hidden}.stage-bar span{display:block; height:100%; background:linear-gradient(90deg,var(--accent-soft),var(--accent))}.flow-insight{margin-top:10px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:#0b1425; display:grid; gap:7px}.flow-insight-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}.field-label{font-size:12px; color:var(--muted)}.field-value{margin-top:3px; font-size:13px; line-height:1.4}
+    .board-shell{min-height:0; overflow:hidden}.board{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; max-height:100%; overflow:auto; padding-right:2px}.lane{padding:12px; min-height:auto}.lane-head{justify-content:space-between; margin-bottom:8px}.lane-title{font-size:14px; font-weight:800}.lane-body{display:grid; gap:8px}.lane-body:empty{display:none}.card{padding:0; cursor:pointer; overflow:hidden; border:1px solid rgba(255,255,255,.07); border-radius:15px; background:#0b1425; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}.card:hover{transform:translateY(-2px); border-color:var(--accent-soft)}.card.selected{border-color:var(--accent); box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent), var(--shadow)}.card-top{padding:11px 12px 0; border-top:3px solid var(--accent-soft)}.card.high .card-top{border-top-color:var(--bad)}.card.med .card-top{border-top-color:var(--warn)}.card.low .card-top{border-top-color:var(--good)}.card-title{font-size:14px; font-weight:850; line-height:1.3}.card-body{color:var(--muted); font-size:12px; margin-top:5px; line-height:1.35; min-height:34px}.card-bottom{padding:0 12px 11px}.card-meta,.card-footer{margin-top:7px; display:flex; justify-content:space-between; gap:8px; align-items:center}.risk{font-size:12px; font-weight:850}.risk.high{color:var(--bad)}.risk.med{color:var(--warn)}.risk.low{color:var(--good)}
+    .project-side .panel{overflow:hidden}.detail-stack{display:grid; gap:10px; min-height:0; overflow:auto; padding-right:2px}.detail-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px 11px; margin-top:8px}.list,.timeline,.connector-grid,.exec-grid{display:grid; gap:8px}.list-card,.timeline-item{padding:10px 11px; border:1px solid var(--line); border-radius:14px; background:#0b1425}.timeline-item{display:flex; gap:9px; align-items:flex-start}.timeline-dot{width:9px; height:9px; border-radius:999px; background:var(--accent); margin-top:6px}.narrative{border-left:3px solid var(--accent-soft); padding-left:11px; margin-top:8px}.compare-table table{width:100%; border-collapse:collapse}.compare-table th,.compare-table td{border-top:1px solid var(--line); padding:7px 5px; text-align:left; font-size:12px}.bar-track{height:10px; border-radius:999px; background:#0b1527; border:1px solid var(--line); overflow:hidden}.bar-fill{height:100%; background:linear-gradient(90deg,var(--accent-soft) 0%,var(--accent) 100%)}textarea{width:100%; min-height:76px}.brief-sheet{padding:14px 16px; line-height:1.55; white-space:pre-wrap}.screenshot-list{display:grid; gap:8px}.screenshot-card{padding:10px 12px; border-radius:14px; border:1px solid var(--line); background:#0b1425}
+    .demo-guide,.exec-shell{display:none}.exec-shell.active{display:none}.compact-hide{display:none!important}.e2e-step-label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px}.side-focus{border-color:rgba(142,197,255,.25)}
+    @media (max-width:1250px){main{height:auto; min-height:0}.project-page{grid-template-columns:1fr}.summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.project-main{grid-template-rows:auto}.board{max-height:none}.project-side{grid-template-rows:auto}.detail-stack{max-height:none; overflow:visible}.milestone-flow{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media (max-width:900px){.summary-grid,.board,.flow-insight-grid,.milestone-flow{grid-template-columns:1fr 1fr}.hero-strip{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.header-main{align-items:flex-start}.secondary-action{display:none!important}}
+    @media (max-width:620px){main{padding:10px}.summary-grid,.board,.milestone-flow{grid-template-columns:1fr}.toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr}input,select{min-width:0; width:100%}.desktop-only{display:none}.brand-title{font-size:20px}}
   </style>
 </head>
 <body>
@@ -32,117 +37,114 @@
         <div class="brand-mark" id="brandMark">AC</div>
         <div>
           <div class="brand-title" id="brandTitle">Atlas Control</div>
-          <div class="subtitle" id="brandSubtitle">Professional Kanban command board for crisis operations, approvals, execution receipts, and audit evidence.</div>
+          <div class="subtitle" id="brandSubtitle">Project E2E supply-chain leader board.</div>
         </div>
       </div>
       <div class="row">
-        <button id="btnExecutive" class="ghost">Executive mode</button>
+        <button id="btnExecutive" class="ghost secondary-action">Executive mode</button>
         <span class="pill" id="apiStatus">API: checking</span>
         <span class="pill" id="requestStatus">Selection: none</span>
       </div>
     </div>
-    <div class="toolbar" style="margin-top:14px;">
-      <button class="primary" id="btnRefresh">Refresh board</button>
-      <button id="btnRunScenario">Run approval scenario</button>
-      <button class="ghost" id="btnReset">Reset demo seed</button>
-      <button class="ghost" id="btnDocs">Open API docs</button>
-      <button class="ghost" id="btnExportBrief">Copy one-page brief</button>
-      <button class="ghost" id="btnExportShots">Export operations brief</button>
-      <input id="searchInput" placeholder="Search card, resource, assignee, action" />
+    <div class="toolbar">
+      <button class="primary" id="btnRefresh">Refresh project</button>
+      <button id="btnRunScenario" class="ghost">Run approval scenario</button>
+      <button class="ghost secondary-action" id="btnReset">Reset demo seed</button>
+      <button class="ghost secondary-action" id="btnDocs">Open API docs</button>
+      <button class="ghost desktop-only" id="btnExportBrief">Copy one-page brief</button>
+      <button class="ghost secondary-action" id="btnExportShots">Export operations brief</button>
+      <input id="searchInput" placeholder="Search project issue, resource, owner" />
     </div>
-    <div class="selector-row" style="margin-top:10px;">
-      <select id="seedPackSelect"><option value="">Seed pack</option></select>
-      <select id="brandSelect"><option value="">Brand</option></select>
-      <select id="personaSelect"><option value="">Executive persona</option></select>
-      <select id="themeSelect"><option value="">Customer theme</option></select>
-    </div>
-    <div class="filter-row" style="margin-top:10px;">
-      <select id="assigneeFilter"><option value="all">All assignees</option></select>
-      <select id="approvalFilter"><option value="all">All approval states</option></select>
-      <select id="slaFilter"><option value="all">All SLA states</option></select>
-      <select id="connectorFilter"><option value="all">All connector packs</option></select>
+    <div class="selector-row project-name">
+      <select id="seedPackSelect"><option value="">Project</option></select>
+      <select id="brandSelect"><option value="">Customer</option></select>
+      <select id="personaSelect"><option value="">Leader view</option></select>
+      <select id="themeSelect"><option value="">Product family</option></select>
       <select id="milestoneFilter"><option value="all">All product milestones</option></select>
+    </div>
+    <div class="filter-row">
+      <select id="assigneeFilter"><option value="all">All owners</option></select>
+      <select id="approvalFilter"><option value="all">All approvals</option></select>
+      <select id="slaFilter"><option value="all">All SLA</option></select>
+      <select id="connectorFilter"><option value="all">All systems</option></select>
       <input id="riskMinInput" type="number" min="0" max="100" placeholder="Min risk" />
     </div>
-    <div class="status-row small" style="margin-top:10px;">
-      <div id="statusLine">Loading operator surface…</div>
+    <div class="status-row small">
+      <div id="statusLine">Loading project E2E board…</div>
       <div id="metaLine">Board not loaded yet.</div>
     </div>
   </header>
+
   <main>
-    <section class="hero-strip">
-      <div>
-        <div class="small">Operations mode</div>
-        <div class="hero-headline" id="heroLine">Loading supply-chain operations framing…</div>
-        <div class="hero-sub" id="heroSub">Track each risk case from signal to recommendation, approval, execution, and audit.</div>
-      </div>
-      <div class="tag-row" id="heroTags"></div>
-    </section>
+    <div class="project-page" data-layout="one-page-project-e2e">
+      <div class="project-main">
+        <section class="hero-strip">
+          <div>
+            <div class="small">One-page project control tower</div>
+            <div class="hero-headline" id="heroLine">Loading supply-chain project framing…</div>
+            <div class="hero-sub" id="heroSub">Follow one project from supplier signal through IQC, assembly, test, packing, and final OQC release.</div>
+          </div>
+          <div class="tag-row" id="heroTags"></div>
+        </section>
 
-    <section class="demo-guide">
-      <div class="section-title"><h2>Scripted Demo Mode</h2><span class="small" id="guideMeta">Guided buyer walkthrough</span></div>
-      <div class="demo-progress"><span id="guideProgress" style="width:0%"></span></div>
-      <div class="demo-step-title" id="guideTitle">Ready to start</div>
-      <div class="demo-step-meta"><span class="pill" id="guideStepPill">Step 0 / 0</span><span class="pill" id="guidePackPill">Pack: —</span><span class="pill" id="guideActionPill">Action: none</span></div>
-      <div id="guideNarration" class="muted">Choose a seed pack, then start the guided demo to walk a buyer through the story in a controlled order.</div>
-      <div class="demo-guide-actions">
-        <button class="primary" id="btnGuideStart">Start guided demo</button>
-        <button id="btnGuidePrev">Previous step</button>
-        <button id="btnGuideNext">Next step</button>
-        <button class="ghost" id="btnGuideApply">Apply step now</button>
-      </div>
-    </section>
+        <section class="panel side-focus">
+          <div class="section-title"><h2>Project E2E Flow</h2><span class="small" id="milestoneMeta">Supplier status → IQC → Assembly → Test → Packing → OQC</span></div>
+          <div class="flow-toolbar">
+            <div>
+              <div class="flow-title">E2E release flow: supplier signal to final OQC release</div>
+              <div class="flow-sub">One row, one project: stage risk, active blocker, approval, simulation, writeback, and audit evidence are visible without page switching.</div>
+            </div>
+            <div class="row">
+              <button class="ghost" id="btnFlowFirstIssue">Focus first issue</button>
+              <button class="ghost" id="btnFlowClear">Show full flow</button>
+            </div>
+          </div>
+          <div class="milestone-flow" id="milestoneFlow"></div>
+          <div class="flow-insight" id="flowInsight">
+            <div class="small">Flow insight will update after the board loads.</div>
+          </div>
+        </section>
 
-    <section class="panel">
-      <div class="section-title"><h2>Product Milestone View</h2><span class="small" id="milestoneMeta">Supplier status → IQC → Assembly → Test → Packing → OQC</span></div>
-      <div class="flow-toolbar">
-        <div>
-          <div class="flow-title">E2E release flow: supplier signal to final OQC release</div>
-          <div class="flow-sub">Select a stage to narrow the board, inspect blockers, approve the next action, simulate the writeback, then release evidence into the audit timeline.</div>
+        <section class="summary-grid" id="summaryGrid"></section>
+
+        <section class="section board-shell">
+          <div class="section-title"><h2>Project Action Queue</h2><span class="small">Critical cards only: risk, owner, stage, approval, and next handoff.</span></div>
+          <div class="board" id="board"></div>
+        </section>
+      </div>
+
+      <aside class="project-side">
+        <section class="panel side-focus">
+          <div class="section-title"><h2>Next Decision</h2><span class="small" id="caseMeta">No case selected</span></div>
+          <div id="caseDetail" class="empty">Select a project card to open the next governed action.</div>
+        </section>
+        <div class="detail-stack">
+          <section class="panel"><div class="section-title"><h3>Approval Narrative</h3><span class="small">Business why</span></div><div id="approvalStory" class="empty">Narrative will appear for the selected case.</div></section>
+          <section class="panel"><div class="section-title"><h3>Pending Approval</h3><span class="small" id="pendingMeta">Awaiting selection</span></div><div id="pendingPanel" class="empty">No pending actions loaded yet.</div><div id="approvalActions" style="display:none; margin-top:12px;"><div class="field-label">Decision note</div><textarea id="decisionNote" placeholder="Explain the decision for audit and handoff."></textarea></div></section>
+          <section class="panel"><div class="section-title"><h3>Simulation</h3><span class="small" id="simulationMeta">Select an approved or pending action</span></div><div id="simulationPanel" class="empty">Run a simulation before executing writeback.</div></section>
+          <section class="panel"><div class="section-title"><h3>Receipt & Trust</h3><span class="small" id="receiptMeta">Awaiting selection</span></div><div id="receiptPanel" class="empty">Receipt details will appear after simulation or execution.</div></section>
+          <section class="panel"><div class="section-title"><h3>Data Trust</h3><span class="small" id="transparencyMeta">Awaiting selection</span></div><div id="transparencyPanel" class="empty">Evidence and ledger proof status will appear for the selected case.</div></section>
+          <section class="panel"><div class="section-title"><h3>Scenario Comparison</h3><span class="small" id="scenarioMeta">Select a case</span></div><div id="scenarioPanel" class="empty">Scenario table and chart will appear for the selected case.</div></section>
+          <section class="panel"><div class="section-title"><h3>Audit Timeline</h3><span class="small" id="auditMeta">Awaiting selection</span></div><div id="auditPanel" class="empty">Audit trail will appear here for the selected case.</div></section>
+          <section class="panel compact-hide"><div class="section-title"><h3>Operations Brief Export</h3><span class="small">Export professional board stills</span></div><div id="shotPanel" class="screenshot-list"><div class="empty">Operations stills will be generated from the current scenario and selection.</div></div></section>
         </div>
-        <div class="row">
-          <button class="ghost" id="btnFlowFirstIssue">Focus first issue</button>
-          <button class="ghost" id="btnFlowClear">Show full flow</button>
-        </div>
-      </div>
-      <div class="milestone-flow" id="milestoneFlow"></div>
-      <div class="flow-insight" id="flowInsight">
-        <div class="small">Flow insight will update after the board loads.</div>
-      </div>
-    </section>
+      </aside>
 
-    <section class="summary-grid" id="summaryGrid"></section>
+      <section class="demo-guide compact-hide">
+        <div class="section-title"><h2>Scripted Demo Mode</h2><span class="small" id="guideMeta">Guided buyer walkthrough</span></div>
+        <div class="demo-progress"><span id="guideProgress" style="width:0%"></span></div>
+        <div class="demo-step-title" id="guideTitle">Ready to start</div>
+        <div class="demo-step-meta"><span class="pill" id="guideStepPill">Step 0 / 0</span><span class="pill" id="guidePackPill">Pack: —</span><span class="pill" id="guideActionPill">Action: none</span></div>
+        <div id="guideNarration" class="muted">Choose a seed pack, then start the guided demo.</div>
+        <div class="demo-guide-actions"><button class="primary" id="btnGuideStart">Start guided demo</button><button id="btnGuidePrev">Previous step</button><button id="btnGuideNext">Next step</button><button class="ghost" id="btnGuideApply">Apply step now</button></div>
+      </section>
 
-    <section id="executiveShell" class="exec-shell">
-      <div class="exec-hero"><div class="small">Executive mode</div><div class="headline" id="execHeadline">Loading executive story…</div></div>
-      <div class="exec-grid" id="execGrid"></div>
-      <div class="content-grid">
-        <section class="section"><div class="section-title"><h2>Top risk briefing</h2><span class="small">What an executive should talk through</span></div><div id="execTopRisks" class="list"></div></section>
-        <div class="detail-stack" style="position:static;">
-          <section class="panel"><div class="section-title"><h3>Connector mix</h3><span class="small">Governed destinations</span></div><div id="execConnectors" class="connector-grid"></div></section>
-          <section class="panel"><div class="section-title"><h3>Talking points</h3><span class="small">Non-technical story</span></div><div id="execTalkingPoints" class="list"></div></section>
-        </div>
-      </div>
-      <section class="panel"><div class="section-title"><h3>One-page brief</h3><span class="small" id="briefMeta">Buyer-ready export</span></div><div id="briefPanel" class="brief-sheet">Loading brief…</div></section>
-    </section>
-
-    <section class="content-grid">
-      <div class="section">
-        <div class="section-title"><h2>Risk Board</h2><span class="small">Use board filters to narrate ownership, SLA risk, and connector destination.</span></div>
-        <div class="board" id="board"></div>
-      </div>
-      <div class="detail-stack">
-        <section class="panel"><div class="section-title"><h3>Case Detail</h3><span class="small" id="caseMeta">No case selected</span></div><div id="caseDetail" class="empty">Select a card on the board to open its operator context.</div></section>
-        <section class="panel"><div class="section-title"><h3>Approval Narrative</h3><span class="small">For non-technical walkthroughs</span></div><div id="approvalStory" class="empty">Narrative will appear for the selected case.</div></section>
-        <section class="panel"><div class="section-title"><h3>Scenario Comparison</h3><span class="small" id="scenarioMeta">Select a case</span></div><div id="scenarioPanel" class="empty">Scenario table and chart will appear for the selected case.</div></section>
-        <section class="panel"><div class="section-title"><h3>Pending Approval</h3><span class="small" id="pendingMeta">Awaiting selection</span></div><div id="pendingPanel" class="empty">No pending actions loaded yet.</div><div id="approvalActions" style="display:none; margin-top:12px;"><div class="field-label">Decision note</div><textarea id="decisionNote" placeholder="Explain the decision for audit and handoff."></textarea></div></section>
-        <section class="panel"><div class="section-title"><h3>Simulation Panel</h3><span class="small" id="simulationMeta">Select an approved or pending action</span></div><div id="simulationPanel" class="empty">Run a simulation from Pending Approval before executing writeback.</div></section>
-        <section class="panel"><div class="section-title"><h3>Writeback Receipt</h3><span class="small" id="receiptMeta">Awaiting selection</span></div><div id="receiptPanel" class="empty">Receipt details will appear after simulation or execution.</div></section>
-        <section class="panel"><div class="section-title"><h3>Data Trust & Transparency</h3><span class="small" id="transparencyMeta">Awaiting selection</span></div><div id="transparencyPanel" class="empty">Traceability evidence and ledger proof status will appear for the selected case.</div></section>
-        <section class="panel"><div class="section-title"><h3>Operations Brief Export</h3><span class="small">Export professional board stills</span></div><div id="shotPanel" class="screenshot-list"><div class="empty">Operations stills will be generated from the current scenario and selection.</div></div></section>
-        <section class="panel"><div class="section-title"><h3>Audit Timeline</h3><span class="small" id="auditMeta">Awaiting selection</span></div><div id="auditPanel" class="empty">Audit trail will appear here for the selected case.</div></section>
-      </div>
-    </section>
+      <section id="executiveShell" class="exec-shell compact-hide">
+        <div class="exec-hero"><div class="small">Executive mode</div><div class="headline" id="execHeadline">Loading executive story…</div></div>
+        <div class="exec-grid" id="execGrid"></div>
+        <div id="execTopRisks" class="list"></div><div id="execConnectors" class="connector-grid"></div><div id="execTalkingPoints" class="list"></div><div id="briefPanel" class="brief-sheet">Loading brief…</div><span id="briefMeta"></span>
+      </section>
+    </div>
   </main>
   <script src="/app.js"></script>
 </body>

@@ -25,3 +25,16 @@ def test_web_api_proxy_contract_for_local_e2e() -> None:
     assert "location.port === '8080' ? sameOriginApiBase" in app_js
     assert 'CORSMiddleware' in api_main
     assert 'http://localhost:8080' in api_main
+
+
+def test_web_is_one_page_project_e2e_layout() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+
+    assert 'data-layout="one-page-project-e2e"' in html
+    assert 'Project E2E Flow' in html
+    assert 'Project Action Queue' in html
+    assert 'Next Decision' in html
+    assert 'function allVisibleCards' in app_js
+    assert 'Project issues' in app_js
+    assert 'one-page E2E view' in app_js
