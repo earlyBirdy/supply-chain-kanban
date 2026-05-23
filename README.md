@@ -106,6 +106,35 @@ Approval blockers and governed execution receipts
 
 The agent's role is to keep this view current, open Kanban cases when alignment breaks, recommend mitigation actions, and escalate only the cases that need management approval.
 
+
+## AI agents + blockchain convergence
+
+This project treats AI agents and blockchain as a collaborative operating pair for supply-chain management. AI agents are the **brain and hands**: they read fragmented ERP, WMS, MES, TMS, supplier, IoT, market, and logistics signals; predict disruption; recommend recovery; prepare approvals; and execute governed writebacks. Blockchain is the **judge and vault**: it gives the agent a tamper-evident source of truth for provenance, supplier commitments, quality release, settlement receipts, and audit proof.
+
+The one-page Project E2E board now makes that convergence visible in the UI:
+
+```text
+Supplier signal
+  -> IQC containment
+  -> Assembly readiness
+  -> Test recovery
+  -> Packing / logistics cutoff
+  -> OQC release
+  -> receipt + blockchain-ready proof
+```
+
+High-impact scenarios this demo is designed to communicate:
+
+```text
+Autonomous procurement and settlement
+Real-time traceability and cold-chain accountability
+Continuous risk simulation and mitigation
+Machine-to-machine microtransactions for logistics, handling, tolling, charging, and recovery
+Reduced trust friction through immutable evidence
+Lower latency by removing routine human bottlenecks while preserving approval gates
+Always-on resilience when supplier, shipment, quality, or capacity shocks appear
+```
+
 ## How the AI agent works now
 
 The repo has two AI-agent paths. Both feed the same Kanban command board.

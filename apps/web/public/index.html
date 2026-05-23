@@ -25,9 +25,14 @@
     .board-shell{min-height:0; overflow:hidden}.board{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; max-height:100%; overflow:auto; padding-right:2px}.lane{padding:12px; min-height:auto}.lane-head{justify-content:space-between; margin-bottom:8px}.lane-title{font-size:14px; font-weight:800}.lane-body{display:grid; gap:8px}.lane-body:empty{display:none}.card{padding:0; cursor:pointer; overflow:hidden; border:1px solid rgba(255,255,255,.07); border-radius:15px; background:#0b1425; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}.card:hover{transform:translateY(-2px); border-color:var(--accent-soft)}.card.selected{border-color:var(--accent); box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent), var(--shadow)}.card-top{padding:11px 12px 0; border-top:3px solid var(--accent-soft)}.card.high .card-top{border-top-color:var(--bad)}.card.med .card-top{border-top-color:var(--warn)}.card.low .card-top{border-top-color:var(--good)}.card-title{font-size:14px; font-weight:850; line-height:1.3}.card-body{color:var(--muted); font-size:12px; margin-top:5px; line-height:1.35; min-height:34px}.card-bottom{padding:0 12px 11px}.card-meta,.card-footer{margin-top:7px; display:flex; justify-content:space-between; gap:8px; align-items:center}.risk{font-size:12px; font-weight:850}.risk.high{color:var(--bad)}.risk.med{color:var(--warn)}.risk.low{color:var(--good)}
     .project-side .panel{overflow:hidden}.detail-stack{display:grid; gap:10px; min-height:0; overflow:auto; padding-right:2px}.detail-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px 11px; margin-top:8px}.list,.timeline,.connector-grid,.exec-grid{display:grid; gap:8px}.list-card,.timeline-item{padding:10px 11px; border:1px solid var(--line); border-radius:14px; background:#0b1425}.timeline-item{display:flex; gap:9px; align-items:flex-start}.timeline-dot{width:9px; height:9px; border-radius:999px; background:var(--accent); margin-top:6px}.narrative{border-left:3px solid var(--accent-soft); padding-left:11px; margin-top:8px}.compare-table table{width:100%; border-collapse:collapse}.compare-table th,.compare-table td{border-top:1px solid var(--line); padding:7px 5px; text-align:left; font-size:12px}.bar-track{height:10px; border-radius:999px; background:#0b1527; border:1px solid var(--line); overflow:hidden}.bar-fill{height:100%; background:linear-gradient(90deg,var(--accent-soft) 0%,var(--accent) 100%)}textarea{width:100%; min-height:76px}.brief-sheet{padding:14px 16px; line-height:1.55; white-space:pre-wrap}.screenshot-list{display:grid; gap:8px}.screenshot-card{padding:10px 12px; border-radius:14px; border:1px solid var(--line); background:#0b1425}
     .demo-guide,.exec-shell{display:none}.exec-shell.active{display:none}.compact-hide{display:none!important}.e2e-step-label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px}.side-focus{border-color:rgba(142,197,255,.25)}
+
+    .filter-row{display:none}.toolbar{gap:9px}.selector-row{max-width:960px}.project-page{grid-template-columns:minmax(0,1.42fr) minmax(360px,.58fr)}.project-main{grid-template-rows:auto auto auto auto minmax(0,1fr)}
+    .trust-strip{display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:10px}.trust-card{padding:12px 13px; border:1px solid rgba(255,255,255,.07); border-radius:16px; background:#0b1425; min-height:108px}.trust-card strong{display:block; font-size:14px; margin-bottom:5px}.trust-card p{margin:0; color:var(--muted); font-size:12px; line-height:1.38}.trust-card .chipline{margin-top:9px; display:flex; gap:6px; flex-wrap:wrap}.trust-arrow{display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:999px; background:#101b2e; border:1px solid var(--line); color:var(--accent); font-weight:900}
+    .decision-stack{display:grid; gap:10px; min-height:0; overflow:auto}.decision-panel{padding:12px; border:1px solid rgba(255,255,255,.07); border-radius:16px; background:linear-gradient(180deg,var(--surface-top),var(--surface-bottom))}.decision-panel h3{margin:0; font-size:15px}.decision-panel .section-title{margin-bottom:7px}.decision-panel.primary-decision{border-color:rgba(142,197,255,.25)}.queue-summary{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:8px}.queue-summary .mini-kpi{border:1px solid var(--line); border-radius:12px; padding:9px; background:#0b1425}.mini-kpi b{display:block; font-size:20px}.quick-filter-note{font-size:11px; color:var(--muted); margin-left:auto}.project-signal{font-size:12px; color:var(--muted); line-height:1.35; margin-top:5px}
+
     @media (max-width:1250px){main{height:auto; min-height:0}.project-page{grid-template-columns:1fr}.summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.project-main{grid-template-rows:auto}.board{max-height:none}.project-side{grid-template-rows:auto}.detail-stack{max-height:none; overflow:visible}.milestone-flow{grid-template-columns:repeat(3,minmax(0,1fr))}}
-    @media (max-width:900px){.summary-grid,.board,.flow-insight-grid,.milestone-flow{grid-template-columns:1fr 1fr}.hero-strip{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.header-main{align-items:flex-start}.secondary-action{display:none!important}}
-    @media (max-width:620px){main{padding:10px}.summary-grid,.board,.milestone-flow{grid-template-columns:1fr}.toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr}input,select{min-width:0; width:100%}.desktop-only{display:none}.brand-title{font-size:20px}}
+    @media (max-width:900px){.summary-grid,.board,.flow-insight-grid,.milestone-flow,.trust-strip{grid-template-columns:1fr 1fr}.hero-strip{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.header-main{align-items:flex-start}.secondary-action{display:none!important}}
+    @media (max-width:620px){main{padding:10px}.summary-grid,.board,.milestone-flow,.trust-strip{grid-template-columns:1fr}.toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr}input,select{min-width:0; width:100%}.desktop-only{display:none}.brand-title{font-size:20px}}
   </style>
 </head>
 <body>
@@ -37,7 +42,7 @@
         <div class="brand-mark" id="brandMark">AC</div>
         <div>
           <div class="brand-title" id="brandTitle">Atlas Control</div>
-          <div class="subtitle" id="brandSubtitle">Project E2E supply-chain leader board.</div>
+          <div class="subtitle" id="brandSubtitle">One-page project E2E agent + trust board.</div>
         </div>
       </div>
       <div class="row">
@@ -48,7 +53,7 @@
     </div>
     <div class="toolbar">
       <button class="primary" id="btnRefresh">Refresh project</button>
-      <button id="btnRunScenario" class="ghost">Run approval scenario</button>
+      <button id="btnRunScenario" class="ghost">Generate risk scenario</button>
       <button class="ghost secondary-action" id="btnReset">Reset demo seed</button>
       <button class="ghost secondary-action" id="btnDocs">Open API docs</button>
       <button class="ghost desktop-only" id="btnExportBrief">Copy one-page brief</button>
@@ -87,6 +92,24 @@
           <div class="tag-row" id="heroTags"></div>
         </section>
 
+        <section class="trust-strip" id="agentTrustRail" aria-label="AI agent and blockchain trust rail">
+          <article class="trust-card">
+            <strong>AI Agent Brain + Hands</strong>
+            <p>Forecast disruption, rank project risk, recommend mitigation, prepare approval, and execute governed ERP / WMS / TMS writebacks.</p>
+            <div class="chipline"><span class="pill">Predict</span><span class="pill">Negotiate</span><span class="pill">Execute</span></div>
+          </article>
+          <article class="trust-card">
+            <strong>Blockchain Judge + Vault</strong>
+            <p>Use tamper-evident proof as the shared source of truth for supplier commitment, OQC release, settlement, and audit receipts.</p>
+            <div class="chipline"><span class="pill">Verify</span><span class="pill">Anchor</span><span class="pill">Prove</span></div>
+          </article>
+          <article class="trust-card">
+            <strong>Autonomous M2M Settlement</strong>
+            <p>Agents can trigger smart-contract-ready microtransactions for logistics handling, cold-chain exception accountability, and route recovery.</p>
+            <div class="chipline"><span class="pill">Smart contract</span><span class="pill">M2M</span><span class="pill">24/7</span></div>
+          </article>
+        </section>
+
         <section class="panel side-focus">
           <div class="section-title"><h2>Project E2E Flow</h2><span class="small" id="milestoneMeta">Supplier status → IQC → Assembly → Test → Packing → OQC</span></div>
           <div class="flow-toolbar">
@@ -108,7 +131,7 @@
         <section class="summary-grid" id="summaryGrid"></section>
 
         <section class="section board-shell">
-          <div class="section-title"><h2>Project Action Queue</h2><span class="small">Critical cards only: risk, owner, stage, approval, and next handoff.</span></div>
+          <div class="section-title"><h2>Project Action Queue</h2><span class="small">One list sorted by risk: blocker → approval → simulation → receipt.</span></div>
           <div class="board" id="board"></div>
         </section>
       </div>
@@ -118,14 +141,28 @@
           <div class="section-title"><h2>Next Decision</h2><span class="small" id="caseMeta">No case selected</span></div>
           <div id="caseDetail" class="empty">Select a project card to open the next governed action.</div>
         </section>
-        <div class="detail-stack">
-          <section class="panel"><div class="section-title"><h3>Approval Narrative</h3><span class="small">Business why</span></div><div id="approvalStory" class="empty">Narrative will appear for the selected case.</div></section>
-          <section class="panel"><div class="section-title"><h3>Pending Approval</h3><span class="small" id="pendingMeta">Awaiting selection</span></div><div id="pendingPanel" class="empty">No pending actions loaded yet.</div><div id="approvalActions" style="display:none; margin-top:12px;"><div class="field-label">Decision note</div><textarea id="decisionNote" placeholder="Explain the decision for audit and handoff."></textarea></div></section>
-          <section class="panel"><div class="section-title"><h3>Simulation</h3><span class="small" id="simulationMeta">Select an approved or pending action</span></div><div id="simulationPanel" class="empty">Run a simulation before executing writeback.</div></section>
-          <section class="panel"><div class="section-title"><h3>Receipt & Trust</h3><span class="small" id="receiptMeta">Awaiting selection</span></div><div id="receiptPanel" class="empty">Receipt details will appear after simulation or execution.</div></section>
-          <section class="panel"><div class="section-title"><h3>Data Trust</h3><span class="small" id="transparencyMeta">Awaiting selection</span></div><div id="transparencyPanel" class="empty">Evidence and ledger proof status will appear for the selected case.</div></section>
-          <section class="panel"><div class="section-title"><h3>Scenario Comparison</h3><span class="small" id="scenarioMeta">Select a case</span></div><div id="scenarioPanel" class="empty">Scenario table and chart will appear for the selected case.</div></section>
-          <section class="panel"><div class="section-title"><h3>Audit Timeline</h3><span class="small" id="auditMeta">Awaiting selection</span></div><div id="auditPanel" class="empty">Audit trail will appear here for the selected case.</div></section>
+        <div class="decision-stack">
+          <section class="decision-panel primary-decision">
+            <div class="section-title"><h3>1. Decide</h3><span class="small">AI recommendation + human approval</span></div>
+            <div id="approvalStory" class="empty">Business narrative will appear for the selected case.</div>
+            <div id="pendingPanel" class="empty" style="margin-top:8px;">No pending actions loaded yet.</div>
+            <div id="approvalActions" style="display:none; margin-top:10px;"><div class="field-label">Decision note</div><textarea id="decisionNote" placeholder="Explain approval, rejection, or escalation for audit."></textarea></div>
+            <span class="small" id="pendingMeta">Awaiting selection</span>
+          </section>
+          <section class="decision-panel">
+            <div class="section-title"><h3>2. Simulate + Execute</h3><span class="small" id="simulationMeta">Select an approved or pending action</span></div>
+            <div id="simulationPanel" class="empty">Run the scenario before executing ERP / WMS / TMS writeback.</div>
+            <div id="scenarioPanel" class="empty" style="margin-top:8px;">Scenario comparison will appear here.</div><span id="scenarioMeta" class="small">Select a case</span>
+          </section>
+          <section class="decision-panel">
+            <div class="section-title"><h3>3. Prove</h3><span class="small" id="receiptMeta">Awaiting selection</span></div>
+            <div id="receiptPanel" class="empty">Writeback receipt and smart-contract-ready proof appear after simulation or execution.</div>
+            <div id="transparencyPanel" class="empty" style="margin-top:8px;">Blockchain-ready evidence and ledger proof status will appear for the selected case.</div><span id="transparencyMeta" class="small">Awaiting selection</span>
+          </section>
+          <section class="decision-panel">
+            <div class="section-title"><h3>4. Audit Timeline</h3><span class="small" id="auditMeta">Awaiting selection</span></div>
+            <div id="auditPanel" class="empty">Audit trail will appear here for the selected case.</div>
+          </section>
           <section class="panel compact-hide"><div class="section-title"><h3>Operations Brief Export</h3><span class="small">Export professional board stills</span></div><div id="shotPanel" class="screenshot-list"><div class="empty">Operations stills will be generated from the current scenario and selection.</div></div></section>
         </div>
       </aside>

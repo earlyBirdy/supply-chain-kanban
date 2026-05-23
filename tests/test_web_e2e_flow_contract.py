@@ -38,3 +38,18 @@ def test_web_is_one_page_project_e2e_layout() -> None:
     assert 'function allVisibleCards' in app_js
     assert 'Project issues' in app_js
     assert 'one-page E2E view' in app_js
+
+
+def test_web_explains_ai_agent_blockchain_trust_rail() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+
+    assert 'agentTrustRail' in html
+    assert 'AI Agent Brain + Hands' in html
+    assert 'Blockchain Judge + Vault' in html
+    assert 'Autonomous M2M Settlement' in html
+    assert 'function renderAgentTrustRail' in app_js
+    assert 'autoSelectFirstProjectIssue' in app_js
+    assert 'AI agents + blockchain convergence' in readme
+    assert 'tamper-evident source of truth' in readme
