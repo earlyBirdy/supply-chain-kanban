@@ -115,7 +115,7 @@ AI Leader Dashboard
 Project E2E Flow
   Supplier status -> IQC -> Assembly -> Test -> Packing -> OQC release.
 
-Project Action Queue
+Major Issues
   A simple risk-ranked list of cases, approvals, blockers, simulations, and receipts.
 
 AI Agent Workbench

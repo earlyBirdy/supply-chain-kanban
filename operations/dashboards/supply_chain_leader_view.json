@@ -63,7 +63,7 @@
   ],
   "kanban_case_rule": "Only open a case when a product milestone or metric breach requires a management action, approval, or governed writeback before OQC release.",
   "product_milestone_view": {
-    "selection_rule": "Leaders can select all milestones or one product milestone to focus the Kanban on the selected lifecycle gate.",
+    "selection_rule": "Leaders can select all stages or one product stage to focus the Kanban on the selected lifecycle gate.",
     "flow": [
       "commodity_supplier",
       "iqc",

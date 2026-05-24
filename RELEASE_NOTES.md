@@ -1,8 +1,32 @@
-## v0.21
+# Release notes
+
+## v0.24
+
+- Replaced the raw selected case UUID badge with a human-readable selected issue label.
+- Made the board load path resilient: optional summary, executive brief, demo script, and screenshot manifest loads can no longer mark the whole dashboard as `API: error`.
+- Removed visible `Load failed` copy for optional panel failures; the top board stays focused on major issues.
+- Bumped the frontend script cache key to `v0.24` for Safari/Docker rebuilds.
+
+## v0.23
+
+- Fixed the visible `renderBrief` runtime path by keeping the renderer available to both internal and browser-global callbacks.
+- Made executive and brief API calls non-fatal so an optional panel cannot flip the whole UI into `API: error`.
+- Changed the page from fixed-height nested scrollers to normal document flow so dashboard blocks no longer overlap while scrolling.
+- Removed the noisy visible `issues visible` status copy and replaced it with a short major-issues sorting note.
+- Added no-cache handling for `/app.js` and a versioned script URL so Safari does not keep stale frontend code after Docker rebuilds.
+
+# Release Notes
+
+## v0.22
+- Fixed the missing `renderExecutive()` frontend function that caused `API: error` after loading executive data.
+- Simplified the header subtitle and board meta copy so old marketing phrases no longer distract from the working issues list.
+- Moved the summary KPIs and risk-sorted Major Issues list to the top of the page.
+- Hid the concept/trust rail by default to keep the first screen focused on major supply-chain issues and next actions.
+
 
 - Renamed the default UI identity from `Supply Chain Control Tower` to `Supply Chain AI Agent`.
 - Replaced fictional vertical demo brands with consistent `Supply Chain AI Agent` labels so the UI no longer opens with unrelated Atlas/VoltStream/EdgeForge naming.
-- Updated the leader dashboard copy toward `Supply Chain by AI Agent`: forecast, inventory, partner KPI, IOP, governed execution, and evidence.
+- Updated the leader dashboard copy toward `Supply Chain AI Agent`: forecast, inventory, partner KPI, IOP, governed execution, and evidence.
 - Updated tests to lock the Supply Chain AI Agent brand and prevent the old placeholder naming from returning.
 
 ## v0.20 — supply-chain brand + brief runtime fix
@@ -152,4 +176,3 @@ Kanban remains the regular operations basis.
 The leader view summarizes management health.
 Cases open only when a metric breach requires action, approval, or governed writeback.
 ```
-

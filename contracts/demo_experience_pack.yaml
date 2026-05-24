@@ -1,7 +1,7 @@
 version: 1
 brands:
   neutral:
-    label: Supply Chain by AI Agent
+    label: Supply Chain AI Agent
     logo_text: Supply Chain AI Agent
     logo_mark: SCA
     accent: '#8ec5ff'
