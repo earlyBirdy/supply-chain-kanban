@@ -1,5 +1,22 @@
 # Release notes
 
+## v0.26
+
+- Kept the main UI as a one-page project-status board focused on summary KPIs, highlighted Major Issues, E2E project flow, AI Leader Dashboard, and the selected next decision.
+- Moved existing-system connections into an `Integrations` subpage so ERP / WMS / MES / TMS / Supplier Portal / CSV setup does not crowd the daily project page.
+- Moved Power Templates and Live Commodity News into a `Templates + news` subpage so demo/market-signal tools stay available without hiding the major issues list.
+- Added simple page switching and active toolbar state for `Project status`, `Integrations`, and `Templates + news`.
+- Bumped the frontend script cache key to `v0.26`.
+
+## v0.25
+
+- Kept the product name as `Supply Chain AI Agent` and made the UI story explicit: AI co-works with ERP, WMS, MES, TMS, supplier portals, and CSV/Excel reports.
+- Added a simple `Connect Existing Systems` panel with read-only-first integration cards and governed writeback positioning.
+- Added `Power Templates` so demos can quickly show commodity shock, supplier OTIF rescue, inventory rebalance, quality hold recovery, forecast/capacity, and governed-writeback capabilities.
+- Added a `Live News for Commodity Arrangements` panel plus a `Track commodity news` action wired to the existing news API.
+- Updated demo news signals and RSS allowlist toward commodities, battery materials, copper, memory, and freight disruption.
+- Bumped the frontend script cache key to `v0.25`.
+
 ## v0.24
 
 - Replaced the raw selected case UUID badge with a human-readable selected issue label.
@@ -176,3 +193,11 @@ Kanban remains the regular operations basis.
 The leader view summarizes management health.
 Cases open only when a metric breach requires action, approval, or governed writeback.
 ```
+
+## v0.28
+
+- Keeps v0.26 as baseline and ignores v0.27.
+- Simplifies the project-status page by showing only the top 4 major issues and grouping lower-priority demo signals.
+- Re-labels the KPI strip from raw total project issues to current major issues so demos do not look flooded after scenario generation.
+- Adds Hugging Face Spaces Docker deployment support for a single-container public demo.
+- Adds same-origin `/api/*` routing support for hosted demos while preserving local Docker Compose behavior.

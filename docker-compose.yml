@@ -124,7 +124,7 @@ services:
       context: ./apps/news_monitor
     environment:
       API_BASE: http://api:8000
-      NEWS_TOPIC: memory
+      NEWS_TOPIC: commodities
       NEWS_MODE: ${NEWS_MODE:-deterministic}
       POLL_SECONDS: ${NEWS_POLL_SECONDS:-30}
     depends_on:

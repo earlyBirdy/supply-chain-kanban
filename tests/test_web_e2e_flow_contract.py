@@ -22,7 +22,7 @@ def test_web_api_proxy_contract_for_local_e2e() -> None:
 
     assert 'location /api/' in nginx
     assert 'proxy_pass http://api:8000/;' in nginx
-    assert "location.port === '8080' ? sameOriginApiBase" in app_js
+    assert "location.port === '8080' || !isLocalHost" in app_js
     assert 'CORSMiddleware' in api_main
     assert 'http://localhost:8080' in api_main
 
@@ -36,8 +36,8 @@ def test_web_is_one_page_project_e2e_layout() -> None:
     assert 'Major Issues' in html
     assert 'Next Decision' in html
     assert 'function allVisibleCards' in app_js
-    assert 'Project issues' in app_js
-    assert 'Major issues sorted by risk.' in app_js
+    assert 'Major issues' in app_js
+    assert 'Showing top ${MAJOR_ISSUE_LIMIT} major issues' in app_js
     assert 'issues visible' not in app_js
 
 
@@ -113,7 +113,7 @@ def test_web_uses_normal_page_flow_to_avoid_overlapping_blocks() -> None:
     assert 'overflow:visible' in html
     assert 'location = /app.js' in nginx
     assert 'Cache-Control "no-store, max-age=0"' in nginx
-    assert '<script src="/app.js?v=0.24"></script>' in html
+    assert '<script src="/app.js?v=0.28"></script>' in html
 
 def test_web_removes_confusing_visible_status_copy() -> None:
     html = (ROOT / 'apps/web/public/index.html').read_text()
@@ -130,7 +130,7 @@ def test_web_keeps_optional_loads_non_fatal_and_status_clear() -> None:
     html = (ROOT / 'apps/web/public/index.html').read_text()
     app_js = (ROOT / 'apps/web/public/app.js').read_text()
 
-    assert 'Promise.allSettled([loadSummary(), loadExecutive(), loadExecutiveBrief(), loadDemoScript()])' in app_js
+    assert 'Promise.allSettled([loadSummary(), loadExecutive(), loadExecutiveBrief(), loadDemoScript(), loadNews()])' in app_js
     assert 'async function safeLoad' in app_js
     assert "loadScreenshotManifest(){ const data = await safeLoad" in app_js
     assert "if(window.renderBrief) window.renderBrief();" in app_js
@@ -148,3 +148,86 @@ def test_web_selection_badge_hides_raw_case_uuid() -> None:
     assert 'Selection: ${c.case_id' not in app_js
     assert 'Selection: none' not in html
     assert 'Selection: none' not in app_js
+
+
+def test_web_has_existing_system_integration_and_templates() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+
+    assert 'Supply Chain AI Agent' in html
+    assert 'Connect Existing Systems' in html
+    assert 'ERP / WMS / MES / TMS / Supplier Portal / CSV reports' in html
+    assert 'Read-only first · governed writeback after approval' in html
+    assert 'Power Templates' in html
+    assert 'Commodity shock' in app_js
+    assert 'Supplier OTIF rescue' in app_js
+    assert 'Inventory rebalance' in app_js
+    assert 'function renderIntegrationHub' in app_js
+    assert 'function renderFeatureTemplates' in app_js
+    assert 'Power Templates' in readme
+
+
+def test_web_tracks_commodity_news_for_arrangements() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    compose = (ROOT / 'docker-compose.yml').read_text()
+    rss = (ROOT / 'apps/news_monitor/app/rss_sources.yaml').read_text()
+    news_router = (ROOT / 'apps/api/app/api/routers/news.py').read_text()
+
+    assert 'Live News for Commodity Arrangements' in html
+    assert 'btnNewsDemo' in html
+    assert 'function renderNewsMonitor' in app_js
+    assert 'function triggerCommodityNews' in app_js
+    assert '/news/items?topic=commodities&limit=6' in app_js
+    assert '/news/check-now?topic=commodities' in app_js
+    assert 'NEWS_TOPIC: commodities' in compose
+    assert 'lithium battery materials' in rss
+    assert 'freight port disruption' in rss
+    assert 'LFP battery material shipment delay' in news_router
+    assert 'review buy timing' in app_js
+
+
+def test_web_keeps_integrations_and_templates_as_subpages() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+
+    assert 'id="pageProject" data-page="project-status"' in html
+    assert 'id="pageIntegrations" data-page="integrations"' in html
+    assert 'id="pageTemplates" data-page="templates-news"' in html
+    assert '<button class="ghost" id="btnPageIntegrations">Integrations</button>' in html
+    assert 'function showPage' in app_js
+    assert "showPage('project')" in app_js
+    assert "showPage('integrations')" in app_js
+    assert "showPage('templates')" in app_js
+    assert html.index('id="pageProject"') < html.index('id="pageIntegrations"')
+    assert html.index('id="pageProject"') < html.index('id="pageTemplates"')
+
+
+def test_web_project_status_shows_top_major_issues_not_full_backlog() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+
+    assert 'One-page view · top issues only · grouped backlog below.' in html
+    assert 'const MAJOR_ISSUE_LIMIT = 4' in app_js
+    assert 'function majorIssueCards' in app_js
+    assert 'lower-priority signals grouped' in app_js
+    assert 'Showing top ${MAJOR_ISSUE_LIMIT} major issues' in app_js
+    assert '<script src="/app.js?v=0.28"></script>' in html
+
+
+def test_hugging_face_space_demo_contract() -> None:
+    dockerfile = (ROOT / 'Dockerfile.hf').read_text()
+    start = (ROOT / 'scripts/hf_start.sh').read_text()
+    docs = (ROOT / 'docs/demo/HUGGING_FACE_SPACE.md').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    api_main = (ROOT / 'apps/api/app/api_main.py').read_text()
+
+    assert 'EXPOSE 7860' in dockerfile
+    assert 'SUPPLY_CHAIN_SERVE_WEB=1' in dockerfile
+    assert 'COPY apps/web/public /app/web' in dockerfile
+    assert 'uvicorn app.api_main:app --host 0.0.0.0 --port "$API_PORT"' in start
+    assert '_include_api("/api")' in api_main
+    assert 'StaticFiles(directory=web_dir, html=True)' in api_main
+    assert "location.port === '8080' || !isLocalHost" in app_js
+    assert 'Docker Space' in docs

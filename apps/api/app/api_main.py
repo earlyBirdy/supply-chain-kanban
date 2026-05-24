@@ -16,12 +16,15 @@ v25: demo-readiness polish
 from __future__ import annotations
 
 import logging
+import os
 import time
 import uuid
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from .logging_utils import setup_logging
@@ -113,7 +116,11 @@ def create_app() -> FastAPI:
         )
 
     @app.get("/", include_in_schema=False)
-    async def _root() -> dict[str, object]:
+    async def _root():
+        web_dir = Path(os.getenv("SUPPLY_CHAIN_WEB_STATIC_DIR", "/app/web"))
+        index_file = web_dir / "index.html"
+        if os.getenv("SUPPLY_CHAIN_SERVE_WEB", "").lower() in {"1", "true", "yes"} and index_file.exists():
+            return FileResponse(index_file)
         return {
             "service": "Supply Chain Kanban API",
             "status": "ok",
@@ -181,20 +188,28 @@ def create_app() -> FastAPI:
         )
         return response
 
-    # Core routers
-    app.include_router(health.router)
-    app.include_router(ontology.router, prefix="/ontology", tags=["ontology"])
-    app.include_router(objects.router, prefix="/objects", tags=["objects"])
-    app.include_router(cases.router, prefix="/cases", tags=["cases"])
-    app.include_router(graph.router, prefix="/graph", tags=["graph"])
-    app.include_router(actions.router, prefix="/actions", tags=["actions"])
-    app.include_router(pending_actions.router, prefix="/pending_actions", tags=["pending_actions"])
-    app.include_router(audit_view.router, prefix="/audit", tags=["audit"])
-    app.include_router(governance.router, prefix="/governance", tags=["governance"])
-    app.include_router(maintenance.router, prefix="/maintenance", tags=["maintenance"])
-    app.include_router(news.router, prefix="/news", tags=["news"])
-    app.include_router(operator.router, prefix="/operator", tags=["operator"])
-    app.include_router(demo.router, prefix="/demo", tags=["demo"])
+    def _include_api(prefix: str = "") -> None:
+        # Core routers. The /api mirror is used by single-container demos such as Hugging Face Spaces.
+        app.include_router(health.router, prefix=prefix)
+        app.include_router(ontology.router, prefix=f"{prefix}/ontology", tags=["ontology"])
+        app.include_router(objects.router, prefix=f"{prefix}/objects", tags=["objects"])
+        app.include_router(cases.router, prefix=f"{prefix}/cases", tags=["cases"])
+        app.include_router(graph.router, prefix=f"{prefix}/graph", tags=["graph"])
+        app.include_router(actions.router, prefix=f"{prefix}/actions", tags=["actions"])
+        app.include_router(pending_actions.router, prefix=f"{prefix}/pending_actions", tags=["pending_actions"])
+        app.include_router(audit_view.router, prefix=f"{prefix}/audit", tags=["audit"])
+        app.include_router(governance.router, prefix=f"{prefix}/governance", tags=["governance"])
+        app.include_router(maintenance.router, prefix=f"{prefix}/maintenance", tags=["maintenance"])
+        app.include_router(news.router, prefix=f"{prefix}/news", tags=["news"])
+        app.include_router(operator.router, prefix=f"{prefix}/operator", tags=["operator"])
+        app.include_router(demo.router, prefix=f"{prefix}/demo", tags=["demo"])
+
+    _include_api("")
+    _include_api("/api")
+
+    web_dir = Path(os.getenv("SUPPLY_CHAIN_WEB_STATIC_DIR", "/app/web"))
+    if os.getenv("SUPPLY_CHAIN_SERVE_WEB", "").lower() in {"1", "true", "yes"} and web_dir.exists():
+        app.mount("/", StaticFiles(directory=web_dir, html=True), name="web")
 
     return app
 

@@ -13,3 +13,13 @@ sources:
   - name: "Google News: AI datacenter RAM lead time"
     url: "https://news.google.com/rss/search?q=AI%20datacenter%20RAM%20lead%20time%20memory%20supply%20when%3A30d&hl=en-US&gl=US&ceid=US:en"
     weight: 0.8
+  - name: "Google News: lithium battery materials"
+    url: "https://news.google.com/rss/search?q=lithium%20battery%20materials%20price%20supply%20when%3A7d&hl=en-US&gl=US&ceid=US:en"
+    weight: 1.0
+  - name: "Google News: copper price supply"
+    url: "https://news.google.com/rss/search?q=copper%20price%20supply%20chain%20when%3A7d&hl=en-US&gl=US&ceid=US:en"
+    weight: 0.9
+  - name: "Google News: freight port disruption"
+    url: "https://news.google.com/rss/search?q=freight%20port%20disruption%20supply%20chain%20when%3A7d&hl=en-US&gl=US&ceid=US:en"
+    weight: 0.9
+

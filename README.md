@@ -106,17 +106,23 @@ Approval blockers and governed execution receipts
 
 The agent's role is to keep this view current, open Kanban cases when alignment breaks, recommend mitigation actions, and escalate only the cases that need management approval.
 
-The simplified UI now separates the daily leader experience into four visible layers:
+The simplified UI now keeps the daily leader experience on one project-status page, with integrations/templates/news available as subpages:
 
 ```text
-AI Leader Dashboard
-  Forecast alignment, inventory alignment, partner performance, and integrated operating-plan actions.
+Major Issues
+  A simple risk-ranked list of cases, approvals, blockers, simulations, and receipts.
+
+Project Status
+  Summary KPIs, major issues, E2E flow, AI Leader Dashboard, and the selected next decision stay visible on the main page.
+
+Integrations subpage
+  ERP / WMS / MES / TMS / Supplier Portal / CSV reports in read-only mode first, then governed writeback after approval.
+
+Power Templates + news subpage
+  Commodity shock, supplier OTIF rescue, inventory rebalance, quality hold recovery, forecast vs capacity, governed writeback demos, and commodity-news arrangement signals.
 
 Project E2E Flow
   Supplier status -> IQC -> Assembly -> Test -> Packing -> OQC release.
-
-Major Issues
-  A simple risk-ranked list of cases, approvals, blockers, simulations, and receipts.
 
 AI Agent Workbench
   Semi-automated Sense -> Recommend -> Execute + Prove triage with human approval preserved for governed writebacks.
@@ -197,18 +203,18 @@ make demo-signals
 Optional RSS mode:
 
 ```bash
-NEWS_MODE=rss NEWS_TOPIC=memory make demo-signals
+NEWS_MODE=rss NEWS_TOPIC=commodities make demo-signals
 ```
 
 Open:
 
 ```text
 Kanban command board: http://localhost:8080
-News API:             http://localhost:8000/news/items?topic=memory
-News alerts:          http://localhost:8000/news/alerts?topic=memory
+News API:             http://localhost:8000/news/items?topic=commodities
+News alerts:          http://localhost:8000/news/alerts?topic=commodities
 ```
 
-Example: AI datacenter RAM lead-time volatility can become a memory supply-risk signal, then a Kanban risk case with impacted orders, recommended supplier/inventory action, approval policy, execution receipt, and audit evidence.
+Example: LFP battery material delays, DRAM spot-price moves, copper lead-time volatility, or freight disruption can become commodity arrangement signals, then Kanban risk cases with impacted orders, recommended supplier/inventory action, approval policy, execution receipt, and audit evidence.
 
 Detailed doc: `docs/product/AI_AGENT_OPERATING_MODEL.md`.
 
@@ -421,3 +427,17 @@ Signal -> Kanban case -> Recommendation -> Approval -> Execution -> Receipt -> A
 ```
 
 Every feature must make that loop faster, safer, or easier for a supply-chain manager to explain.
+
+
+## Hugging Face demo
+
+For a public hosted demo, use a Hugging Face **Docker Space**. The repo includes `Dockerfile.hf`, which runs the Supply Chain AI Agent API, seeded Postgres demo database, and static web UI in one container on port `7860`.
+
+Quick local smoke test:
+
+```bash
+docker build -f Dockerfile.hf -t supply-chain-ai-agent-hf .
+docker run --rm -p 7860:7860 supply-chain-ai-agent-hf
+```
+
+Then open `http://localhost:7860`. See `docs/demo/HUGGING_FACE_SPACE.md` for Space setup notes.

@@ -17,7 +17,7 @@
     .row,.toolbar,.filter-row,.selector-row,.status-row,.lane-head,.card-meta,.tag-row,.section-title,.demo-guide-actions,.header-main,.brand-lockup{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
     .header-main{justify-content:space-between;} .brand-lockup{gap:12px;} .brand-mark{width:40px; height:40px; border-radius:14px; display:grid; place-items:center; font-weight:900; letter-spacing:.04em; background:linear-gradient(135deg,var(--accent-soft),var(--accent)); color:#081019; box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 26px var(--panel-glow);} .brand-title{font-size:23px; font-weight:850;} .subtitle{color:var(--muted); font-size:13px; margin-top:2px;}
     button,input,select,textarea{border-radius:12px; border:1px solid var(--line); background:#0d1628; color:var(--text); padding:9px 11px;} button{cursor:pointer;} button.primary{background:linear-gradient(135deg,var(--accent-soft),var(--accent)); color:#081019; border:none; font-weight:800;} button.ghost{background:#0d1628;} button.active{box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 0 0 1px var(--accent);} input{min-width:260px}.pill{display:inline-flex; align-items:center; gap:6px; border-radius:999px; background:#0d1628; border:1px solid var(--line); color:var(--muted); padding:5px 9px; font-size:12px;} .pill.ok{color:var(--good); border-color:rgba(125,211,165,.32);} .pill.warn{color:var(--warn); border-color:rgba(255,207,112,.38);} .pill.bad{color:var(--bad); border-color:rgba(255,142,142,.38);} .small,.muted,.kicker{font-size:12px; color:var(--muted);} a{color:var(--accent)}
-    .toolbar{margin-top:10px}.selector-row,.filter-row{margin-top:8px}.status-row{margin-top:8px}.secondary-action{display:none}.desktop-only{display:inline-flex}.hero-strip,.summary-card,.lane,.panel,.section,.demo-guide{background:linear-gradient(180deg,var(--surface-top) 0%,var(--surface-bottom) 100%); border:1px solid rgba(255,255,255,.07); border-radius:18px; box-shadow:var(--shadow);} .panel,.section{padding:14px;} .section-title{justify-content:space-between}.section-title h2,.section-title h3{margin:0; font-size:16px}.empty{padding:12px 14px; color:var(--muted)}
+    .toolbar{margin-top:10px}.page{display:none; gap:12px}.page.active{display:grid}.toolbar button.active{border-color:var(--accent); box-shadow:0 0 0 1px rgba(142,197,255,.25) inset}.selector-row,.filter-row{margin-top:8px}.status-row{margin-top:8px}.secondary-action{display:none}.desktop-only{display:inline-flex}.hero-strip,.summary-card,.lane,.panel,.section,.demo-guide{background:linear-gradient(180deg,var(--surface-top) 0%,var(--surface-bottom) 100%); border:1px solid rgba(255,255,255,.07); border-radius:18px; box-shadow:var(--shadow);} .panel,.section{padding:14px;} .section-title{justify-content:space-between}.section-title h2,.section-title h3{margin:0; font-size:16px}.empty{padding:12px 14px; color:var(--muted)}
     .project-page{display:grid; grid-template-columns:minmax(0,1.36fr) minmax(390px,.64fr); gap:14px; align-items:start;} .project-main,.project-side{display:grid; gap:12px; min-height:0}.project-main{grid-template-rows:auto}.project-side{grid-template-rows:auto}.project-side{position:sticky; top:154px; max-height:calc(100vh - 174px); overflow:auto; padding-right:2px;}
     .hero-strip{padding:13px 16px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:center}.hero-headline{font-size:18px; font-weight:850; line-height:1.28}.hero-sub{font-size:12px; color:var(--muted); margin-top:4px}.project-name{display:flex; gap:8px; align-items:center; flex-wrap:wrap}.project-name::before{content:'PROJECT'; color:var(--muted); font-size:11px; letter-spacing:.08em;}
     .summary-grid{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px}.summary-card{padding:12px 14px}.summary-card .value{font-size:26px; font-weight:900; margin-top:4px}.summary-card:nth-child(n+7){display:none}.leader-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}.leader-card{padding:12px 13px; border:1px solid rgba(255,255,255,.07); border-radius:16px; background:#0b1425; min-height:104px}.leader-card strong{display:block; font-size:13px; margin-bottom:5px}.leader-card .value{font-size:22px; font-weight:900; margin-top:6px}.leader-card p{margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.35}
@@ -28,11 +28,14 @@
 
     .filter-row{display:none}.toolbar{gap:9px}.selector-row{max-width:960px}.project-page{grid-template-columns:minmax(0,1.42fr) minmax(360px,.58fr)}.project-main{grid-template-rows:auto}
     .trust-strip{display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:10px}.trust-card{padding:12px 13px; border:1px solid rgba(255,255,255,.07); border-radius:16px; background:#0b1425; min-height:108px}.trust-card strong{display:block; font-size:14px; margin-bottom:5px}.trust-card p{margin:0; color:var(--muted); font-size:12px; line-height:1.38}.trust-card .chipline{margin-top:9px; display:flex; gap:6px; flex-wrap:wrap}.trust-arrow{display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:999px; background:#101b2e; border:1px solid var(--line); color:var(--accent); font-weight:900}
-    .agent-workbench{display:grid; gap:8px}.agent-step{padding:9px 10px; border:1px solid var(--line); border-radius:13px; background:#0b1425}.agent-step strong{font-size:13px}.agent-step p{margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.35}.agent-step.hot{border-color:rgba(255,207,112,.42)}.agent-step.blocked{border-color:rgba(255,142,142,.46)}.decision-stack{display:grid; gap:10px; min-height:0; overflow:visible}.decision-panel{padding:12px; border:1px solid rgba(255,255,255,.07); border-radius:16px; background:linear-gradient(180deg,var(--surface-top),var(--surface-bottom))}.decision-panel h3{margin:0; font-size:15px}.decision-panel .section-title{margin-bottom:7px}.decision-panel.primary-decision{border-color:rgba(142,197,255,.25)}.queue-summary{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:8px}.queue-summary .mini-kpi{border:1px solid var(--line); border-radius:12px; padding:9px; background:#0b1425}.mini-kpi b{display:block; font-size:20px}.quick-filter-note{font-size:11px; color:var(--muted); margin-left:auto}.project-signal{font-size:12px; color:var(--muted); line-height:1.35; margin-top:5px}
+    .integration-flow{margin:8px 0 12px; color:var(--text); line-height:1.45}.integration-grid,.template-grid,.news-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}.integration-card,.template-card,.news-card{padding:12px; border:1px solid rgba(255,255,255,.07); border-radius:16px; background:#0b1425}.template-card p,.integration-card p,.news-card p{margin:8px 0 0; color:var(--muted); line-height:1.4}.agent-workbench{display:grid; gap:8px}.agent-step{padding:9px 10px; border:1px solid var(--line); border-radius:13px; background:#0b1425}.agent-step strong{font-size:13px}.agent-step p{margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.35}.agent-step.hot{border-color:rgba(255,207,112,.42)}.agent-step.blocked{border-color:rgba(255,142,142,.46)}.decision-stack{display:grid; gap:10px; min-height:0; overflow:visible}.decision-panel{padding:12px; border:1px solid rgba(255,255,255,.07); border-radius:16px; background:linear-gradient(180deg,var(--surface-top),var(--surface-bottom))}.decision-panel h3{margin:0; font-size:15px}.decision-panel .section-title{margin-bottom:7px}.decision-panel.primary-decision{border-color:rgba(142,197,255,.25)}.queue-summary{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:8px}.queue-summary .mini-kpi{border:1px solid var(--line); border-radius:12px; padding:9px; background:#0b1425}.mini-kpi b{display:block; font-size:20px}.quick-filter-note{font-size:11px; color:var(--muted); margin-left:auto}.project-signal{font-size:12px; color:var(--muted); line-height:1.35; margin-top:5px}
 
     @media (max-width:1250px){main{height:auto; min-height:0}.project-page{grid-template-columns:1fr}.project-side{position:static; max-height:none; overflow:visible}.summary-grid,.leader-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.project-main{grid-template-rows:auto}.board{max-height:none}.project-side{grid-template-rows:auto}.detail-stack{max-height:none; overflow:visible}.milestone-flow{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media (max-width:900px){.summary-grid,.leader-grid,.board,.flow-insight-grid,.milestone-flow,.trust-strip{grid-template-columns:1fr 1fr}.hero-strip{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.header-main{align-items:flex-start}.secondary-action{display:none!important}}
-    @media (max-width:620px){main{padding:10px}.summary-grid,.leader-grid,.board,.milestone-flow,.trust-strip{grid-template-columns:1fr}.toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr}input,select{min-width:0; width:100%}.desktop-only{display:none}.brand-title{font-size:20px}}
+    @media (max-width:620px){main{padding:10px}.summary-grid,.leader-grid,.board,.milestone-flow,.trust-strip,.integration-grid,.template-grid,.news-grid{grid-template-columns:1fr}.toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr}input,select{min-width:0; width:100%}.desktop-only{display:none}.brand-title{font-size:20px}}
+
+    .issue-rollup{border:1px dashed rgba(142,197,255,.35); border-radius:16px; padding:16px; background:rgba(17,28,49,.52); color:var(--muted); display:flex; flex-direction:column; gap:6px;}
+    .issue-rollup strong{color:var(--text);}
   </style>
 </head>
 <body>
@@ -57,6 +60,9 @@
       <button class="ghost secondary-action" id="btnReset">Reset demo seed</button>
       <button class="ghost secondary-action" id="btnDocs">Open API docs</button>
       <button class="ghost desktop-only" id="btnExportBrief">Copy one-page brief</button>
+      <button class="ghost" id="btnPageProject">Project status</button>
+      <button class="ghost" id="btnPageIntegrations">Integrations</button>
+      <button class="ghost" id="btnNewsDemo">Templates + news</button>
       <button class="ghost secondary-action" id="btnExportShots">Export operations brief</button>
       <input id="searchInput" placeholder="Search project issue, resource, owner" />
     </div>
@@ -83,6 +89,7 @@
   <main>
     <div class="project-page" data-layout="one-page-project-e2e">
       <div class="project-main">
+        <div class="page active" id="pageProject" data-page="project-status">
         <section class="summary-grid" id="summaryGrid" aria-label="Major issues summary"></section>
 
         <section class="hero-strip">
@@ -113,7 +120,7 @@
         </section>
 
         <section class="section board-shell">
-          <div class="section-title"><h2>Major Issues</h2><span class="small">Sorted by risk: blocker → approval → next action.</span></div>
+          <div class="section-title"><h2>Major Issues</h2><span class="small">One-page view · top issues only · grouped backlog below.</span></div>
           <div class="board" id="board"></div>
         </section>
 
@@ -146,6 +153,26 @@
           </div>
         </section>
 
+        </div>
+
+        <div class="page" id="pageIntegrations" data-page="integrations">
+          <section class="panel side-focus" aria-label="Existing system integrations">
+            <div class="section-title"><h2>Connect Existing Systems</h2><span class="small">Subpage · Read-only first · governed writeback after approval</span></div>
+            <div class="integration-flow">ERP / WMS / MES / TMS / Supplier Portal / CSV reports → AI normalizes objects → major issues → approve → writeback receipt.</div>
+            <div class="integration-grid" id="integrationHub"></div>
+          </section>
+        </div>
+
+        <div class="page" id="pageTemplates" data-page="templates-news">
+          <section class="panel side-focus" aria-label="Supply Chain AI Agent feature templates">
+            <div class="section-title"><h2>Power Templates</h2><span class="small">Subpage · show what the AI agent can do</span></div>
+            <div class="template-grid" id="featureTemplates"></div>
+          </section>
+          <section class="panel side-focus" aria-label="Commodity news monitor">
+            <div class="section-title"><h2>Live News for Commodity Arrangements</h2><span class="small" id="newsMeta">RSS / API-ready</span></div>
+            <div class="news-grid" id="commodityNews"><div class="empty">News signals will appear here after sync.</div></div>
+          </section>
+        </div>
 
       </div>
 
@@ -200,6 +227,6 @@
       </section>
     </div>
   </main>
-  <script src="/app.js?v=0.24"></script>
+  <script src="/app.js?v=0.28"></script>
 </body>
 </html>
