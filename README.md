@@ -1,3 +1,13 @@
+---
+title: Supply Chain AI Agent
+emoji: 🚚
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Supply Chain Kanban AI Agent
 
 A professional supply-chain manager-agent that runs like a team lead or department manager: it watches daily operating signals, opens and updates Kanban risk cases, explains business impact, recommends mitigations, routes approvals, executes governed writebacks into existing systems, and keeps evidence for audit.
