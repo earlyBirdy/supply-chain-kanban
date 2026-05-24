@@ -21,7 +21,7 @@ import uuid
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from .logging_utils import setup_logging
@@ -111,6 +111,24 @@ def create_app() -> FastAPI:
             message="Invalid request",
             details=exc.errors(),
         )
+
+    @app.get("/", include_in_schema=False)
+    async def _root() -> dict[str, object]:
+        return {
+            "service": "Supply Chain Kanban API",
+            "status": "ok",
+            "message": "Open the simple web dashboard on http://localhost:8080 or API docs on /docs.",
+            "links": {
+                "web_dashboard": "http://localhost:8080",
+                "api_docs": "/docs",
+                "health": "/healthz",
+                "demo_summary": "/demo/summary",
+            },
+        }
+
+    @app.get("/favicon.ico", include_in_schema=False)
+    async def _favicon() -> Response:
+        return Response(status_code=204)
 
     @app.middleware("http")
     async def _request_id_middleware(request: Request, call_next):

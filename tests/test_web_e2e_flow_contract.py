@@ -53,3 +53,46 @@ def test_web_explains_ai_agent_blockchain_trust_rail() -> None:
     assert 'autoSelectFirstProjectIssue' in app_js
     assert 'AI agents + blockchain convergence' in readme
     assert 'tamper-evident source of truth' in readme
+
+def test_web_has_simple_ai_leader_dashboard_contract() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+
+    assert 'AI Leader Dashboard' in html
+    assert 'Forecast · inventory · partner KPI · IOP' in html
+    assert 'AI Agent Workbench' in html
+    assert 'Semi-automated triage' in html
+    assert 'function renderLeaderDashboard' in app_js
+    assert 'function renderAgentQueue' in app_js
+    assert 'Supply Chain AI Agent dashboard + one-page E2E view' in app_js
+    assert 'Semi-automated Sense -> Recommend -> Execute + Prove triage' in readme
+
+
+def test_web_default_brand_is_supply_chain_specific() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    experience = (ROOT / 'contracts/demo_experience_pack.yaml').read_text()
+
+    assert 'Supply Chain AI Agent' in html
+    assert 'Supply Chain AI Agent' in app_js
+    assert 'Supply Chain AI Agent' in experience
+    assert 'logo_mark: SCA' in experience
+    assert 'Atlas Control' not in html
+    assert 'Supply Chain Control Tower' not in html
+    assert 'Supply Chain Control Tower' not in app_js
+    assert 'Supply Chain Control Tower' not in experience
+    assert 'Atlas Grid' not in experience
+    assert 'VoltStream Ops' not in experience
+    assert 'EdgeForge Control' not in experience
+    assert "brand.logo_mark || 'SCA'" in app_js
+
+
+def test_web_renders_one_page_brief_loaded_from_api() -> None:
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+
+    assert 'function renderBrief' in app_js
+    assert 'loadExecutiveBrief' in app_js
+    assert 'renderBrief();' in app_js
+    assert 'data-brief-ready' in app_js
+    assert 'One-page operations brief' in app_js

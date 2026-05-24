@@ -106,6 +106,24 @@ Approval blockers and governed execution receipts
 
 The agent's role is to keep this view current, open Kanban cases when alignment breaks, recommend mitigation actions, and escalate only the cases that need management approval.
 
+The simplified UI now separates the daily leader experience into four visible layers:
+
+```text
+AI Leader Dashboard
+  Forecast alignment, inventory alignment, partner performance, and integrated operating-plan actions.
+
+Project E2E Flow
+  Supplier status -> IQC -> Assembly -> Test -> Packing -> OQC release.
+
+Project Action Queue
+  A simple risk-ranked list of cases, approvals, blockers, simulations, and receipts.
+
+AI Agent Workbench
+  Semi-automated Sense -> Recommend -> Execute + Prove triage with human approval preserved for governed writebacks.
+```
+
+This keeps the operator view simple: the agent watches many signals, but the user only sees the next management decision, the affected project stage, and the proof trail.
+
 
 ## AI agents + blockchain convergence
 

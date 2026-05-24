@@ -173,7 +173,7 @@ class GovernedWritebackAdapter:
 
     def _business_owner(self, family: str) -> str:
         owners = {
-            "erp": "Supply Chain Control Tower",
+            "erp": "Supply Chain AI Agent",
             "supplier_portal": "Supplier Operations Desk",
             "ticketing": "Operations Governance Office",
         }

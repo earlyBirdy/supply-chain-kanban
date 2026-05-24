@@ -116,3 +116,14 @@ The board must be understandable in one screen:
 ```text
 Case -> Impact -> Recommendation -> Approval -> Execution -> Proof
 ```
+
+## Simple AI leader dashboard UX
+
+The web UI is intentionally reduced to a daily supply-chain leader view:
+
+1. **Leader Dashboard** — four KPI cards for forecast alignment, inventory alignment, partner performance, and integrated operating-plan actions.
+2. **Project E2E Flow** — one lifecycle row from supplier status to OQC release so the leader can see where the project is blocked.
+3. **Project Action Queue** — one risk-sorted action list instead of multiple dashboards.
+4. **AI Agent Workbench** — semi-automated Sense → Recommend → Execute + Prove guidance. The agent can propose and prepare actions, but governed writebacks still require approval gates and receipts.
+
+The UX rule is: hide data-source complexity, keep management decisions visible, and attach proof to every action.

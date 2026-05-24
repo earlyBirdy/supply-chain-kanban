@@ -1,48 +1,48 @@
 version: 1
 brands:
   neutral:
-    label: Neutral Enterprise
-    logo_text: Atlas Control
-    logo_mark: AC
+    label: Supply Chain by AI Agent
+    logo_text: Supply Chain AI Agent
+    logo_mark: SCA
     accent: '#8ec5ff'
     accent_soft: '#335581'
     panel_glow: 'rgba(142,197,255,0.24)'
     surface_top: 'rgba(13,21,38,0.96)'
     surface_bottom: 'rgba(10,16,29,0.96)'
-    export_stamp: Atlas Control Demo
+    export_stamp: Supply Chain AI Agent Demo
   datagrid:
-    label: Data Center Blue
-    logo_text: Atlas Grid
-    logo_mark: AG
+    label: Supply Chain AI Agent - Data Center
+    logo_text: Supply Chain AI Agent
+    logo_mark: SCA
     accent: '#86d0ff'
     accent_soft: '#305f8f'
     panel_glow: 'rgba(134,208,255,0.26)'
     surface_top: 'rgba(10,23,41,0.96)'
     surface_bottom: 'rgba(8,16,32,0.96)'
-    export_stamp: Atlas Grid Data Center Demo
+    export_stamp: Supply Chain AI Agent Data Center Demo
   voltstream:
-    label: EV Launch Amber
-    logo_text: VoltStream Ops
-    logo_mark: VS
+    label: Supply Chain AI Agent - EV Launch
+    logo_text: Supply Chain AI Agent
+    logo_mark: SCA
     accent: '#ffcb72'
     accent_soft: '#8a5a18'
     panel_glow: 'rgba(255,203,114,0.23)'
     surface_top: 'rgba(34,20,10,0.96)'
     surface_bottom: 'rgba(23,15,8,0.96)'
-    export_stamp: VoltStream EV Launch Demo
+    export_stamp: Supply Chain AI Agent EV Launch Demo
   edgeforge:
-    label: Industrial Edge Teal
-    logo_text: EdgeForge Control
-    logo_mark: EF
+    label: Supply Chain AI Agent - Industrial Edge
+    logo_text: Supply Chain AI Agent
+    logo_mark: SCA
     accent: '#7ed9c4'
     accent_soft: '#216b67'
     panel_glow: 'rgba(126,217,196,0.22)'
     surface_top: 'rgba(9,26,27,0.96)'
     surface_bottom: 'rgba(7,18,20,0.96)'
-    export_stamp: EdgeForge Industrial Demo
+    export_stamp: Supply Chain AI Agent Industrial Edge Demo
 seed_packs:
   portfolio:
-    label: Portfolio Control Tower
+    label: Portfolio AI Agent
     description: Balanced cross-portfolio seed with memory, EV battery, and industrial edge risks.
     seed_file: 01_seed_demo.sql
     default_persona: coo

@@ -29,30 +29,30 @@ demo:
 
 demo-min:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
-	docker compose down -v || true
-	docker compose up -d --build
+	docker compose down --remove-orphans -v || true
+	./scripts/compose_up_safe.sh up -d --build
 	@bash ./scripts/demo_smoke.sh
 	@echo "API docs: http://localhost:8000/docs"
 
 demo-web:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
-	docker compose down -v || true
-	docker compose --profile web up -d --build
+	docker compose down --remove-orphans -v || true
+	./scripts/compose_up_safe.sh --profile web up -d --build
 	@bash ./scripts/demo_smoke.sh web
 	@echo "API docs: http://localhost:8000/docs"
 	@echo "Kanban board: http://localhost:8080"
 
 demo-agent:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
-	docker compose down -v || true
-	docker compose --profile agent --profile web up -d --build
+	docker compose down --remove-orphans -v || true
+	./scripts/compose_up_safe.sh --profile agent --profile web up -d --build
 	@bash ./scripts/demo_smoke.sh web
 	@echo "API docs: http://localhost:8000/docs"
 	@echo "Kanban board: http://localhost:8080"
 
 demo-signals:
 	@if [[ ! -f .env ]]; then echo "No .env found. Create one: cp .env.example .env"; fi
-	docker compose --profile signals up -d --build
+	./scripts/compose_up_safe.sh --profile signals up -d --build
 	@echo "Signal monitor started. Tail logs with: docker compose logs -f news_monitor"
 
 seed:
@@ -66,10 +66,10 @@ psql:
 	@POSTGRES_USER=$${POSTGRES_USER:-demo}; POSTGRES_DB=$${POSTGRES_DB:-demo}; 	docker compose exec -T db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
 
 down:
-	docker compose down || true
+	docker compose down --remove-orphans || true
 
 reset:
-	docker compose down -v || true
+	docker compose down --remove-orphans -v || true
 	@echo "Removed volumes. Next: make demo-min or make demo-web"
 
 status:

@@ -1,3 +1,18 @@
+## v0.21
+
+- Renamed the default UI identity from `Supply Chain Control Tower` to `Supply Chain AI Agent`.
+- Replaced fictional vertical demo brands with consistent `Supply Chain AI Agent` labels so the UI no longer opens with unrelated Atlas/VoltStream/EdgeForge naming.
+- Updated the leader dashboard copy toward `Supply Chain by AI Agent`: forecast, inventory, partner KPI, IOP, governed execution, and evidence.
+- Updated tests to lock the Supply Chain AI Agent brand and prevent the old placeholder naming from returning.
+
+## v0.20 — supply-chain brand + brief runtime fix
+
+- Replaced the neutral Atlas placeholder with `Supply Chain AI Agent` / `SCA` for the default demo brand.
+- Restored the missing web `renderBrief()` function so `loadExecutiveBrief()` no longer throws `Can't find variable: renderBrief`.
+- Added web contract coverage for the default brand and one-page brief rendering.
+
+Validation: `python3 scripts/run_checks.py` → 50 passed.
+
 # Release Notes
 
 ## Supply Chain Kanban AI Agent — Operations Basis
