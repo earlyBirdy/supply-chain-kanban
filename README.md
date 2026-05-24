@@ -310,9 +310,6 @@ operations/governance/policy.yaml             runtime policy
 apps/web/public/                              professional Kanban UI
 ```
 
-## What was removed from the core
-
-The repo no longer includes Devpost submission copy or model-specific Gemini live scaffolding. BI is **kept for further usage** as an optional integration/analytics layer, similar to ERP/WMS/TMS integrations. BI must stay outside the default operational path, but dashboard specs and analytics SQL are kept for future reporting, executive review, and ERP-adjacent analytics.
 
 ## Run locally and open the Kanban dashboard
 
