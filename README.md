@@ -30,7 +30,7 @@ Traditional systems + live news + supplier/logistics signals
   -> receipt + audit + blockchain-ready proof
 ```
 
-The simple UI is centered on one daily question for managers: **what are the major issues, what is the recommended action, who must approve it, and what proof will we keep after execution?**
+The simple UI is centered on one daily question for managers: **what are the major issues, what is the recommended action, who must approve it, what system will change, and what proof will we keep after execution?**
 
 ## Ontology: from fragmented rows to supply-chain objects
 
@@ -50,7 +50,7 @@ ActionReceipt
 ApprovalDecision
 ```
 
-This ontology layer lets the AI agent reason across systems. A delayed inbound material can be linked to inventory shortage, production risk, customer commitment exposure, supplier OTIF, cash impact, and the next approved recovery action.
+This ontology layer lets the AI agent reason across systems. A delayed inbound material can be linked to inventory shortage, MES build risk, customer commitment exposure, supplier OTIF, cash impact, news-driven commodity risk, and the next approved recovery action. The contract now includes explicit `ForecastPlan`, `InventoryPosition`, `PartnerPerformanceMetric`, `NewsRiskSignal`, and `AgentDecision` objects so the UI can explain the business decision instead of only showing raw system rows.
 
 ## Co-working with traditional systems E2E
 
@@ -199,6 +199,7 @@ Start here:
 - `docs/architecture/ARCHITECTURE.md`
 - `docs/product/KANBAN_OPERATING_MODEL.md`
 - `docs/product/AI_AGENT_OPERATING_MODEL.md`
+- `docs/product/ONTOLOGY_INTEGRATION_BLUEPRINT.md`
 - `docs/architecture/BLOCKCHAIN_SITETRACK_ERP_STRATEGY.md`
 - `docs/architecture/BLOCKCHAIN_OPERATIONAL_DATABASE_DECISION.md`
 - `docs/architecture/CANONICAL_CONTROL_PLANE.md`

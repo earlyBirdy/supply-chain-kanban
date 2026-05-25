@@ -158,8 +158,15 @@ def test_web_has_existing_system_integration_and_templates() -> None:
     assert 'Supply Chain AI Agent' in html
     assert 'Connect Existing Systems' in html
     assert 'ERP / WMS / MES / TMS / Supplier Portal / CSV reports' in html
+    assert 'ontology objects → AI risk prediction → major issues' in html
     assert 'Read-only first · governed writeback after approval' in html
+    assert 'Ontology Decision Map' in html
     assert 'Power Templates' in html
+    assert 'News + Market Data' in app_js
+    assert 'Blockchain Evidence' in app_js
+    assert 'function renderOntologyMap' in app_js
+    assert 'ForecastPlan' in app_js
+    assert 'AgentDecision' in app_js
     assert 'Commodity shock' in app_js
     assert 'Supplier OTIF rescue' in app_js
     assert 'Inventory rebalance' in app_js
@@ -231,3 +238,26 @@ def test_hugging_face_space_demo_contract() -> None:
     assert 'StaticFiles(directory=web_dir, html=True)' in api_main
     assert "location.port === '8080' || !isLocalHost" in app_js
     assert 'Docker Space' in docs
+
+
+def test_ontology_contract_supports_ai_agent_erp_mes_news_blockchain_map() -> None:
+    ontology = (ROOT / 'contracts/supply_chain_ontology.yaml').read_text()
+    readme = (ROOT / 'README.md').read_text()
+    blueprint = (ROOT / 'docs/product/ONTOLOGY_INTEGRATION_BLUEPRINT.md').read_text()
+
+    for token in [
+        'ForecastPlan:',
+        'InventoryPosition:',
+        'PartnerPerformanceMetric:',
+        'NewsRiskSignal:',
+        'AgentDecision:',
+        'integration_model:',
+        'BlockchainEvidence:',
+        'read_only_first_then_approval_gated_writeback',
+    ]:
+        assert token in ontology
+
+    assert 'docs/product/ONTOLOGY_INTEGRATION_BLUEPRINT.md' in readme
+    assert 'ERP/MES/WMS/TMS/Supplier/CSV/News' in blueprint
+    assert 'approval-gated writeback' in blueprint
+    assert 'blockchain-ready proof' in blueprint

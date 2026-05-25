@@ -270,6 +270,202 @@
         }
       }
     },
+    "ForecastPlan": {
+      "description": "Demand-planning object that links customer forecast, ERP demand, constrained supply, and finance exposure.",
+      "key": "forecast_id",
+      "properties": {
+        "forecast_id": {
+          "type": "string"
+        },
+        "sku": {
+          "type": "string"
+        },
+        "customer_commitment_id": {
+          "type": "string",
+          "optional": true
+        },
+        "period": {
+          "type": "string"
+        },
+        "forecast_qty": {
+          "type": "number"
+        },
+        "confidence_score": {
+          "type": "number",
+          "optional": true
+        },
+        "revenue_exposure": {
+          "type": "number",
+          "optional": true
+        },
+        "source_system": {
+          "type": "string",
+          "optional": true,
+          "enum": [
+            "ERP",
+            "CRM",
+            "CSV",
+            "planner_override"
+          ]
+        }
+      }
+    },
+    "InventoryPosition": {
+      "description": "Current and projected inventory view across ERP/WMS/MES for shortage, excess, and allocation reasoning.",
+      "key": "inventory_position_id",
+      "properties": {
+        "inventory_position_id": {
+          "type": "string"
+        },
+        "sku": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "on_hand_qty": {
+          "type": "number"
+        },
+        "allocated_qty": {
+          "type": "number",
+          "optional": true
+        },
+        "projected_shortage_qty": {
+          "type": "number",
+          "optional": true
+        },
+        "projected_excess_qty": {
+          "type": "number",
+          "optional": true
+        },
+        "source_system": {
+          "type": "string",
+          "optional": true,
+          "enum": [
+            "ERP",
+            "WMS",
+            "MES",
+            "CSV"
+          ]
+        }
+      }
+    },
+    "PartnerPerformanceMetric": {
+      "description": "Supplier, carrier, or factory performance KPI used by the AI agent to rank risk and recovery actions.",
+      "key": "metric_id",
+      "properties": {
+        "metric_id": {
+          "type": "string"
+        },
+        "partner_id": {
+          "type": "string"
+        },
+        "partner_type": {
+          "type": "string",
+          "enum": [
+            "supplier",
+            "carrier",
+            "factory",
+            "customer"
+          ]
+        },
+        "metric": {
+          "type": "string",
+          "enum": [
+            "OTIF",
+            "yield",
+            "scrap",
+            "efficiency",
+            "response_aging",
+            "ppm"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "period": {
+          "type": "string"
+        },
+        "source_system": {
+          "type": "string",
+          "optional": true
+        }
+      }
+    },
+    "NewsRiskSignal": {
+      "description": "News-derived commodity, logistics, supplier, or geopolitical risk signal before the risk appears inside ERP/MES.",
+      "key": "news_signal_id",
+      "properties": {
+        "news_signal_id": {
+          "type": "string"
+        },
+        "topic": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "number"
+        },
+        "impacted_resource_id": {
+          "type": "string",
+          "optional": true
+        },
+        "impacted_supplier_id": {
+          "type": "string",
+          "optional": true
+        },
+        "recommended_arrangement": {
+          "type": "string",
+          "optional": true
+        },
+        "observed_at": {
+          "type": "datetime"
+        }
+      }
+    },
+    "AgentDecision": {
+      "description": "Human-readable AI decision packet connecting evidence, recommendation, approval, and writeback.",
+      "key": "decision_id",
+      "properties": {
+        "decision_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "recommendation_id": {
+          "type": "string",
+          "optional": true
+        },
+        "approval_state": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "needs_approval",
+            "approved",
+            "rejected",
+            "executed"
+          ]
+        },
+        "business_impact": {
+          "type": "object"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "type": "datetime"
+        }
+      }
+    },
     "Case": {
       "description": "AI agent case representing an emerging constraint.",
       "key": "case_id",
@@ -920,6 +1116,86 @@
         "from_key": "receipt_id",
         "to_key": "receipt_id"
       }
+    },
+    {
+      "name": "ForecastPlan_demands_SKU",
+      "from": "ForecastPlan",
+      "to": "SKU",
+      "predicate": "forecasts",
+      "join": {
+        "from_key": "sku",
+        "to_key": "sku"
+      }
+    },
+    {
+      "name": "ForecastPlan_at_Location",
+      "from": "ForecastPlan",
+      "to": "Location",
+      "predicate": "forecasts_at",
+      "join": {
+        "from_key": "customer_commitment_id",
+        "to_key": "location"
+      }
+    },
+    {
+      "name": "InventoryPosition_for_SKU",
+      "from": "InventoryPosition",
+      "to": "SKU",
+      "predicate": "stocks",
+      "join": {
+        "from_key": "sku",
+        "to_key": "sku"
+      }
+    },
+    {
+      "name": "InventoryPosition_at_Location",
+      "from": "InventoryPosition",
+      "to": "Location",
+      "predicate": "stocked_at",
+      "join": {
+        "from_key": "location",
+        "to_key": "location"
+      }
+    },
+    {
+      "name": "PartnerPerformanceMetric_for_Supplier",
+      "from": "PartnerPerformanceMetric",
+      "to": "Supplier",
+      "predicate": "measures",
+      "join": {
+        "from_key": "partner_id",
+        "to_key": "supplier_id"
+      }
+    },
+    {
+      "name": "NewsRiskSignal_impacts_Resource",
+      "from": "NewsRiskSignal",
+      "to": "Resource",
+      "predicate": "predicts_risk_for",
+      "join": {
+        "from_key": "impacted_resource_id",
+        "to_key": "resource_id"
+      }
+    },
+    {
+      "name": "NewsRiskSignal_impacts_Supplier",
+      "from": "NewsRiskSignal",
+      "to": "Supplier",
+      "predicate": "predicts_risk_for",
+      "join": {
+        "from_key": "impacted_supplier_id",
+        "to_key": "supplier_id"
+      }
+    },
+    {
+      "name": "AgentDecision_for_Case",
+      "from": "AgentDecision",
+      "to": "Case",
+      "predicate": "decides_for",
+      "join": {
+        "from_key": "case_id",
+        "to_key": "case_id"
+      }
     }
   ],
   "action_types": {
@@ -1063,6 +1339,34 @@
         "name": "TypedActionsOnly",
         "description": "Agents and humans must mutate operating state only through the action catalog; raw table writes are out of contract."
       }
+    ]
+  },
+  "integration_model": {
+    "strategy": "read_only_first_then_approval_gated_writeback",
+    "system_roles": {
+      "ERP": "Purchase orders, sales orders, inventory balance, supplier/material master, and financial exposure.",
+      "MES": "Production orders, yield, scrap, downtime, IQC/OQC quality holds, and line capacity.",
+      "WMS": "Inbound/outbound stock movement, pick-pack status, and warehouse exceptions.",
+      "TMS": "Shipment ETA, carrier delay, route risk, and premium freight cost.",
+      "SupplierPortal": "Confirmations, ASN, capacity promises, OTIF exceptions, and escalation tickets.",
+      "NewsMonitor": "Commodity, logistics, supplier, and geopolitical signals converted into NewsRiskSignal objects.",
+      "BlockchainEvidence": "Tamper-evident anchors for EvidenceReceipt hashes after approval/writeback, not the operational database."
+    },
+    "ai_agent_loop": [
+      "Sense ERP/MES/WMS/TMS/supplier/news signals.",
+      "Map facts into ontology objects and relationships.",
+      "Predict risk, cost, service, and inventory impact.",
+      "Recommend recovery action with business explanation.",
+      "Require human approval for external-system changes.",
+      "Execute governed writeback and attach receipt/audit/blockchain-ready proof."
+    ],
+    "ui_principles": [
+      "Show top major issues first, not raw tables.",
+      "Keep forecast, inventory, partner KPI, and IOP action cards on one page.",
+      {
+        "Explain each decision in CFO language": "cost, risk, service, approval, proof."
+      },
+      "Keep blockchain evidence visible but outside the default operational path."
     ]
   }
 }
