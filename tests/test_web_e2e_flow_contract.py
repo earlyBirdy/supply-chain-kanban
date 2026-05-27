@@ -113,7 +113,7 @@ def test_web_uses_normal_page_flow_to_avoid_overlapping_blocks() -> None:
     assert 'overflow:visible' in html
     assert 'location = /app.js' in nginx
     assert 'Cache-Control "no-store, max-age=0"' in nginx
-    assert '<script src="/app.js?v=0.28"></script>' in html
+    assert '<script src="/app.js?v=0.30"></script>' in html
 
 def test_web_removes_confusing_visible_status_copy() -> None:
     html = (ROOT / 'apps/web/public/index.html').read_text()
@@ -220,7 +220,7 @@ def test_web_project_status_shows_top_major_issues_not_full_backlog() -> None:
     assert 'function majorIssueCards' in app_js
     assert 'lower-priority signals grouped' in app_js
     assert 'Showing top ${MAJOR_ISSUE_LIMIT} major issues' in app_js
-    assert '<script src="/app.js?v=0.28"></script>' in html
+    assert '<script src="/app.js?v=0.30"></script>' in html
 
 
 def test_hugging_face_space_demo_contract() -> None:
@@ -261,3 +261,55 @@ def test_ontology_contract_supports_ai_agent_erp_mes_news_blockchain_map() -> No
     assert 'ERP/MES/WMS/TMS/Supplier/CSV/News' in blueprint
     assert 'approval-gated writeback' in blueprint
     assert 'blockchain-ready proof' in blueprint
+
+
+def test_agent_skills_and_autoresearch_playbook_contract() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+    playbook = (ROOT / 'docs/product/AGENT_SKILLS_AND_AUTORESEARCH_PLAYBOOK.md').read_text()
+
+    assert 'skill-driven triage' in html
+    assert 'bounded risk experiments' in html
+    assert '<script src="/app.js?v=0.30"></script>' in html
+    assert 'Agent Skill Playbook' in app_js
+    assert 'Autoresearch Sandbox' in app_js
+    assert 'Agent skill triage' in app_js
+    assert 'Autoresearch risk sprint' in app_js
+    assert 'docs/product/AGENT_SKILLS_AND_AUTORESEARCH_PLAYBOOK.md' in readme
+    assert 'Skill playbook' in readme
+    assert 'Autoresearch loop' in readme
+    assert 'bounded experiment process' in playbook
+    assert 'EvidenceReceipt / blockchain-ready proof' in playbook
+
+
+def test_patch_checklist_wording_is_explicit() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+    blueprint = (ROOT / 'docs/product/ONTOLOGY_INTEGRATION_BLUEPRINT.md').read_text()
+    playbook = (ROOT / 'docs/product/AGENT_SKILLS_AND_AUTORESEARCH_PLAYBOOK.md').read_text()
+
+    combined = '\n'.join([html, app_js, readme, blueprint, playbook])
+    for token in [
+        'Ontology-first positioning',
+        'real-world supply-chain objects instead of only showing ERP/MES/WMS rows',
+        'orders, suppliers, plants, forecasts, inventory positions, partner metrics, news risks, and agent decisions',
+        'source systems feeding the ontology layer',
+        'not as the final user experience',
+        'ingest system data',
+        'map to ontology',
+        'detect risks',
+        'predict disruptions',
+        'recommend actions',
+        'require human approval',
+        'create writeback receipt',
+        'traceable receipts',
+        'decision hashes',
+        'tamper-resistant evidence',
+        'not a required runtime dependency',
+        'Commodity, supplier, logistics, and geopolitical risk signals',
+        'product/design patterns',
+        'without heavy runtime dependencies',
+    ]:
+        assert token in combined

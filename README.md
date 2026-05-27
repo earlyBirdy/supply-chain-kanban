@@ -20,41 +20,60 @@ pinned: false
 ## Concept in one loop
 
 ```text
-Traditional systems + live news + supplier/logistics signals
-  -> ontology objects
-  -> AI risk detection
-  -> major issue board
-  -> recommendation + simulation
-  -> human approval gate
-  -> governed ERP/WMS/MES/TMS/supplier writeback
-  -> receipt + audit + blockchain-ready proof
+ingest system data from ERP/MES/WMS/TMS/supplier/news/blockchain evidence
+  -> map to ontology
+  -> detect risks
+  -> predict disruptions
+  -> recommend actions
+  -> require human approval
+  -> create writeback receipt
+  -> audit trail + decision hashes + tamper-resistant evidence
 ```
+
+
+## Agent skills + autoresearch extension
+
+The uploaded `skills-main` and `autoresearch` references were folded into the product direction as operating patterns, not as runtime dependencies. They guide agent behavior through product/design patterns without adding heavy runtime dependencies. The repo now treats the AI agent as a disciplined supply-chain teammate:
+
+```text
+Skill playbook      -> clarify business change, triage issues, produce PRD/issue slices
+Autoresearch loop   -> run bounded experiments against forecast/risk hypotheses
+Dashboard ontology  -> expose the result as ForecastPlan, InventoryPosition, NewsRiskSignal, AgentDecision, and EvidenceReceipt
+Human approval gate -> keep ERP/MES/WMS/TMS writebacks governed
+```
+
+This means the demo can show more than a dashboard: it can explain **how the agent decides**, **how an operator reviews the recommendation**, **how a bounded experiment improves risk prediction**, and **how the final action stays auditable**.
+
+See `docs/product/AGENT_SKILLS_AND_AUTORESEARCH_PLAYBOOK.md` for the implementation playbook.
 
 The simple UI is centered on one daily question for managers: **what are the major issues, what is the recommended action, who must approve it, what system will change, and what proof will we keep after execution?**
 
-## Ontology: from fragmented rows to supply-chain objects
+## Ontology-first positioning: from fragmented rows to supply-chain objects
 
-Most supply-chain systems store the business as disconnected rows: ERP purchase orders, WMS stock movements, MES production records, TMS shipment events, supplier confirmations, quality holds, and finance reports. The agent maps these rows into common operating objects:
+Most supply-chain systems store the business as disconnected rows: ERP purchase orders, WMS stock movements, MES production records, TMS shipment events, supplier confirmations, quality holds, and finance reports. The repo models real-world supply-chain objects instead of only showing ERP/MES/WMS rows. The agent maps these rows into common operating objects:
 
 ```text
 Order
 Shipment
 Supplier
+Plant
 Material
+ForecastPlan
 InventoryPosition
 ProductionOrder
 QualityIssue
 CustomerCommitment
-RiskSignal
-ActionReceipt
-ApprovalDecision
+PartnerPerformanceMetric
+NewsRiskSignal
+AgentDecision
+EvidenceReceipt
 ```
 
-This ontology layer lets the AI agent reason across systems. A delayed inbound material can be linked to inventory shortage, MES build risk, customer commitment exposure, supplier OTIF, cash impact, news-driven commodity risk, and the next approved recovery action. The contract now includes explicit `ForecastPlan`, `InventoryPosition`, `PartnerPerformanceMetric`, `NewsRiskSignal`, and `AgentDecision` objects so the UI can explain the business decision instead of only showing raw system rows.
+This ontology-first layer lets the AI agent reason across systems. A delayed inbound material can be linked to inventory shortage, MES build risk, customer commitment exposure, supplier OTIF, plant capacity, cash impact, news-driven commodity risk, and the next approved recovery action. The contract includes orders, suppliers, plants, forecasts, inventory positions, partner metrics, news risks, and agent decisions so the UI can explain the business decision instead of only showing raw system rows.
 
-## Co-working with traditional systems E2E
+## ERP / MES / WMS / TMS integration story
 
-The product keeps existing systems as the source of operational truth, then adds an AI-agent decision layer above them:
+Traditional ERP/MES/WMS/TMS systems feed into the ontology layer as source systems, not the final user experience. The product keeps existing systems as the source of operational truth, then adds an AI-agent decision layer above them:
 
 ```text
 ERP    -> PO, SO, inventory, supplier, material master
@@ -65,11 +84,11 @@ Portal -> supplier confirmation, ASN, capacity, escalation
 CSV    -> fast onboarding when APIs are not ready
 ```
 
-Recommended integration mode is **read-only first**, then **approval-gated writeback**. This lowers implementation risk while still allowing the agent to create measurable operating value.
+Recommended integration mode is **read-only first**, then **approval-gated writeback**. This lowers implementation risk while still allowing the agent to create measurable operating value without forcing users to live inside ERP/MES/WMS/TMS screens.
 
 ## Blockchain-ready evidence
 
-Blockchain is treated as an evidence and trust layer, not as a magic database. The operational database stays fast for UI and workflow, while blockchain-style receipts can anchor:
+Blockchain is treated as an audit, evidence, and trust layer, not a required default runtime dependency and not a magic database. The operational database stays fast for UI and workflow, while blockchain-style receipts can anchor traceable receipts, decision hashes, and tamper-resistant evidence:
 
 ```text
 approval proof
@@ -84,7 +103,7 @@ This makes the supply-chain action trail easier to verify across teams, supplier
 
 ## Live news for commodity arrangement
 
-The agent can track commodity and logistics news to help predict risk before it appears inside ERP. Examples include lithium/LFP battery materials, DRAM/NAND/HBM signals, copper price movement, port congestion, freight disruption, and supplier/geopolitical events.
+The agent can track news/risk signals as inputs for commodity, supplier, logistics, and geopolitical risk prediction before the risk appears inside ERP. Examples include lithium/LFP battery materials, DRAM/NAND/HBM signals, copper price movement, port congestion, freight disruption, and supplier/geopolitical events.
 
 ```text
 News signal -> commodity risk -> impacted material/order -> AI recommendation -> approval -> action receipt

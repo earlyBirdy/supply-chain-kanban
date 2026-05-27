@@ -1,24 +1,29 @@
 # Ontology + ERP/MES AI Agent Blueprint
 
-This repo demonstrates a supply-chain AI leader layer that sits above existing ERP, MES, WMS, TMS, supplier, news, and evidence systems. The design goal is simple: keep traditional systems as the source of operational truth, then use an ontology and governed AI-agent workflow to detect major issues earlier, recommend action, route approval, execute writebacks, and preserve proof.
+This repo demonstrates a supply-chain AI leader layer that sits above existing ERP, MES, WMS, TMS, supplier, news, and evidence systems. The design goal is simple: keep traditional systems as source systems feeding the ontology layer, not as the final user experience; then use a governed AI-agent workflow to detect major issues earlier, recommend action, route approval, execute writebacks, and preserve proof.
 
 ## Operating loop
 
 ```text
-ERP/MES/WMS/TMS/Supplier/CSV/News
-  -> canonical ontology objects
-  -> AI prediction and decision packet
-  -> simple major-issue dashboard
-  -> human approval gate
-  -> governed writeback
+ingest system data from ERP/MES/WMS/TMS/Supplier/CSV/News
+  -> map to ontology
+  -> detect risks
+  -> predict disruptions
+  -> recommend actions
+  -> require human approval
+  -> create writeback receipt
   -> evidence receipt + blockchain-ready anchor
+  -> decision hashes + tamper-resistant evidence
 ```
 
 ## Ontology structure
 
-The ontology is organized around objects that business leaders already use:
+The ontology-first structure models real-world supply-chain objects instead of only showing ERP/MES/WMS rows. It is organized around objects that business leaders already use:
 
 ```text
+Order                     customer/order promise, service exposure, source-system refs
+Supplier                  partner identity, commitment, escalation path
+Plant                     factory/site capacity, constraint, production context
 ForecastPlan              demand forecast, customer commitment, confidence, revenue exposure
 InventoryPosition         stock, allocation, projected shortage, projected excess
 PartnerPerformanceMetric  OTIF, yield, scrap, efficiency, response aging, PPM
@@ -30,7 +35,7 @@ EvidenceReceipt           validated proof attached to the decision/action
 BlockchainAnchor          tamper-evident hash anchor for the receipt
 ```
 
-This gives the agent one shared language for ERP orders, MES production quality, WMS stock, TMS shipment risk, supplier promises, and market/news disruption.
+This gives the agent one shared language for orders, suppliers, plants, forecasts, inventory positions, partner metrics, news risks, and agent decisions across ERP orders, MES production quality, WMS stock, TMS shipment risk, supplier promises, and market/news disruption.
 
 ## Integration pattern
 
@@ -48,14 +53,14 @@ Use **read-only first** integrations until the board proves value. After that, e
 
 ## AI-agent automation boundary
 
-The AI agent can automate sensing, mapping, ranking, simulation, recommendation, and draft actions. It must not silently change ERP/MES/WMS/TMS records. External-system writes require:
+The AI agent can automate the explicit loop: ingest system data, map to ontology, detect risks, predict disruptions, recommend actions, require human approval, and create writeback receipt. It must not silently change ERP/MES/WMS/TMS records. External-system writes require:
 
 1. a visible `AgentDecision`,
 2. business-impact explanation,
 3. evidence references,
 4. policy/approval state,
 5. execution receipt,
-6. audit and blockchain-ready proof.
+6. audit and blockchain-ready proof with traceable receipts, decision hashes, and tamper-resistant evidence.
 
 ## Simple UI view
 

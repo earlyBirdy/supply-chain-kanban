@@ -90,16 +90,18 @@
     const root=$('integrationHub');
     if(!root) return;
     const systems=[
-      ['ERP','PO, SO, inventory, supplier/material master, financial exposure','Read-only import first · PO/SO/inventory writeback only after approval'],
-      ['MES','Production order, yield, scrap, downtime, IQC/OQC quality holds','Expose shop-floor blockers before the final release gate'],
-      ['WMS','Stock, inbound, outbound, pick/pack status','Sync warehouse exceptions into shortage/excess inventory issues'],
-      ['TMS','Shipment ETA, carrier delay, route cost, premium freight','Recommend expedite, reroute, or inventory buffer action'],
+      ['ERP','PO, SO, inventory, supplier/material master, financial exposure','Source system feeding ontology · read-only first · writeback only after approval'],
+      ['MES','Production order, yield, scrap, downtime, IQC/OQC quality holds','Source system feeding ontology · expose shop-floor blockers before release'],
+      ['WMS','Stock, inbound, outbound, pick/pack status','Source system feeding ontology · sync exceptions into shortage/excess issues'],
+      ['TMS','Shipment ETA, carrier delay, route cost, premium freight','Source system feeding ontology · recommend expedite, reroute, or buffer action'],
       ['Supplier Portal','Confirmations, ASN, OTIF, capacity, escalation','Open supplier tickets with evidence receipts attached'],
-      ['News + Market Data','Commodity, logistics, supplier, and geopolitical signals','Predict material status before ERP shows the shortage'],
-      ['Blockchain Evidence','Approval, supplier promise, quality release, and writeback receipt hashes','Tamper-evident proof layer outside the default operational database'],
+      ['News + Market Data','Commodity, supplier, logistics, and geopolitical risk signals','Predict disruptions before ERP shows the shortage'],
+      ['Blockchain Evidence','Traceable receipts, decision hashes, supplier proof, and writeback hashes','Audit/proof layer, not a required runtime dependency'],
       ['CSV / Excel','Legacy reports when no API is available','Upload → AI maps columns → preview ontology objects'],
+      ['Agent Skill Playbook','Clarify change, triage issues, create PRD slices, and hand off governed work','Product/design pattern guiding agent behavior without heavy runtime dependencies'],
+      ['Autoresearch Sandbox','Bounded experiments for forecast, risk, and news-signal models','Product/design pattern; promote only measured improvements into production'],
     ];
-    root.innerHTML=systems.map(([name,body,status])=>`<article class="integration-card"><div class="row" style="justify-content:space-between"><strong>${esc(name)}</strong>${badge(name==='CSV / Excel'?'warn':name==='Blockchain Evidence'?'':'ok', name==='CSV / Excel'?'Import':name==='Blockchain Evidence'?'Proof':'Ready')}</div><p>${esc(body)}</p><p>${esc(status)}</p></article>`).join('');
+    root.innerHTML=systems.map(([name,body,status])=>`<article class="integration-card"><div class="row" style="justify-content:space-between"><strong>${esc(name)}</strong>${badge(name==='CSV / Excel'?'warn':name==='Blockchain Evidence'?'':'ok', name==='CSV / Excel'?'Import':name==='Blockchain Evidence'?'Proof':name==='Agent Skill Playbook'?'Skill':name==='Autoresearch Sandbox'?'Lab':'Ready')}</div><p>${esc(body)}</p><p>${esc(status)}</p></article>`).join('');
   }
 
   function renderOntologyMap(){
@@ -107,11 +109,12 @@
     if(!root) return;
     const objects=[
       ['ForecastPlan','Demand forecast + customer commitment + finance exposure','Feeds Forecast Alignment and service-risk decisions'],
+      ['Order / Supplier / Plant','Real-world supply-chain objects with source-system references','Shows the business object instead of raw ERP/MES/WMS rows'],
       ['InventoryPosition','ERP/WMS/MES stock, allocation, shortage, and excess','Feeds Inventory Alignment and rebalance recommendations'],
       ['PartnerPerformanceMetric','OTIF, yield, scrap, efficiency, response aging, PPM','Feeds Partner Performance and supplier escalation'],
       ['NewsRiskSignal','Commodity, logistics, supplier, and geopolitical news','Predicts material status before system-of-record data catches up'],
       ['AgentDecision','Recommendation, evidence, approval state, and business impact','Turns AI reasoning into a governed human decision packet'],
-      ['EvidenceReceipt + BlockchainAnchor','Validated proof and tamper-evident receipt hash','Keeps audit proof attached after writeback execution'],
+      ['EvidenceReceipt + BlockchainAnchor','Traceable receipt, decision hash, and tamper-resistant evidence','Keeps audit proof attached after writeback execution'],
     ];
     root.innerHTML=objects.map(([name,body,outcome])=>`<article class="ontology-card"><strong>${esc(name)}</strong><p>${esc(body)}</p><p>${esc(outcome)}</p></article>`).join('');
   }
@@ -125,7 +128,10 @@
       ['Inventory rebalance','Protect launch timing by shifting constrained inventory from lower-priority builds.','allocation inventory'],
       ['Quality hold recovery','Connect MES/IQC quality signals to controlled containment and OQC release proof.','quality iqc'],
       ['Forecast vs capacity','Compare demand, inventory, MES capacity, and finance exposure before customer promises break.','forecast capacity'],
+      ['AI-agent automation loop','Ingest system data → map to ontology → detect risks → predict disruptions → recommend actions → require human approval → create writeback receipt.','ready execute'],
       ['Governed writeback','Show approve → simulate → execute → receipt across ERP / WMS / TMS.','ready execute'],
+      ['Agent skill triage','Turn ambiguous business asks into issue slices, acceptance criteria, and operator-ready handoffs.','triage approval'],
+      ['Autoresearch risk sprint','Run bounded experiments on forecast/news signals, log results, then promote only proven risk improvements.','forecast news'],
     ];
     root.innerHTML=templates.map(([title,body,query])=>`<article class="template-card"><strong>${esc(title)}</strong><p>${esc(body)}</p><button class="ghost" data-template-query="${esc(query)}">Show related issues</button></article>`).join('');
     root.querySelectorAll('[data-template-query]').forEach((el)=>el.addEventListener('click',()=>{ state.filters.query=el.getAttribute('data-template-query') || ''; $('searchInput').value=state.filters.query; loadBoard().catch(handleError); }));
