@@ -37,6 +37,12 @@ BlockchainAnchor          tamper-evident hash anchor for the receipt
 
 This gives the agent one shared language for orders, suppliers, plants, forecasts, inventory positions, partner metrics, news risks, and agent decisions across ERP orders, MES production quality, WMS stock, TMS shipment risk, supplier promises, and market/news disruption.
 
+For NEWS features, news is not shown as headlines. News is converted into ontology-linked risk signals. The AI agent maps each event to affected commodities, suppliers, logistics lanes, financial exposure, and recommended approval-gated actions. News is converted into ontology-linked commodity risk signals, then mapped to affected materials, BOM exposure, suppliers, industries, price risk, lead-time risk, and approval-gated actions.
+
+Every news, market, supplier, price, and BOM signal must be stored with ERP/MES-compatible metadata. The AI agent does not only say “shortage risk.” It explains 人事時地物: who is affected, what changed, when the trend formed, where the risk appears, which materials/products are exposed, what source supports the signal, what confidence level it has, what price range changed, and what approval-gated action should happen next.
+
+A proper shortage prediction should include source confidence %, extraction confidence %, model confidence %, time period, price range, ERP/MES/WMS/TMS references, and evidence receipts. For example: “For the last 6 months, memory showed rising AI demand, supplier capacity shift, price momentum, stock/ETF confirmation, and BOM exposure. The news headline confirms a trend already detected earlier.” This sentence is only the planner-facing summary. For business users, the primary planner view should be a **Supply Chain Risk Review / S&OP Exception Report** covering signal, risk, exposure, business impact, scenario planning, options, recommendation, owner/approval, evidence confidence, and follow-up triggers. 5 Why and 8D-lite remain as a supporting RCA/corrective-action appendix, not the main supply-chain view. The machine-readable output must use the full `commodity_prediction_packet.v1` structure with `human_context` for 人事時地物, ERP vendor/material IDs, PO/WO/lot references, plant/warehouse/lane references, price min/max ranges, publish dates, confidence percentages, approval owner, writeback target, evidence hash, decision hash, and action receipt.
+
 ## Integration pattern
 
 Use **read-only first** integrations until the board proves value. After that, enable **approval-gated writeback** only for well-defined actions.

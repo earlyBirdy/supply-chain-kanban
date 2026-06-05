@@ -160,6 +160,9 @@
             <div class="section-title"><h2>Connect Existing Systems</h2><span class="small">Subpage · Read-only first · governed writeback after approval</span></div>
             <div class="integration-flow">ERP / MES / WMS / TMS source systems → ingest system data → map to ontology → detect risks → predict disruptions → recommend actions → require human approval → create writeback receipt → decision hashes + tamper-resistant evidence. Core path: real-world supply-chain objects, not raw ERP/MES/WMS rows. Legacy label: ERP / WMS / MES / TMS / Supplier Portal / CSV reports → skill-driven triage → bounded risk experiments → ontology objects → AI risk prediction → major issues.</div>
             <div class="integration-grid" id="integrationHub"></div>
+            <div class="section-title" style="margin-top:14px"><h2>XPRIZE Business Submission Mode</h2><span class="small">Continuous agent · approval gate · evidence log · revenue proof</span></div>
+            <div class="integration-flow">Real-business demo path: continuous AI agent reads ERP/MES/WMS mock data and news/risk signals, detects inventory, supplier, or production risk, creates recommended actions, routes Planner/CFO approval, writes back simulated ERP/MES actions, and shows evidence receipts, Gemini trace fields, and blockchain-ready hashes.</div>
+            <div class="integration-grid" id="businessSubmission"><div class="empty">Business submission readiness will load from the API.</div></div>
             <div class="section-title" style="margin-top:14px"><h2>Ontology Decision Map</h2><span class="small">Objects the AI agent reasons over</span></div>
             <div class="ontology-grid" id="ontologyMap"></div>
           </section>
@@ -170,8 +173,14 @@
             <div class="section-title"><h2>Power Templates</h2><span class="small">Subpage · show what the AI agent can do</span></div>
             <div class="template-grid" id="featureTemplates"></div>
           </section>
+          <section class="panel side-focus" aria-label="IT and defense commodity trend radar">
+            <div class="section-title"><h2>IT / Defense Commodity Trend Radar</h2><span class="small">6-12 month early warning · weak signals before headlines</span></div>
+            <div class="integration-flow">Prediction path: weak signals → demand acceleration → supply tightness → price momentum → export-control stress → BOM exposure → human-approved action. The agent watches memory, advanced packaging, critical semiconductor minerals, rare earth magnets, defense metals, and high-reliability passives before mainstream shortage news arrives.</div>
+            <div class="integration-grid" id="commodityTrendRadar"><div class="empty">Commodity trend radar will load from the API.</div></div>
+          </section>
           <section class="panel side-focus" aria-label="Commodity news monitor">
             <div class="section-title"><h2>Live News for Commodity Arrangements</h2><span class="small" id="newsMeta">RSS / API-ready</span></div>
+            <div class="integration-flow">News is not shown as headlines. News is converted into ontology-linked risk signals. The AI agent maps each event to affected commodities, suppliers, logistics lanes, financial exposure, and recommended approval-gated actions. News is converted into ontology-linked commodity risk signals and mapped to affected materials, BOM exposure, suppliers, industries, price risk, lead-time risk, and approval-gated actions.</div>
             <div class="news-grid" id="commodityNews"><div class="empty">News signals will appear here after sync.</div></div>
           </section>
         </div>
@@ -229,6 +238,6 @@
       </section>
     </div>
   </main>
-  <script src="/app.js?v=0.30"></script>
+  <script src="/app.js?v=0.33"></script>
 </body>
 </html>

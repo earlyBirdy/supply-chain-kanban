@@ -105,11 +105,59 @@ This makes the supply-chain action trail easier to verify across teams, supplier
 
 The agent can track news/risk signals as inputs for commodity, supplier, logistics, and geopolitical risk prediction before the risk appears inside ERP. Examples include lithium/LFP battery materials, DRAM/NAND/HBM signals, copper price movement, port congestion, freight disruption, and supplier/geopolitical events.
 
+News is not shown as headlines. News is converted into ontology-linked risk signals. The AI agent maps each event to affected commodities, suppliers, logistics lanes, financial exposure, and recommended approval-gated actions.
+
+News is converted into ontology-linked commodity risk signals. The AI agent maps each event to affected materials, BOM exposure, suppliers, industries, price risk, lead-time risk, and approval-gated actions.
+
+Every news, market, supplier, price, and BOM signal must be stored with ERP/MES-compatible metadata. The AI agent does not only say “shortage risk.” It explains 人事時地物: who is affected, what changed, when the trend formed, where the risk appears, which materials/products are exposed, what source supports the signal, what confidence level it has, what price range changed, and what approval-gated action should happen next.
+
+A predictive agent answer should look like this, not like a headline summary:
+
 ```text
-News signal -> commodity risk -> impacted material/order -> AI recommendation -> approval -> action receipt
+For the last 6 months, memory showed rising AI demand, supplier capacity shift, price momentum, stock/ETF confirmation, and BOM exposure. The news headline confirms a trend already detected earlier.
+
+People / orgs: memory suppliers, ERP vendor IDs, affected customers, approval owners
+Event: AI demand rose, capacity shifted, prices moved, lead times changed
+Time: last 6 months lookback + next 6-12 months prediction window
+Place: supplier region, plant, warehouse, logistics lane, customer market
+Object: DRAM, NAND, HBM, DDR5, SSD, BOM component, SKU, order, work order
+Sources: news, market report, supplier quote, ERP PO, MES demand, WMS inventory, stock/ETF signal
+Confidence: source confidence %, combined model confidence %, evidence quality score
+Price range: contract/spot/quote range, change %, currency, valid-from/valid-to period
+Action: supplier review, LTA, buffer, alternate source, procurement hold, margin scenario
+```
+
+For real ERP/MES interconnection, this short explanation must be backed by a full `commodity_prediction_packet.v1` evidence packet with `prediction_id`, `schema_version`, `human_context` for 人事時地物, `erp_mes_wms_tms_mapping`, detailed `price_ranges`, `sources` with `source_confidence`, `extraction_confidence`, `model_confidence`, approval owner, writeback targets, evidence hash, decision hash, and action receipt. The primary planner-facing layer should use a **Supply Chain Risk Review / S&OP Exception Report** because supply-chain teams decide signal, risk, exposure, business impact, scenarios, options, recommendation, owner, evidence confidence, and follow-up triggers. **5 Why + 8D-lite** remains as a supporting RCA/corrective-action appendix for root cause, containment, validation, recurrence prevention, and evidence closure. See `docs/product/COMMODITY_TREND_RADAR.md` for the complete memory packet example.
+
+```text
+News signal -> ontology-linked risk signal -> commodity/BOM/supplier/logistics/finance impact -> AI recommendation -> approval-gated action -> action receipt
 ```
 
 This helps purchasing and planning teams adjust allocation, expedite timing, alternate sourcing, inventory buffers, and customer commitments earlier.
+
+
+## IT / Defense Commodity Trend Radar
+
+The repo now includes an early-warning radar for likely IT and defense commodity shortages in the coming 6-12 months. The agent does not wait for mainstream shortage news. It watches weak signals from demand acceleration, supply tightness, price momentum, export-control stress, BOM exposure, supplier lead-time changes, and news confirmation.
+
+Current watchlist:
+
+```text
+Memory chips: HBM, DDR5/DRAM, NAND/SSD
+Advanced packaging: ABF substrate, CoWoS capacity, silicon interposers
+Critical semiconductor minerals: gallium, germanium, indium, tantalum
+Rare earth magnets: NdPr, dysprosium, terbium, yttrium
+Defense metals: tungsten and antimony
+High-reliability passives: MLCC, tantalum capacitors, resistors
+```
+
+The API exposes this as an evidence-ready trend radar:
+
+```bash
+curl http://localhost:8000/commodity_trends/
+```
+
+See `docs/product/COMMODITY_TREND_RADAR.md` and `data/sample_inputs/commodity_trend_radar_it_defense.json`.
 
 ## CFO / ROI advantage
 
@@ -375,3 +423,21 @@ docker run --rm -p 7860:7860 supply-chain-ai-agent-hf
 ```
 
 Then open `http://localhost:7860`. See `docs/demo/HUGGING_FACE_SPACE.md` for Space setup notes.
+
+## XPRIZE / Devpost real-business submission mode
+
+This repo now includes a real-business submission path for Devpost/XPRIZE review. It is designed to show more than a static dashboard:
+
+1. **Continuous AI agent** — reads ERP/MES/WMS mock data plus news/risk signals, detects inventory, supplier, and production risk, and creates recommended actions.
+2. **Human approval gate** — a Planner, CFO, or Operations manager approves, rejects, or requests more evidence before any simulated ERP/MES/WMS writeback.
+3. **Evidence log** — every agent decision includes source inputs, confidence, a decision hash, receipt hash, blockchain-ready proof status, and Gemini/API trace fields.
+4. **Revenue/customer evidence** — the demo includes a pilot offer and proof checklist for a pilot user, signed LOI, Stripe invoice, or paid consulting/demo package.
+
+Business-readiness API:
+
+```bash
+curl http://localhost:8000/business_submission/
+curl -X POST http://localhost:8000/business_submission/run
+```
+
+The safe default remains read-only monitoring. External-system writeback is simulated and approval-gated for the demo.

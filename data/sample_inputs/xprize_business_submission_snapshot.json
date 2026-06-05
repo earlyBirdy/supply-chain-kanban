@@ -1,0 +1,14 @@
+{
+  "submission_title": "Supply Chain Kanban AI: AI-Native Operating System for Supply Chains",
+  "continuous_agent_loop": [
+    "Read ERP/MES/WMS mock data",
+    "Read news/risk signals",
+    "Detect inventory, supplier, or production risk",
+    "Create recommended actions",
+    "Require Planner/CFO approval",
+    "Write back simulated ERP/MES action",
+    "Create evidence receipt and blockchain-ready hash"
+  ],
+  "pilot_offer": "Two-week supply-chain risk cockpit setup with read-only ERP/MES/WMS import, AI risk board, approval-gated writeback, and evidence receipts.",
+  "revenue_evidence_needed": ["pilot user", "signed LOI", "Stripe invoice/payment link", "paid consulting/demo package"]
+}

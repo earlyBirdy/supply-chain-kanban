@@ -113,7 +113,7 @@ def test_web_uses_normal_page_flow_to_avoid_overlapping_blocks() -> None:
     assert 'overflow:visible' in html
     assert 'location = /app.js' in nginx
     assert 'Cache-Control "no-store, max-age=0"' in nginx
-    assert '<script src="/app.js?v=0.30"></script>' in html
+    assert '<script src="/app.js?v=0.33"></script>' in html
 
 def test_web_removes_confusing_visible_status_copy() -> None:
     html = (ROOT / 'apps/web/public/index.html').read_text()
@@ -130,7 +130,7 @@ def test_web_keeps_optional_loads_non_fatal_and_status_clear() -> None:
     html = (ROOT / 'apps/web/public/index.html').read_text()
     app_js = (ROOT / 'apps/web/public/app.js').read_text()
 
-    assert 'Promise.allSettled([loadSummary(), loadExecutive(), loadExecutiveBrief(), loadDemoScript(), loadNews()])' in app_js
+    assert 'Promise.allSettled([loadSummary(), loadExecutive(), loadExecutiveBrief(), loadDemoScript(), loadNews(), loadBusinessSubmission(), loadCommodityTrends()])' in app_js
     assert 'async function safeLoad' in app_js
     assert "loadScreenshotManifest(){ const data = await safeLoad" in app_js
     assert "if(window.renderBrief) window.renderBrief();" in app_js
@@ -193,6 +193,13 @@ def test_web_tracks_commodity_news_for_arrangements() -> None:
     assert 'freight port disruption' in rss
     assert 'LFP battery material shipment delay' in news_router
     assert 'review buy timing' in app_js
+    assert 'News is not shown as headlines' in html
+    assert 'ontology-linked risk signals' in html
+    assert 'affected commodities, suppliers, logistics lanes, financial exposure' in html
+    assert 'recommended approval-gated actions' in html
+    assert 'ontology-linked commodity risk signals' in html
+    assert 'affected materials, BOM exposure, suppliers, industries, price risk, lead-time risk' in html
+    assert 'map event to commodities, suppliers, logistics lanes' in app_js
 
 
 def test_web_keeps_integrations_and_templates_as_subpages() -> None:
@@ -220,7 +227,7 @@ def test_web_project_status_shows_top_major_issues_not_full_backlog() -> None:
     assert 'function majorIssueCards' in app_js
     assert 'lower-priority signals grouped' in app_js
     assert 'Showing top ${MAJOR_ISSUE_LIMIT} major issues' in app_js
-    assert '<script src="/app.js?v=0.30"></script>' in html
+    assert '<script src="/app.js?v=0.33"></script>' in html
 
 
 def test_hugging_face_space_demo_contract() -> None:
@@ -271,7 +278,7 @@ def test_agent_skills_and_autoresearch_playbook_contract() -> None:
 
     assert 'skill-driven triage' in html
     assert 'bounded risk experiments' in html
-    assert '<script src="/app.js?v=0.30"></script>' in html
+    assert '<script src="/app.js?v=0.33"></script>' in html
     assert 'Agent Skill Playbook' in app_js
     assert 'Autoresearch Sandbox' in app_js
     assert 'Agent skill triage' in app_js
@@ -313,3 +320,121 @@ def test_patch_checklist_wording_is_explicit() -> None:
         'without heavy runtime dependencies',
     ]:
         assert token in combined
+
+
+def test_web_has_xprize_business_submission_mode() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+    runbook = (ROOT / 'docs/demo/XPRIZE_BUSINESS_SUBMISSION_RUNBOOK.md').read_text()
+
+    assert 'XPRIZE Business Submission Mode' in html
+    assert 'continuous AI agent reads ERP/MES/WMS mock data and news/risk signals' in html
+    assert 'routes Planner/CFO approval' in html
+    assert 'evidence receipts, Gemini trace fields, and blockchain-ready hashes' in html
+    assert 'function renderBusinessSubmission' in app_js
+    assert "fetchJson('/business_submission/')" in app_js
+    assert 'loadBusinessSubmission' in app_js
+    assert 'Continuous AI agent' in app_js
+    assert 'Human approval gate' in app_js
+    assert 'Revenue/customer evidence' in app_js
+    assert 'Gemini trace schema' in app_js
+    assert 'real-business submission path' in readme
+    assert 'curl http://localhost:8000/business_submission/' in readme
+    assert 'Pilot package + monthly subscription' in app_js
+    assert 'Read ERP/MES/WMS mock data.' in runbook
+    assert 'Create evidence receipts with decision hashes and blockchain-ready proof.' in runbook
+
+
+def test_web_has_it_defense_commodity_trend_radar() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+    doc = (ROOT / 'docs/product/COMMODITY_TREND_RADAR.md').read_text()
+    sample = (ROOT / 'data/sample_inputs/commodity_trend_radar_it_defense.json').read_text()
+
+    assert 'IT / Defense Commodity Trend Radar' in html
+    assert '6-12 month early warning' in html
+    assert 'weak signals before headlines' in html
+    assert 'memory, advanced packaging, critical semiconductor minerals, rare earth magnets, defense metals, and high-reliability passives' in html
+    assert 'function renderCommodityTrendRadar' in app_js
+    assert "fetchJson('/commodity_trends/')" in app_js
+    assert 'loadCommodityTrends' in app_js
+    assert 'IT/Defense shortage radar' in app_js
+    assert 'Memory chips: HBM, DDR5/DRAM, NAND/SSD' in readme
+    assert 'curl http://localhost:8000/commodity_trends/' in readme
+    assert 'mainstream news already late' in doc
+    assert 'News is not shown as headlines' in doc
+    assert 'ontology-linked commodity risk signals' in doc
+    assert 'BOM exposure, suppliers, industries, price risk, lead-time risk' in doc
+    assert 'ERP/MES-compatible metadata' in doc
+    assert '人事時地物' in doc
+    assert 'For the last 6 months, memory showed rising AI demand' in doc
+    assert 'source confidence %' in doc or 'Confidence' in doc
+    assert 'price range' in doc
+    assert 'erp_material_ids' in doc
+    assert 'commodity_prediction_packet.v1' in doc
+    assert 'erp_mes_wms_tms_mapping' in doc
+    assert 'source_confidence' in doc
+    assert 'extraction_confidence' in doc
+    assert 'model_confidence' in doc
+    assert 'quote_validity_window' in doc
+    assert 'purchase_orders' in doc
+    assert 'work_orders' in doc
+    assert 'evidence_hash' in doc
+    assert 'decision_hash' in doc
+    assert 'action_receipt_id' in doc
+    assert 'Supply Chain Risk Review / S&OP Exception Report' in doc
+    assert 'Planner question' in doc
+    assert 'Scenario planning example' in doc
+    assert 'follow_up_triggers' in doc
+    assert '5 Why' in doc
+    assert '8D-lite' in doc
+    assert 'planner_report' in doc
+    assert 'risk_review' in doc
+    assert 'rca_appendix' in doc
+    assert 'five_why' in doc
+    assert 'eight_d_lite' in doc
+    assert 'D4_root_cause' in doc
+    assert 'D8_evidence_closure' in doc
+    assert 'defense_metals_tungsten_antimony' in sample
+
+
+def test_ontology_contract_and_api_mirror_include_prediction_packet_metadata() -> None:
+    contract_yaml = (ROOT / 'contracts/supply_chain_ontology.yaml').read_text()
+    contract_json = (ROOT / 'contracts/supply_chain_ontology.json').read_text()
+    api_yaml = (ROOT / 'apps/api/app/ontology.yaml').read_text()
+    api_json = (ROOT / 'apps/api/app/ontology.json').read_text()
+
+    combined = '\n'.join([contract_yaml, contract_json, api_yaml, api_json])
+    for token in [
+        'CommodityRiskSignal',
+        'CommodityPredictionPacket',
+        'commodity_prediction_packet.v1',
+        'Supply Chain Risk Review / S&OP Exception Report',
+        'RcaAppendix5Why8DLite',
+        'HumanContext5W',
+        'ErpMesWmsTmsMetadataMap',
+        'EvidenceSource',
+        'PriceRangeSignal',
+        'ERP/MES/WMS/TMS-compatible keys',
+        '人/who',
+        '事/what_changed',
+        '時/when',
+        '地/where',
+        '物/which_objects',
+        'source_confidence',
+        'extraction_confidence',
+        'model_confidence',
+        'price_ranges',
+        'erp_material_ids',
+        'purchase_orders',
+        'work_orders',
+        'evidence_hash',
+        'decision_hash',
+        'action_receipt_id',
+    ]:
+        assert token in combined
+
+    assert 'CommodityPredictionPacket_has_ERP_MES_WMS_TMS_Metadata' in contract_yaml
+    assert 'CommodityPredictionPacket_has_ERP_MES_WMS_TMS_Metadata' in api_yaml
