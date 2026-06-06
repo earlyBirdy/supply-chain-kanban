@@ -44,7 +44,6 @@ from .api.routers import (
     pending_actions,
     news,
     operator,
-    business_submission,
     commodity_trends,
 )
 
@@ -204,7 +203,6 @@ def create_app() -> FastAPI:
         app.include_router(maintenance.router, prefix=f"{prefix}/maintenance", tags=["maintenance"])
         app.include_router(news.router, prefix=f"{prefix}/news", tags=["news"])
         app.include_router(operator.router, prefix=f"{prefix}/operator", tags=["operator"])
-        app.include_router(business_submission.router, prefix=f"{prefix}/business_submission", tags=["business_submission"])
         app.include_router(commodity_trends.router, prefix=f"{prefix}/commodity_trends", tags=["commodity_trends"])
         app.include_router(demo.router, prefix=f"{prefix}/demo", tags=["demo"])
 

@@ -68,7 +68,7 @@ Kanban is the regular supply-chain operations basis. It is used for daily planni
 
 ```text
 Devpost submission copy
-Gemini/model-specific live demo scaffolding
+event/model-specific live demo scaffolding
 historical v0.6 demo notes
 ```
 

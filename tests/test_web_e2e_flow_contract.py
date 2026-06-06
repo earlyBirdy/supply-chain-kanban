@@ -130,7 +130,7 @@ def test_web_keeps_optional_loads_non_fatal_and_status_clear() -> None:
     html = (ROOT / 'apps/web/public/index.html').read_text()
     app_js = (ROOT / 'apps/web/public/app.js').read_text()
 
-    assert 'Promise.allSettled([loadSummary(), loadExecutive(), loadExecutiveBrief(), loadDemoScript(), loadNews(), loadBusinessSubmission(), loadCommodityTrends()])' in app_js
+    assert 'Promise.allSettled([loadSummary(), loadExecutive(), loadExecutiveBrief(), loadDemoScript(), loadNews(), loadCommodityTrends()])' in app_js
     assert 'async function safeLoad' in app_js
     assert "loadScreenshotManifest(){ const data = await safeLoad" in app_js
     assert "if(window.renderBrief) window.renderBrief();" in app_js
@@ -321,29 +321,6 @@ def test_patch_checklist_wording_is_explicit() -> None:
     ]:
         assert token in combined
 
-
-def test_web_has_xprize_business_submission_mode() -> None:
-    html = (ROOT / 'apps/web/public/index.html').read_text()
-    app_js = (ROOT / 'apps/web/public/app.js').read_text()
-    readme = (ROOT / 'README.md').read_text()
-    runbook = (ROOT / 'docs/demo/XPRIZE_BUSINESS_SUBMISSION_RUNBOOK.md').read_text()
-
-    assert 'XPRIZE Business Submission Mode' in html
-    assert 'continuous AI agent reads ERP/MES/WMS mock data and news/risk signals' in html
-    assert 'routes Planner/CFO approval' in html
-    assert 'evidence receipts, Gemini trace fields, and blockchain-ready hashes' in html
-    assert 'function renderBusinessSubmission' in app_js
-    assert "fetchJson('/business_submission/')" in app_js
-    assert 'loadBusinessSubmission' in app_js
-    assert 'Continuous AI agent' in app_js
-    assert 'Human approval gate' in app_js
-    assert 'Revenue/customer evidence' in app_js
-    assert 'Gemini trace schema' in app_js
-    assert 'real-business submission path' in readme
-    assert 'curl http://localhost:8000/business_submission/' in readme
-    assert 'Pilot package + monthly subscription' in app_js
-    assert 'Read ERP/MES/WMS mock data.' in runbook
-    assert 'Create evidence receipts with decision hashes and blockchain-ready proof.' in runbook
 
 
 def test_web_has_it_defense_commodity_trend_radar() -> None:
