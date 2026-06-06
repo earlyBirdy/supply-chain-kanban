@@ -13,7 +13,7 @@ pinned: false
 **Supply Chain AI Agent** is an ontology-driven operating layer for supply-chain teams. It co-works with traditional systems such as ERP, WMS, MES, TMS, supplier portals, CSV reports, market/news feeds, and optional blockchain evidence layers. The goal is not to replace existing systems; the goal is to connect them end-to-end, find major issues earlier, recommend actions, route approvals, execute governed writebacks, and keep proof for audit.
 
 - GitHub: https://github.com/earlyBirdy/supply-chain-kanban
-- Hugging Face demo: https://huggingface.co/spaces/earlyBirdy/supply-chain-kanban
+- Hugging Face demo: coming soon...
 
 `#SupplyChainAI` `#AIAgent` `#Ontology` `#Blockchain` `#ERP` `#WMS` `#MES` `#TMS` `#CommodityRisk` `#ROI`
 
@@ -30,6 +30,38 @@ ingest system data from ERP/MES/WMS/TMS/supplier/news/blockchain evidence
   -> audit trail + decision hashes + tamper-resistant evidence
 ```
 
+
+
+## Dashboard ontology enhancement: ERP/MES + AI agent + blockchain proof + simple UX
+
+This patch strengthens the dashboard ontology so it can behave like a practical supply-chain control room instead of a raw data-board. The new structure adds source-system references, BOM exposure, MES capacity constraints, S&OP exceptions, AI-agent run traces, governed writeback receipts, and persona-specific simple UI contracts.
+
+```text
+ERP / MES / WMS / TMS / Supplier Portal / CSV / News / Blockchain Evidence
+  -> SourceSystemConnector + SourceRecordReference
+  -> Order / InventoryPosition / ProductionRecord / BillOfMaterialsExposure / CapacityConstraint
+  -> NewsRiskSignal + CommodityPredictionPacket
+  -> AgentRun + AgentDecision + PendingAction
+  -> human approval
+  -> WritebackReceipt + EvidenceReceipt + optional BlockchainAnchor
+  -> SimpleUIView for planner / CFO / plant / supplier manager
+```
+
+Key design rules:
+
+- **ERP/MES compatibility:** every prediction and dashboard object keeps source-system keys, table names, record IDs, confidence, validation status, and writeback target.
+- **AI-agent automation:** the agent may read, map, score, predict, simulate, and recommend automatically; ERP/MES/WMS/TMS writeback still requires visible human approval.
+- **Blockchain datasets:** blockchain is an audit/proof layer for receipt hashes, decision hashes, source-record hashes, and action receipt IDs; it is not the default operational database.
+- **News prediction:** news and market data become ontology-linked risk packets with 人事時地物, source confidence, time period, price ranges, BOM exposure, supplier exposure, and follow-up triggers.
+- **Simple UI view:** the first screen answers one manager question: what are the top issues, what action is recommended, who approves, which system changes, and what proof is kept?
+
+Updated references:
+
+- `contracts/supply_chain_ontology.yaml` / `.json`
+- `apps/api/app/ontology.yaml` / `.json`
+- `docs/product/ONTOLOGY_INTEGRATION_BLUEPRINT.md`
+- `docs/operations/DATASETS.md`
+- `data/sample_inputs/dashboard_ontology_sample.json`
 
 ## Agent skills + autoresearch extension
 

@@ -1,10 +1,10 @@
 {
   "version": "1.0",
   "name": "SupplyChainOntology",
-  "description": "Canonical ontology contract for the Supply Chain Kanban enterprise demo. It defines the business objects, relationships, and governed action boundary that AI agents and human operators share.",
+  "description": "Canonical ontology contract for the Supply Chain AI Agent enterprise demo. It defines business objects, source-system mappings, AI-agent decision packets, blockchain-ready evidence datasets, and simple UI views shared by human operators and governed automation.",
   "contract": {
     "canonical": true,
-    "revision": 2,
+    "revision": "continuous-improvement",
     "source_of_truth": "contracts/supply_chain_ontology.yaml",
     "companion_contracts": {
       "action_catalog": "contracts/action_catalog.yaml",
@@ -1408,6 +1408,463 @@
           "type": "string"
         }
       }
+    },
+    "SourceSystemConnector": {
+      "description": "ERP/MES/WMS/TMS/supplier/news/blockchain connector profile used to control read-only sync, approval-gated writeback, trust tier, and field mapping.",
+      "key": "connector_id",
+      "canonical_table": "source_system_connectors",
+      "properties": {
+        "connector_id": {
+          "type": "string"
+        },
+        "system_type": {
+          "type": "string",
+          "enum": [
+            "ERP",
+            "MES",
+            "WMS",
+            "TMS",
+            "SupplierPortal",
+            "NewsMonitor",
+            "MarketData",
+            "BlockchainEvidence",
+            "CSV"
+          ]
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "read_only",
+            "approval_gated_writeback",
+            "proof_anchor_only"
+          ]
+        },
+        "trust_tier": {
+          "type": "string",
+          "enum": [
+            "high",
+            "standard",
+            "low"
+          ]
+        },
+        "owner": {
+          "type": "string",
+          "optional": true
+        },
+        "sync_cadence": {
+          "type": "string",
+          "optional": true
+        },
+        "last_sync_at": {
+          "type": "datetime",
+          "optional": true
+        },
+        "field_map_ref": {
+          "type": "string",
+          "optional": true
+        }
+      }
+    },
+    "SourceRecordReference": {
+      "description": "Stable pointer back to the original ERP/MES/WMS/TMS/news/blockchain source row so every ontology object remains auditable and writeback-safe.",
+      "key": "source_ref_id",
+      "canonical_table": "source_record_references",
+      "properties": {
+        "source_ref_id": {
+          "type": "string"
+        },
+        "connector_id": {
+          "type": "string"
+        },
+        "source_system": {
+          "type": "string"
+        },
+        "source_table": {
+          "type": "string",
+          "optional": true
+        },
+        "source_record_id": {
+          "type": "string"
+        },
+        "source_record_version": {
+          "type": "string",
+          "optional": true
+        },
+        "object_type": {
+          "type": "string"
+        },
+        "object_id": {
+          "type": "string"
+        },
+        "observed_at": {
+          "type": "datetime"
+        },
+        "source_confidence": {
+          "type": "number",
+          "optional": true
+        },
+        "extraction_confidence": {
+          "type": "number",
+          "optional": true
+        },
+        "validation_status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "cross_checked",
+            "pending",
+            "rejected"
+          ]
+        }
+      }
+    },
+    "BillOfMaterialsExposure": {
+      "description": "BOM-level exposure that links a constrained resource or commodity risk to affected SKUs, plants, orders, work orders, and revenue/customer commitments.",
+      "key": "bom_exposure_id",
+      "canonical_table": "bom_exposures",
+      "properties": {
+        "bom_exposure_id": {
+          "type": "string"
+        },
+        "sku": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "plant_id": {
+          "type": "string",
+          "optional": true
+        },
+        "supplier_id": {
+          "type": "string",
+          "optional": true
+        },
+        "erp_material_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "purchase_orders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "work_orders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "affected_qty": {
+          "type": "number",
+          "optional": true
+        },
+        "revenue_exposure": {
+          "type": "number",
+          "optional": true
+        },
+        "confidence_score": {
+          "type": "number",
+          "optional": true
+        },
+        "source_ref_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        }
+      }
+    },
+    "CapacityConstraint": {
+      "description": "MES/plant capacity issue such as line loading, yield loss, downtime, manpower, tooling, or quality hold that changes available supply.",
+      "key": "constraint_id",
+      "canonical_table": "capacity_constraints",
+      "properties": {
+        "constraint_id": {
+          "type": "string"
+        },
+        "plant_id": {
+          "type": "string"
+        },
+        "sku": {
+          "type": "string",
+          "optional": true
+        },
+        "constraint_type": {
+          "type": "string",
+          "enum": [
+            "line_capacity",
+            "yield_loss",
+            "downtime",
+            "quality_hold",
+            "manpower",
+            "tooling",
+            "material_shortage"
+          ]
+        },
+        "available_capacity": {
+          "type": "number",
+          "optional": true
+        },
+        "required_capacity": {
+          "type": "number",
+          "optional": true
+        },
+        "gap_qty": {
+          "type": "number",
+          "optional": true
+        },
+        "period": {
+          "type": "string"
+        },
+        "source_system": {
+          "type": "string",
+          "enum": [
+            "MES",
+            "ERP",
+            "CSV",
+            "planner_override"
+          ]
+        },
+        "confidence_score": {
+          "type": "number",
+          "optional": true
+        }
+      }
+    },
+    "SAndOPException": {
+      "description": "Planner-facing exception report that summarizes signal, exposure, scenario options, owner, approval, and follow-up triggers.",
+      "key": "exception_id",
+      "canonical_table": "sandop_exceptions",
+      "properties": {
+        "exception_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "uuid"
+        },
+        "risk_review_id": {
+          "type": "string",
+          "optional": true
+        },
+        "exception_type": {
+          "type": "string",
+          "enum": [
+            "demand_supply_gap",
+            "inventory_shortage",
+            "excess_inventory",
+            "supplier_risk",
+            "quality_hold",
+            "logistics_delay",
+            "commodity_price_risk"
+          ]
+        },
+        "planner_question": {
+          "type": "string"
+        },
+        "recommended_option": {
+          "type": "string"
+        },
+        "business_impact": {
+          "type": "object"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "approval_owner": {
+          "type": "string",
+          "optional": true
+        },
+        "follow_up_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "in_review",
+            "approved",
+            "executed",
+            "closed"
+          ]
+        }
+      }
+    },
+    "AgentRun": {
+      "description": "Trace of one AI-agent automation cycle from sensing to recommendation and proof generation.",
+      "key": "agent_run_id",
+      "canonical_table": "agent_runs",
+      "properties": {
+        "agent_run_id": {
+          "type": "string"
+        },
+        "agent_name": {
+          "type": "string"
+        },
+        "started_at": {
+          "type": "datetime"
+        },
+        "completed_at": {
+          "type": "datetime",
+          "optional": true
+        },
+        "trigger_type": {
+          "type": "string",
+          "enum": [
+            "scheduled",
+            "manual",
+            "news_event",
+            "source_sync",
+            "threshold_breach"
+          ]
+        },
+        "input_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "output_decision_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "model_confidence": {
+          "type": "number",
+          "optional": true
+        },
+        "policy_result": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "needs_approval",
+            "blocked"
+          ]
+        },
+        "human_review_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "WritebackReceipt": {
+      "description": "Receipt created after an approved action writes to ERP/MES/WMS/TMS/supplier portal or creates a simulated writeback in the demo.",
+      "key": "writeback_receipt_id",
+      "canonical_table": "writeback_receipts",
+      "properties": {
+        "writeback_receipt_id": {
+          "type": "string"
+        },
+        "pending_id": {
+          "type": "uuid"
+        },
+        "decision_id": {
+          "type": "string",
+          "optional": true
+        },
+        "target_system": {
+          "type": "string",
+          "enum": [
+            "ERP",
+            "MES",
+            "WMS",
+            "TMS",
+            "SupplierPortal",
+            "DemoSimulator"
+          ]
+        },
+        "target_record_id": {
+          "type": "string",
+          "optional": true
+        },
+        "action_type": {
+          "type": "string"
+        },
+        "request_hash": {
+          "type": "string"
+        },
+        "response_hash": {
+          "type": "string",
+          "optional": true
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "simulated",
+            "submitted",
+            "accepted",
+            "rejected",
+            "failed"
+          ]
+        },
+        "executed_at": {
+          "type": "datetime"
+        },
+        "evidence_receipt_id": {
+          "type": "string",
+          "optional": true
+        }
+      }
+    },
+    "SimpleUIView": {
+      "description": "Human-facing UI contract for a role-based dashboard view: what question it answers, which ontology objects it uses, and which action it enables.",
+      "key": "view_id",
+      "canonical_table": "simple_ui_views",
+      "properties": {
+        "view_id": {
+          "type": "string"
+        },
+        "persona": {
+          "type": "string",
+          "enum": [
+            "planner",
+            "cfo",
+            "plant_manager",
+            "supply_chain_leader",
+            "quality_manager",
+            "supplier_manager"
+          ]
+        },
+        "primary_question": {
+          "type": "string"
+        },
+        "visible_objects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "decision_action": {
+          "type": "string"
+        },
+        "evidence_policy": {
+          "type": "string"
+        },
+        "layout_hint": {
+          "type": "string",
+          "enum": [
+            "one_page",
+            "drill_down",
+            "timeline",
+            "matrix"
+          ]
+        }
+      }
     }
   },
   "relationships": [
@@ -1750,6 +2207,106 @@
         "from_key": "price_range_refs",
         "to_key": "price_signal_id"
       }
+    },
+    {
+      "name": "SourceRecordReference_from_SourceSystemConnector",
+      "from": "SourceRecordReference",
+      "to": "SourceSystemConnector",
+      "predicate": "originates_from",
+      "join": {
+        "from_key": "connector_id",
+        "to_key": "connector_id"
+      }
+    },
+    {
+      "name": "BillOfMaterialsExposure_for_SKU",
+      "from": "BillOfMaterialsExposure",
+      "to": "SKU",
+      "predicate": "exposes",
+      "join": {
+        "from_key": "sku",
+        "to_key": "sku"
+      }
+    },
+    {
+      "name": "BillOfMaterialsExposure_uses_Resource",
+      "from": "BillOfMaterialsExposure",
+      "to": "Resource",
+      "predicate": "depends_on",
+      "join": {
+        "from_key": "resource_id",
+        "to_key": "resource_id"
+      }
+    },
+    {
+      "name": "BillOfMaterialsExposure_from_Supplier",
+      "from": "BillOfMaterialsExposure",
+      "to": "Supplier",
+      "predicate": "sourced_from",
+      "join": {
+        "from_key": "supplier_id",
+        "to_key": "supplier_id"
+      }
+    },
+    {
+      "name": "CapacityConstraint_at_Plant",
+      "from": "CapacityConstraint",
+      "to": "Plant",
+      "predicate": "constrains",
+      "join": {
+        "from_key": "plant_id",
+        "to_key": "plant_id"
+      }
+    },
+    {
+      "name": "CapacityConstraint_affects_SKU",
+      "from": "CapacityConstraint",
+      "to": "SKU",
+      "predicate": "affects",
+      "join": {
+        "from_key": "sku",
+        "to_key": "sku"
+      }
+    },
+    {
+      "name": "SAndOPException_for_Case",
+      "from": "SAndOPException",
+      "to": "Case",
+      "predicate": "summarizes",
+      "join": {
+        "from_key": "case_id",
+        "to_key": "case_id"
+      }
+    },
+    {
+      "name": "AgentRun_produces_AgentDecision",
+      "from": "AgentRun",
+      "to": "AgentDecision",
+      "predicate": "produces",
+      "join": {
+        "from_key": "output_decision_ids",
+        "to_key": "decision_id"
+      }
+    },
+    {
+      "name": "WritebackReceipt_for_PendingAction",
+      "from": "WritebackReceipt",
+      "to": "PendingAction",
+      "predicate": "executes",
+      "join": {
+        "from_key": "pending_id",
+        "to_key": "pending_id"
+      }
+    },
+    {
+      "name": "SimpleUIView_surfaces_AgentDecision",
+      "from": "SimpleUIView",
+      "to": "AgentDecision",
+      "predicate": "surfaces",
+      "join": {
+        "from_key": "decision_action",
+        "to_key": "decision_id"
+      }
     }
   ],
   "action_types": {
@@ -1943,6 +2500,287 @@
       "evidence_hash",
       "decision_hash",
       "action_receipt_id"
-    ]
+    ],
+    "layers": [
+      {
+        "layer": "1. Source system connector",
+        "purpose": "Read ERP/MES/WMS/TMS/supplier/news data without disrupting the system of record.",
+        "ontology_objects": [
+          "SourceSystemConnector",
+          "SourceRecordReference"
+        ]
+      },
+      {
+        "layer": "2. Canonical business ontology",
+        "purpose": "Normalize rows into orders, inventory, production, BOM exposure, partner KPIs, capacity constraints, and risk cases.",
+        "ontology_objects": [
+          "Order",
+          "InventoryPosition",
+          "ProductionRecord",
+          "BillOfMaterialsExposure",
+          "CapacityConstraint",
+          "PartnerPerformanceMetric",
+          "Case"
+        ]
+      },
+      {
+        "layer": "3. AI-agent automation",
+        "purpose": "Sense, map, detect, predict, recommend, request approval, and produce a receipt.",
+        "ontology_objects": [
+          "AgentRun",
+          "NewsRiskSignal",
+          "CommodityPredictionPacket",
+          "AgentDecision",
+          "PendingAction"
+        ]
+      },
+      {
+        "layer": "4. Governed writeback",
+        "purpose": "Allow only approved changes to touch ERP/MES/WMS/TMS/supplier portals.",
+        "ontology_objects": [
+          "WritebackReceipt",
+          "EvidenceReceipt",
+          "AuditEvent"
+        ]
+      },
+      {
+        "layer": "5. Evidence + blockchain dataset",
+        "purpose": "Keep operational data in the database while anchoring hashes/receipts for tamper-evident proof.",
+        "ontology_objects": [
+          "TraceabilityEvent",
+          "EvidenceReceipt",
+          "BlockchainAnchor"
+        ]
+      },
+      {
+        "layer": "6. Simple user experience",
+        "purpose": "Show top issues, next decision, affected object, action, approval owner, target system, and proof; hide raw tables by default.",
+        "ontology_objects": [
+          "SimpleUIView",
+          "SAndOPException",
+          "SupplyChainRiskReview"
+        ]
+      }
+    ],
+    "source_to_ontology_mapping": {
+      "ERP": {
+        "read": [
+          "PO",
+          "SO",
+          "MRP",
+          "inventory",
+          "supplier/material master",
+          "cost exposure"
+        ],
+        "objects": [
+          "Order",
+          "InventoryPosition",
+          "ForecastPlan",
+          "BillOfMaterialsExposure"
+        ],
+        "writeback_after_approval": [
+          "purchase_request",
+          "PO_note",
+          "allocation_note"
+        ]
+      },
+      "MES": {
+        "read": [
+          "work order",
+          "yield",
+          "scrap",
+          "downtime",
+          "IQC/OQC hold",
+          "line capacity"
+        ],
+        "objects": [
+          "ProductionRecord",
+          "CapacityConstraint",
+          "PartnerPerformanceMetric"
+        ],
+        "writeback_after_approval": [
+          "quality_disposition_request",
+          "build_priority_note"
+        ]
+      },
+      "WMS": {
+        "read": [
+          "on hand",
+          "allocated",
+          "inbound",
+          "outbound",
+          "pick/pack exception"
+        ],
+        "objects": [
+          "InventoryPosition",
+          "Shipment"
+        ],
+        "writeback_after_approval": [
+          "allocation_move",
+          "expedite_pick_pack_task"
+        ]
+      },
+      "TMS": {
+        "read": [
+          "ETA",
+          "carrier delay",
+          "route risk",
+          "freight cost"
+        ],
+        "objects": [
+          "Shipment",
+          "PartnerPerformanceMetric"
+        ],
+        "writeback_after_approval": [
+          "expedite_request",
+          "reroute_request"
+        ]
+      },
+      "SupplierPortal": {
+        "read": [
+          "confirmation",
+          "ASN",
+          "capacity promise",
+          "OTIF exception"
+        ],
+        "objects": [
+          "Supplier",
+          "PartnerPerformanceMetric",
+          "TraceabilityEvent"
+        ],
+        "writeback_after_approval": [
+          "supplier_escalation_ticket"
+        ]
+      },
+      "NewsMonitor": {
+        "read": [
+          "commodity",
+          "supplier",
+          "logistics",
+          "geopolitical",
+          "export-control signal"
+        ],
+        "objects": [
+          "NewsRiskSignal",
+          "CommodityRiskSignal",
+          "CommodityPredictionPacket"
+        ],
+        "writeback_after_approval": []
+      },
+      "BlockchainEvidence": {
+        "read": [
+          "anchor status",
+          "receipt hash",
+          "commitment proof"
+        ],
+        "objects": [
+          "EvidenceReceipt",
+          "BlockchainAnchor"
+        ],
+        "writeback_after_approval": [
+          "anchor_receipt_hash_only"
+        ]
+      },
+      "CSV": {
+        "read": [
+          "legacy reports and fast onboarding extracts"
+        ],
+        "objects": [
+          "SourceRecordReference",
+          "Order",
+          "Shipment",
+          "ProductionRecord",
+          "InventoryPosition"
+        ],
+        "writeback_after_approval": []
+      }
+    },
+    "ai_agent_automation_contract": {
+      "allowed_without_human_approval": [
+        "read source data",
+        "map fields",
+        "score risk",
+        "draft recommendation",
+        "simulate scenarios",
+        "prepare writeback payload",
+        "create evidence packet"
+      ],
+      "requires_human_approval": [
+        "ERP/MES/WMS/TMS/supplier portal writeback",
+        "purchase commitment",
+        "customer allocation change",
+        "supplier escalation sent externally",
+        "blockchain anchor submission if it represents legal/commercial commitment"
+      ],
+      "blocked": [
+        "silent source-system changes",
+        "unexplained model-only decisions",
+        "writeback without receipt",
+        "evidence without source reference"
+      ]
+    },
+    "news_prediction_model": {
+      "purpose": "Convert headlines and market feeds into ontology-linked risk signals instead of a news-only feed.",
+      "minimum_packet_fields": [
+        "human_context",
+        "source_confidence",
+        "extraction_confidence",
+        "model_confidence",
+        "time_period",
+        "price_ranges",
+        "erp_mes_wms_tms_mapping",
+        "bom_exposure",
+        "recommended_actions",
+        "follow_up_triggers"
+      ],
+      "memory_window": "6-12 month weak-signal window before mainstream shortage headlines when data is available."
+    },
+    "blockchain_dataset_model": {
+      "operational_truth": "Postgres/API tables remain the operational source of truth for the dashboard and approvals.",
+      "anchored_dataset": [
+        "EvidenceReceipt",
+        "WritebackReceipt",
+        "AgentDecision",
+        "TraceabilityEvent"
+      ],
+      "anchor_payload": [
+        "receipt_hash",
+        "decision_hash",
+        "source_record_hashes",
+        "action_receipt_id",
+        "timestamp",
+        "validation_status"
+      ],
+      "rule": "Anchor hashes/proofs only; do not make blockchain the default operational database."
+    },
+    "simple_ui_experience": {
+      "home_question": "What are the top major issues, what action is recommended, who must approve, which system changes, and what proof is kept?",
+      "default_cards": [
+        "Major issues",
+        "AI Leader Dashboard",
+        "Project E2E Flow",
+        "Next Decision",
+        "AI Agent Workbench",
+        "Decide",
+        "Simulate + Execute",
+        "Prove",
+        "Audit Timeline"
+      ],
+      "progressive_disclosure": [
+        "start with top issues",
+        "open one case",
+        "show affected order/BOM/supplier/plant",
+        "simulate options",
+        "approve or reject",
+        "execute governed writeback",
+        "show evidence receipt"
+      ],
+      "personas": {
+        "planner": "risk, supply/demand gap, next action",
+        "cfo": "revenue/cost exposure, approval policy, proof",
+        "plant_manager": "capacity, yield, quality hold, OQC release",
+        "supplier_manager": "OTIF, ASN, confirmation, escalation"
+      }
+    }
   }
 }

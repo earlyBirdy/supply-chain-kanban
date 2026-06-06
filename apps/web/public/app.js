@@ -90,14 +90,14 @@
     const root=$('integrationHub');
     if(!root) return;
     const systems=[
-      ['ERP','PO, SO, inventory, supplier/material master, financial exposure','Source system feeding ontology · read-only first · writeback only after approval'],
-      ['MES','Production order, yield, scrap, downtime, IQC/OQC quality holds','Source system feeding ontology · expose shop-floor blockers before release'],
+      ['ERP','PO, SO, inventory, supplier/material master, financial exposure','SourceSystemConnector + SourceRecordReference · read-only first · writeback only after approval'],
+      ['MES','Production order, yield, scrap, downtime, IQC/OQC quality holds, capacity constraints','SourceSystemConnector + CapacityConstraint · expose shop-floor blockers before release'],
       ['WMS','Stock, inbound, outbound, pick/pack status','Source system feeding ontology · sync exceptions into shortage/excess issues'],
       ['TMS','Shipment ETA, carrier delay, route cost, premium freight','Source system feeding ontology · recommend expedite, reroute, or buffer action'],
       ['Supplier Portal','Confirmations, ASN, OTIF, capacity, escalation','Open supplier tickets with evidence receipts attached'],
-      ['News + Market Data','Commodity, supplier, logistics, and geopolitical risk signals','Predict disruptions before ERP shows the shortage'],
+      ['News + Market Data','Commodity, supplier, logistics, and geopolitical risk signals plus price-range and BOM-exposure signals','Predict disruptions before ERP shows the shortage; keep source confidence and time period'],
       ['Commodity Trend Radar','Memory, advanced packaging, critical minerals, rare earth magnets, tungsten/antimony, and high-reliability passives','6-12 month early warning for IT/Defense shortages before mainstream headlines'],
-      ['Blockchain Evidence','Traceable receipts, decision hashes, supplier proof, and writeback hashes','Audit/proof layer, not a required runtime dependency'],
+      ['Blockchain Evidence','EvidenceReceipt, WritebackReceipt, source-record hashes, decision hashes, and optional anchors','Audit/proof layer, not a required runtime dependency or operational database'],
       ['CSV / Excel','Legacy reports when no API is available','Upload → AI maps columns → preview ontology objects'],
       ['Agent Skill Playbook','Clarify change, triage issues, create PRD slices, and hand off governed work','Product/design pattern guiding agent behavior without heavy runtime dependencies'],
       ['Autoresearch Sandbox','Bounded experiments for forecast, risk, and news-signal models','Product/design pattern; promote only measured improvements into production'],
@@ -138,13 +138,18 @@
     const root=$('ontologyMap');
     if(!root) return;
     const objects=[
+      ['SourceSystemConnector + SourceRecordReference','ERP/MES/WMS/TMS/news/CSV origin, record IDs, trust tier, source confidence, extraction confidence','Keeps every object traceable to system of record and safe for writeback'],
       ['ForecastPlan','Demand forecast + customer commitment + finance exposure','Feeds Forecast Alignment and service-risk decisions'],
       ['Order / Supplier / Plant','Real-world supply-chain objects with source-system references','Shows the business object instead of raw ERP/MES/WMS rows'],
       ['InventoryPosition','ERP/WMS/MES stock, allocation, shortage, and excess','Feeds Inventory Alignment and rebalance recommendations'],
+      ['BillOfMaterialsExposure','Affected SKU, material IDs, PO/WO, plant, supplier, affected qty, and revenue exposure','Turns commodity/news risk into product and customer impact'],
+      ['CapacityConstraint','MES capacity, yield, downtime, quality hold, manpower, tooling, or material shortage','Explains why supply cannot meet forecast or customer commitment'],
+      ['SAndOPException','Planner-facing exception report with scenarios, recommendation, owner, approval, and follow-up triggers','Makes the AI output understandable to supply-chain leaders'],
       ['PartnerPerformanceMetric','OTIF, yield, scrap, efficiency, response aging, PPM','Feeds Partner Performance and supplier escalation'],
       ['NewsRiskSignal','Ontology-linked risk signal: affected commodities, suppliers, logistics lanes, financial exposure, and approval-gated actions','Converts headlines into material, BOM exposure, industry, price-risk, and lead-time-risk decisions'],
-      ['AgentDecision','Recommendation, evidence, approval state, and business impact','Turns AI reasoning into a governed human decision packet'],
-      ['EvidenceReceipt + BlockchainAnchor','Traceable receipt, decision hash, and tamper-resistant evidence','Keeps audit proof attached after writeback execution'],
+      ['AgentRun + AgentDecision','Automation trace, recommendation, evidence, approval state, model confidence, and business impact','Turns AI reasoning into a governed human decision packet'],
+      ['WritebackReceipt + EvidenceReceipt + BlockchainAnchor','Target system, request/response hash, action receipt, decision hash, and tamper-resistant evidence','Keeps audit proof attached after writeback execution'],
+      ['SimpleUIView','Persona, primary question, visible objects, decision action, evidence policy, and layout hint','Keeps the default UX simple while preserving deeper ontology detail'],
     ];
     root.innerHTML=objects.map(([name,body,outcome])=>`<article class="ontology-card"><strong>${esc(name)}</strong><p>${esc(body)}</p><p>${esc(outcome)}</p></article>`).join('');
   }
@@ -160,6 +165,9 @@
       ['Quality hold recovery','Connect MES/IQC quality signals to controlled containment and OQC release proof.','quality iqc'],
       ['Forecast vs capacity','Compare demand, inventory, MES capacity, and finance exposure before customer promises break.','forecast capacity'],
       ['AI-agent automation loop','Ingest system data → map to ontology → detect risks → predict disruptions → recommend actions → require human approval → create writeback receipt.','ready execute'],
+      ['ERP/MES source traceability','Use SourceSystemConnector and SourceRecordReference to trace every card to PO, WO, inventory, shipment, news, or evidence rows.','erp mes source'],
+      ['BOM exposure review','Convert commodity/news risk into SKU, material ID, PO, WO, plant, supplier, and revenue exposure.','bom material exposure'],
+      ['Simple manager view','One page answers: top issues, recommended action, approval owner, target system, and proof.','manager approval proof'],
       ['Governed writeback','Show approve → simulate → execute → receipt across ERP / WMS / TMS.','ready execute'],
       ['Agent skill triage','Turn ambiguous business asks into issue slices, acceptance criteria, and operator-ready handoffs.','triage approval'],
       ['Autoresearch risk sprint','Run bounded experiments on forecast/news signals, log results, then promote only proven risk improvements.','forecast news'],

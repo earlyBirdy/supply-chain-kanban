@@ -363,3 +363,117 @@ CREATE TABLE IF NOT EXISTS news_alerts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_news_alerts_topic_time ON news_alerts(topic, ts DESC);
+
+-- Dashboard ontology enhancement: source-system, AI-agent, blockchain dataset, and UX support objects.
+CREATE TABLE IF NOT EXISTS source_system_connectors (
+  connector_id TEXT PRIMARY KEY,
+  system_type TEXT NOT NULL CHECK (system_type IN ('ERP','MES','WMS','TMS','SupplierPortal','NewsMonitor','MarketData','BlockchainEvidence','CSV')),
+  display_name TEXT NOT NULL,
+  mode TEXT NOT NULL DEFAULT 'read_only' CHECK (mode IN ('read_only','approval_gated_writeback','proof_anchor_only')),
+  trust_tier TEXT NOT NULL DEFAULT 'standard' CHECK (trust_tier IN ('high','standard','low')),
+  owner TEXT,
+  sync_cadence TEXT,
+  last_sync_at TIMESTAMPTZ,
+  field_map_ref TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS source_record_references (
+  source_ref_id TEXT PRIMARY KEY,
+  connector_id TEXT REFERENCES source_system_connectors(connector_id) ON DELETE SET NULL,
+  source_system TEXT NOT NULL,
+  source_table TEXT,
+  source_record_id TEXT NOT NULL,
+  source_record_version TEXT,
+  object_type TEXT NOT NULL,
+  object_id TEXT NOT NULL,
+  observed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  source_confidence NUMERIC,
+  extraction_confidence NUMERIC,
+  validation_status TEXT NOT NULL DEFAULT 'pending' CHECK (validation_status IN ('verified','cross_checked','pending','rejected'))
+);
+CREATE INDEX IF NOT EXISTS idx_source_record_refs_object ON source_record_references(object_type, object_id);
+
+CREATE TABLE IF NOT EXISTS bom_exposures (
+  bom_exposure_id TEXT PRIMARY KEY,
+  sku TEXT NOT NULL,
+  resource_id TEXT NOT NULL,
+  plant_id TEXT,
+  supplier_id TEXT,
+  erp_material_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+  purchase_orders JSONB NOT NULL DEFAULT '[]'::jsonb,
+  work_orders JSONB NOT NULL DEFAULT '[]'::jsonb,
+  affected_qty NUMERIC,
+  revenue_exposure NUMERIC,
+  confidence_score NUMERIC,
+  source_ref_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_bom_exposures_resource ON bom_exposures(resource_id);
+CREATE INDEX IF NOT EXISTS idx_bom_exposures_sku ON bom_exposures(sku);
+
+CREATE TABLE IF NOT EXISTS capacity_constraints (
+  constraint_id TEXT PRIMARY KEY,
+  plant_id TEXT NOT NULL,
+  sku TEXT,
+  constraint_type TEXT NOT NULL CHECK (constraint_type IN ('line_capacity','yield_loss','downtime','quality_hold','manpower','tooling','material_shortage')),
+  available_capacity NUMERIC,
+  required_capacity NUMERIC,
+  gap_qty NUMERIC,
+  period TEXT NOT NULL,
+  source_system TEXT NOT NULL CHECK (source_system IN ('MES','ERP','CSV','planner_override')),
+  confidence_score NUMERIC,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS sandop_exceptions (
+  exception_id TEXT PRIMARY KEY,
+  case_id UUID REFERENCES agent_cases(case_id) ON DELETE CASCADE,
+  risk_review_id TEXT,
+  exception_type TEXT NOT NULL CHECK (exception_type IN ('demand_supply_gap','inventory_shortage','excess_inventory','supplier_risk','quality_hold','logistics_delay','commodity_price_risk')),
+  planner_question TEXT NOT NULL,
+  recommended_option TEXT NOT NULL,
+  business_impact JSONB NOT NULL DEFAULT '{}'::jsonb,
+  owner TEXT NOT NULL,
+  approval_owner TEXT,
+  follow_up_triggers JSONB NOT NULL DEFAULT '[]'::jsonb,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','in_review','approved','executed','closed')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS agent_runs (
+  agent_run_id TEXT PRIMARY KEY,
+  agent_name TEXT NOT NULL,
+  started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at TIMESTAMPTZ,
+  trigger_type TEXT NOT NULL CHECK (trigger_type IN ('scheduled','manual','news_event','source_sync','threshold_breach')),
+  input_refs JSONB NOT NULL DEFAULT '[]'::jsonb,
+  output_decision_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+  model_confidence NUMERIC,
+  policy_result TEXT NOT NULL DEFAULT 'needs_approval' CHECK (policy_result IN ('allow','needs_approval','blocked')),
+  human_review_required BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS writeback_receipts (
+  writeback_receipt_id TEXT PRIMARY KEY,
+  pending_id UUID REFERENCES pending_actions(pending_id) ON DELETE SET NULL,
+  decision_id TEXT,
+  target_system TEXT NOT NULL CHECK (target_system IN ('ERP','MES','WMS','TMS','SupplierPortal','DemoSimulator')),
+  target_record_id TEXT,
+  action_type TEXT NOT NULL,
+  request_hash TEXT NOT NULL,
+  response_hash TEXT,
+  status TEXT NOT NULL CHECK (status IN ('simulated','submitted','accepted','rejected','failed')),
+  executed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  evidence_receipt_id TEXT
+);
+
+CREATE TABLE IF NOT EXISTS simple_ui_views (
+  view_id TEXT PRIMARY KEY,
+  persona TEXT NOT NULL CHECK (persona IN ('planner','cfo','plant_manager','supply_chain_leader','quality_manager','supplier_manager')),
+  primary_question TEXT NOT NULL,
+  visible_objects JSONB NOT NULL DEFAULT '[]'::jsonb,
+  decision_action TEXT NOT NULL,
+  evidence_policy TEXT NOT NULL,
+  layout_hint TEXT NOT NULL DEFAULT 'one_page' CHECK (layout_hint IN ('one_page','drill_down','timeline','matrix'))
+);

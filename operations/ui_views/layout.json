@@ -1,1 +1,34 @@
-{"navigation":["Kanban Command Board","Crisis Operations","Approvals","Execution Receipts","Audit"]}
+{
+  "navigation": [
+    "Project Status",
+    "Integrations + Ontology",
+    "Templates + News",
+    "Approvals",
+    "Execution Receipts",
+    "Audit"
+  ],
+  "default_layout": "one_page_project_e2e",
+  "simple_ui_contract": {
+    "home_question": "What are the top major issues, what action is recommended, who must approve, which system changes, and what proof is kept?",
+    "primary_cards": [
+      "Major Issues",
+      "AI Leader Dashboard",
+      "Project E2E Flow",
+      "Next Decision",
+      "AI Agent Workbench",
+      "Decide",
+      "Simulate + Execute",
+      "Prove",
+      "Audit Timeline"
+    ],
+    "progressive_disclosure": [
+      "top_issues_only",
+      "open_one_case",
+      "show_affected_order_bom_supplier_plant",
+      "simulate_options",
+      "approve_or_reject",
+      "execute_governed_writeback",
+      "show_evidence_receipt"
+    ]
+  }
+}

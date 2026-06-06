@@ -1,0 +1,18 @@
+{
+  "schema": "dashboard_ontology_sample.v1",
+  "purpose": "Example payload showing ERP/MES/WMS/TMS/news/blockchain datasets mapped into the Supply Chain AI Agent ontology.",
+  "source_system_connectors": [
+    {"connector_id": "erp_demo", "system_type": "ERP", "mode": "approval_gated_writeback", "trust_tier": "high"},
+    {"connector_id": "mes_demo", "system_type": "MES", "mode": "approval_gated_writeback", "trust_tier": "high"},
+    {"connector_id": "news_demo", "system_type": "NewsMonitor", "mode": "read_only", "trust_tier": "standard"},
+    {"connector_id": "ledger_demo", "system_type": "BlockchainEvidence", "mode": "proof_anchor_only", "trust_tier": "standard"}
+  ],
+  "source_record_references": [
+    {"source_ref_id": "erp_demo:PO-88019", "connector_id": "erp_demo", "source_system": "ERP", "source_table": "purchase_orders", "source_record_id": "PO-88019", "object_type": "BillOfMaterialsExposure", "object_id": "bom-hbm-001", "source_confidence": 0.96, "extraction_confidence": 0.98, "validation_status": "verified"}
+  ],
+  "bom_exposures": [
+    {"bom_exposure_id": "bom-hbm-001", "sku": "AI-SERVER-A1", "resource_id": "hbm_memory", "plant_id": "plant_tw_01", "supplier_id": "sup_memory_01", "erp_material_ids": ["MAT-HBM-16G"], "purchase_orders": ["PO-88019"], "work_orders": ["WO-2026-0618"], "affected_qty": 480, "revenue_exposure": 1240000, "confidence_score": 0.82}
+  ],
+  "agent_run": {"agent_run_id": "run-2026-06-05-news-hbm", "agent_name": "commodity_constraint_agent", "trigger_type": "news_event", "policy_result": "needs_approval", "human_review_required": true},
+  "simple_ui_view": {"view_id": "planner_home", "persona": "planner", "primary_question": "What are the top issues and which approved action should happen next?", "visible_objects": ["SAndOPException", "BillOfMaterialsExposure", "AgentDecision", "WritebackReceipt"], "decision_action": "approve_or_reject_pending_action", "evidence_policy": "show receipt/hash after simulation or execution", "layout_hint": "one_page"}
+}

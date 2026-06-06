@@ -201,3 +201,11 @@ Cases open only when a metric breach requires action, approval, or governed writ
 - Re-labels the KPI strip from raw total project issues to current major issues so demos do not look flooded after scenario generation.
 - Adds Hugging Face Spaces Docker deployment support for a single-container public demo.
 - Adds same-origin `/api/*` routing support for hosted demos while preserving local Docker Compose behavior.
+
+## Dashboard ontology enhancement — ERP/MES AI-agent control room
+
+- Expanded the ontology contract with source-system connectors, source-record references, BOM exposure, MES capacity constraints, S&OP exceptions, AI-agent run traces, writeback receipts, and simple UI view contracts.
+- Synced canonical ontology mirrors under `contracts/` and `apps/api/app/` in both YAML and JSON.
+- Added SQL seed schema support for the new dataset families and a sample ontology-enhancement payload.
+- Updated the web UI copy and ontology map so users see ERP/MES traceability, BOM exposure, capacity constraints, AI-agent governance, blockchain proof, and a simpler manager-first view.
+- Updated docs for the ERP/MES integration pattern, AI automation boundary, blockchain dataset model, and simple UI/UX hierarchy.

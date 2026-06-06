@@ -101,3 +101,84 @@ better approval control before system writebacks
 audit-ready proof for finance, customer, and compliance review
 ```
 
+
+## Dashboard ontology enhancement
+
+The improved structure adds a practical bridge between the dashboard and real ERP/MES environments. The dashboard should not ask users to understand every raw table. It should preserve the raw source reference in the background, then show the business object in front.
+
+### 1. Source-system connector layer
+
+Each inbound system is represented by `SourceSystemConnector` and every normalized row keeps a `SourceRecordReference`.
+
+```text
+ERP/MES/WMS/TMS/Portal/News/CSV/Blockchain
+  -> SourceSystemConnector
+  -> SourceRecordReference
+  -> ontology object
+  -> AI Agent decision
+  -> approval-gated writeback receipt
+```
+
+This is the key to interconnection with current ERP/MES systems. It keeps the original vendor/table/record/version/source confidence/extraction confidence fields so a planner can trace a risk card back to the real PO, WO, inventory row, shipment event, news signal, or evidence receipt.
+
+### 2. Supply-chain operating objects
+
+The ontology enhancement adds four objects that make the dashboard more useful for supply-chain people:
+
+| Object | Why it matters |
+| --- | --- |
+| `BillOfMaterialsExposure` | Links commodity/news risk to affected SKUs, ERP material IDs, POs, WOs, plants, suppliers, and revenue exposure. |
+| `CapacityConstraint` | Converts MES yield, downtime, line capacity, quality hold, manpower, tooling, or material shortage into a supply constraint. |
+| `SAndOPException` | Gives planners a natural exception report: signal, impact, scenarios, recommended option, owner, approval, and follow-up triggers. |
+| `SimpleUIView` | Defines what each persona should see first so the UI stays simple instead of becoming a raw-table dashboard. |
+
+### 3. AI-agent automation boundary
+
+The AI agent is allowed to read, normalize, score, simulate, recommend, and draft writeback payloads automatically. It must request approval before external writeback. This makes the automation useful without making ERP/MES governance unsafe.
+
+```text
+Allowed automatically:
+read -> map -> score -> predict -> simulate -> recommend -> prepare receipt
+
+Requires human approval:
+ERP/MES/WMS/TMS/SupplierPortal writeback, purchase commitment, allocation change, customer-impacting action
+
+Blocked:
+silent source-system changes, untraceable model-only decisions, writeback without receipt
+```
+
+### 4. Blockchain dataset model
+
+Blockchain remains a proof layer. The operational truth stays in the application database and existing systems. The anchored dataset is small and audit-oriented:
+
+```text
+EvidenceReceipt
+WritebackReceipt
+AgentDecision
+TraceabilityEvent
+receipt_hash / decision_hash / source_record_hashes / action_receipt_id
+```
+
+This keeps the UI fast and ERP/MES-compatible while still giving customers tamper-evident proof when they need supplier, finance, customer, or compliance evidence.
+
+### 5. Simple UI and user experience
+
+The default user experience should be a control-room page, not a complicated data model explorer.
+
+```text
+Home question:
+What are the top major issues, what action is recommended, who must approve,
+which system changes, and what proof is kept?
+```
+
+Recommended information hierarchy:
+
+1. Top major issues only.
+2. AI Leader Dashboard: forecast, inventory, partner KPI, and IOP actions.
+3. Project E2E flow: supplier status -> IQC -> assembly -> test -> packing -> OQC.
+4. Next decision: affected object, impact, recommendation, approval owner.
+5. Simulate + execute: show before/after impact and target system.
+6. Prove: writeback receipt, evidence receipt, decision hash, blockchain anchor status.
+7. Audit timeline: who approved what, when, why, and from which source data.
+
+This is why `SimpleUIView` is now a first-class ontology object. It lets product, engineering, and demo scripts describe the user experience with the same ontology that the agent uses for reasoning.
