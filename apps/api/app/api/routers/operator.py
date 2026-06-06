@@ -140,31 +140,65 @@ def _board_filters(cards: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
+def _titleize_identifier(value: Any) -> str:
+    text = str(value or "").replace("_", " ").replace("-", " ").strip()
+    return " ".join(part.upper() if part.upper() in {"LFP", "DDR5", "AI", "ERP", "MES", "WMS", "TMS"} else part.capitalize() for part in text.split()) or "the selected resource"
+
+
+def _humanize_action(value: Any) -> str:
+    text = str(value or "Monitor case")
+    words: List[str] = []
+    current = ""
+    for idx, ch in enumerate(text):
+        if idx and ch.isupper() and current and not current[-1].isupper():
+            words.append(current)
+            current = ch
+        elif ch in {"_", "-"}:
+            if current:
+                words.append(current)
+                current = ""
+        else:
+            current += ch
+    if current:
+        words.append(current)
+    return " ".join(words).strip() or text
+
+
+def _format_money(value: Any) -> str:
+    try:
+        return f"${float(value):,.0f}"
+    except Exception:
+        return str(value)
+
+
 def _operator_story(case_row: Dict[str, Any], card_row: Dict[str, Any] | None, pending_actions: List[Dict[str, Any]], scenarios: List[Dict[str, Any]]) -> Dict[str, Any]:
     risk_score = int(case_row.get("risk_score") or 0)
     pending_count = sum(1 for row in pending_actions if str(row.get("status") or "") == "pending")
     approved_count = sum(1 for row in pending_actions if str(row.get("status") or "") == "approved")
     next_action = next((str(row.get("action_type") or "") for row in pending_actions if str(row.get("status") or "") in {"pending", "approved"}), "Monitor case")
+    action_label = _humanize_action(next_action)
+    resource_label = _titleize_identifier(case_row.get("resource_id"))
+    issue_label = str((card_row or {}).get("title") or resource_label)
     latest_scenario = scenarios[0] if scenarios else {}
     service_impact = latest_scenario.get("service_impact")
     cost_impact = latest_scenario.get("cost_impact")
     exposure = latest_scenario.get("risk_exposure")
 
     if pending_count:
-        headline = f"Manager approval needed before {next_action} can change an operating system."
-        next_step = "Review the simulation and scenario comparison, approve the action, then execute the governed writeback."
+        headline = f"Approval needed before {action_label} can update an operating system."
+        next_step = "Review the simulation, approve the action, then execute the governed writeback."
     elif approved_count:
-        headline = f"Action is approved and ready for governed execution: {next_action}."
-        next_step = "Run the simulation preview, confirm the connector destination, then execute when ready."
+        headline = f"Approved for governed execution: {action_label}."
+        next_step = "Preview the simulation, confirm the connector destination, then execute."
     else:
-        headline = "No approvals are blocking this case right now."
-        next_step = "Continue monitoring the board or materialize a new action from recommendations."
+        headline = "No approval is blocking this case right now."
+        next_step = "Continue monitoring or create a governed action from the recommendation."
 
     impact_bits = []
     if service_impact is not None:
         impact_bits.append(f"service impact {service_impact}")
     if cost_impact is not None:
-        impact_bits.append(f"cost impact {cost_impact}")
+        impact_bits.append(f"cost impact {_format_money(cost_impact)}")
     if exposure is not None:
         impact_bits.append(f"risk exposure {exposure}")
     if not impact_bits:
@@ -172,8 +206,8 @@ def _operator_story(case_row: Dict[str, Any], card_row: Dict[str, Any] | None, p
 
     return {
         "headline": headline,
-        "why_it_matters": f"Case {case_row.get('case_id')} is risk {risk_score} on resource {case_row.get('resource_id')}",
-        "business_impact": ", ".join(str(x) for x in impact_bits),
+        "why_it_matters": f"{issue_label} is a high-priority risk on {resource_label} with score {risk_score}.",
+        "business_impact": "; ".join(str(x) for x in impact_bits),
         "next_step": next_step,
         "board_status": str((card_row or {}).get("status") or case_row.get("status") or "—"),
         "owner": case_row.get("owner"),

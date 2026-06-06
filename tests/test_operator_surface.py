@@ -98,6 +98,9 @@ def test_operator_case_detail_shape(monkeypatch: pytest.MonkeyPatch) -> None:
     assert js['operator_state']['needs_approval'] == 1
     assert js['recommendations'][0]['action_type'] == 'ExpediteShipment'
     assert 'headline' in js['approval_story']
+    assert 'Case c1' not in js['approval_story']['why_it_matters']
+    assert 'Dram DDR5' in js['approval_story']['why_it_matters']
+    assert 'cost impact $5' in js['approval_story']['business_impact']
     assert js['writebacks'][0]['external_ref'] == 'WB-1'
     assert js['scenario_comparison']['recommended_scenario']['scenario_name'] == 'Expedite'
 
