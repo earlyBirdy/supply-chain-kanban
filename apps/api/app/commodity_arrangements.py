@@ -88,18 +88,23 @@ def build_arrangement_packet(news_items: Iterable[Dict[str, Any]] | None = None)
     check, and a proof hash that can later be anchored.
     """
 
-    radar = build_commodity_trend_radar()
+    source_items = list(news_items or []) or _demo_news_signals()
+    radar = build_commodity_trend_radar(source_items)
     radar_by_key = {
         row["commodity_id"]: row
         for row in radar.get("watchlist", [])
     }
     rows: List[Dict[str, Any]] = []
-    source_items = list(news_items or []) or _demo_news_signals()
 
     for index, item in enumerate(source_items):
         signals = _normalize_signal(item.get("signals"))
         category = str(signals.get("category") or item.get("topic") or "commodity")
-        radar_row = radar_by_key.get("memory_hbm_dram_nand") if category in {"dram", "memory", "server_dram"} else None
+        if category in {"dram", "memory", "server_dram"}:
+            radar_row = radar_by_key.get("memory_hbm_dram_nand")
+        elif category in {"lfp_battery", "lithium", "battery", "copper_components"}:
+            radar_row = radar_by_key.get("critical_semiconductor_minerals")
+        else:
+            radar_row = radar_by_key.get(category)
         price_range = signals.get("price_range") or (radar_row or {}).get("price_range") or "price watch"
         bom_exposure = signals.get("bom_exposure") or [(radar_row or {}).get("bom_exposure_summary") or "BOM exposure pending"]
         if isinstance(bom_exposure, str):
@@ -108,6 +113,7 @@ def build_arrangement_packet(news_items: Iterable[Dict[str, Any]] | None = None)
         arrangement = signals.get("arrangement") or (radar_row or {}).get("arrangement_options", ["review_buy_timing"])[0]
         severity = int(item.get("severity") or ((radar_row or {}).get("early_warning_score") or 70))
         source_confidence = float(signals.get("source_confidence") or (radar_row or {}).get("source_confidence") or 0.7)
+        live_confirmations = (radar_row or {}).get("live_news_confirmations", [])
         packet = {
             "arrangement_id": f"arr-{category}-{index + 1}",
             "commodity_or_material": category,
@@ -129,6 +135,9 @@ def build_arrangement_packet(news_items: Iterable[Dict[str, Any]] | None = None)
                 "supplier_confirmations",
                 "quote_validity_window",
             ],
+            "latest_news_confirmation_count": len(live_confirmations),
+            "radar_score": (radar_row or {}).get("early_warning_score"),
+            "dynamic_refresh_reason": "live news + Commodity Trend Radar matched this commodity/material" if live_confirmations else "demo/default commodity arrangement packet",
             "simple_ux_copy": (
                 f"{category}: {arrangement.replace('_', ' ')}. "
                 f"Confidence {round(source_confidence * 100)}%, {price_range}; "
@@ -143,7 +152,12 @@ def build_arrangement_packet(news_items: Iterable[Dict[str, Any]] | None = None)
         "ok": True,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "title": "Commodity Arrangement Desk",
-        "principle": "Convert live news and radar signals into approval-ready commodity arrangements, not a raw headline list.",
+        "principle": "Convert live news and dynamically refreshed radar signals into approval-ready commodity arrangements, not a raw headline list.",
+        "dynamic_behavior": {
+            "news_items_used": len(source_items),
+            "radar_confirmations": sum(int(card.get("latest_news_confirmation_count") or 0) for card in rows),
+            "refresh_policy": "arrangement cards refresh after news ingest/check-now and carry radar score, source confidence, price range, BOM exposure, approval owner, and proof hash",
+        },
         "cards": rows,
         "simple_ui_cards": [
             "Commodity/material",

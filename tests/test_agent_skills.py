@@ -35,3 +35,14 @@ def test_agent_skills_api_and_api_mirror_are_available_without_db() -> None:
     body = direct.json()
     assert body["title"] == "Agent Skills + Autoresearch Extension Catalog"
     assert body["skills"][0]["ux_surface"]
+
+
+def test_agent_skills_dynamic_autoresearch_queue_uses_live_signals() -> None:
+    data = build_agent_skill_catalog([
+        {"topic": "commodities", "source": "demo", "title": "DRAM price moves", "severity": 78, "signals": {"category": "dram"}}
+    ])
+
+    dynamic = data["dynamic_auto_research"]
+    assert dynamic["live_signal_count"] == 1
+    assert dynamic["queue"][0]["queue_id"] == "dynamic_live_news_to_arrangement"
+    assert "ERP/MES writeback still requires approval" in dynamic["human_stop_rule"]

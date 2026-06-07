@@ -8,6 +8,9 @@ from ...db import all as db_all, one as db_one
 from ...execution import execute_action
 from ...demo_story_store import customer_themes, story_personas
 from ...demo_experience_store import branding_options, guided_scripts, seed_pack_catalog
+from ...agent_skills import build_agent_skill_catalog
+from ...commodity_arrangements import build_arrangement_packet
+from ...commodity_trend_radar import build_commodity_trend_radar
 
 router = APIRouter()
 
@@ -437,6 +440,103 @@ def operator_summary():
         """
     ) or {}
     return {"ok": True, "summary": counts}
+
+
+def _latest_news_rows(topic: str = "commodities", limit: int = 20) -> List[Dict[str, Any]]:
+    try:
+        return db_all(
+            """SELECT item_id, fetched_at, published_at, topic, source, title, url, summary, severity, signals, case_id
+                 FROM news_items
+                 WHERE topic=:topic
+                 ORDER BY severity DESC, fetched_at DESC
+                 LIMIT :lim""",
+            topic=topic,
+            lim=limit,
+        )
+    except Exception:
+        return []
+
+
+@router.get("/overall_status")
+def operator_overall_status():
+    """Simple operator-first control-room summary.
+
+    This endpoint exists so the UI can answer four questions before showing
+    detailed boards: Are we OK? What changed? Who must approve? What proof exists?
+    """
+
+    summary = operator_summary().get("summary", {})
+    top_cards = _top_case_cards(limit=4)
+    news_rows = _latest_news_rows(limit=20)
+    arrangements = build_arrangement_packet(news_rows)
+    radar = build_commodity_trend_radar(news_rows)
+    skills = build_agent_skill_catalog(news_rows)
+
+    approvals = int(summary.get("approvals_waiting") or 0)
+    blocked = int(summary.get("execution_blocked") or 0)
+    high_risk = int(summary.get("high_risk_cards") or 0)
+    proofs = int(summary.get("evidence_receipts") or 0) + int(summary.get("ledger_proofs") or 0)
+    if blocked:
+        health = "blocked"
+        headline = "Supply chain needs attention: execution is blocked."
+    elif approvals:
+        health = "approval_needed"
+        headline = "Supply chain is waiting for human approval."
+    elif high_risk:
+        health = "watch"
+        headline = "Supply chain has high-risk items to watch."
+    else:
+        health = "ok"
+        headline = "Supply chain is under control."
+
+    next_card = top_cards[0] if top_cards else {}
+    next_arrangement = (arrangements.get("cards") or [{}])[0]
+    next_radar = (radar.get("top_watchlist") or [{}])[0]
+    return {
+        "ok": True,
+        "title": "Overall Supply Chain Status",
+        "health": health,
+        "headline": headline,
+        "simple_questions": [
+            "Are we OK?",
+            "What changed since the last check?",
+            "What action is recommended?",
+            "Who approves it?",
+            "What proof will be attached?",
+        ],
+        "status_cards": [
+            {"label": "Health", "value": health, "explain": headline},
+            {"label": "Major issues", "value": len(top_cards), "explain": "Top high-risk / approval / blocked cases only"},
+            {"label": "Approvals", "value": approvals, "explain": "Human gates before ERP/MES/WMS/TMS writeback"},
+            {"label": "Ready / blocked", "value": f"{summary.get('ready_to_execute', 0)} / {blocked}", "explain": "Actions ready to execute versus blocked"},
+            {"label": "Proof", "value": proofs, "explain": "Evidence receipts + blockchain-ready ledger proofs"},
+            {"label": "News/radar", "value": f"{len(news_rows)} / {len(radar.get('top_watchlist') or [])}", "explain": "Live news rows used / top radar risks"},
+        ],
+        "next_best_action": {
+            "issue": next_card.get("title") or next_arrangement.get("commodity_or_material") or "No urgent issue",
+            "affected_object": next_card.get("resource_id") or next_arrangement.get("commodity_or_material") or next_radar.get("commodity"),
+            "recommended_action": next_card.get("next_pending_action") or next_arrangement.get("recommended_arrangement") or ((next_radar.get("recommended_actions") or [None])[0]),
+            "approval_owner": next_arrangement.get("approval_owner") or next_card.get("assignee") or "supply_chain_leader",
+            "target_system": "ERP/MES/WMS/TMS or supplier portal after approval",
+            "proof": next_arrangement.get("evidence_hash") or next_radar.get("evidence_hash"),
+        },
+        "dynamic_signals": {
+            "commodity_arrangement_cards": len(arrangements.get("cards") or []),
+            "radar_confirmations": (radar.get("dynamic_inputs") or {}).get("live_news_confirmations", 0),
+            "autoresearch_queue": len((skills.get("dynamic_auto_research") or {}).get("queue") or []),
+            "source_mix": (radar.get("dynamic_inputs") or {}).get("source_mix", []),
+        },
+        "operator_flow": [
+            "Review overall health",
+            "Open next best action",
+            "Check affected object and source confidence",
+            "Simulate action",
+            "Approve or reject",
+            "Execute governed writeback",
+            "Attach evidence/proof",
+        ],
+    }
+
 
 
 @router.get("/executive")

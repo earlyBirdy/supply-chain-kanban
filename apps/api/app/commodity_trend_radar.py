@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterable, List
 
 
 def _hash_payload(payload: Dict[str, Any]) -> str:
@@ -236,15 +236,107 @@ def _trend_rows() -> List[Dict[str, Any]]:
     return rows
 
 
-def build_commodity_trend_radar() -> Dict[str, Any]:
+def _normalize_signal(value: Any) -> Dict[str, Any]:
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+            return parsed if isinstance(parsed, dict) else {}
+        except Exception:
+            return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _category_to_commodity_id(category: str, text: str = "") -> str | None:
+    key = f"{category} {text}".lower()
+    if any(token in key for token in ("dram", "nand", "hbm", "memory", "ssd")):
+        return "memory_hbm_dram_nand"
+    if any(token in key for token in ("abf", "cowos", "interposer", "advanced packaging", "gpu")):
+        return "advanced_packaging_abf_cowos_interposer"
+    if any(token in key for token in ("gallium", "germanium", "indium", "tantalum", "semiconductor mineral")):
+        return "critical_semiconductor_minerals"
+    if any(token in key for token in ("rare earth", "magnet", "ndpr", "dysprosium", "terbium")):
+        return "rare_earth_magnets_dy_tb_ndpr"
+    if any(token in key for token in ("tungsten", "antimony", "defense metal")):
+        return "defense_metals_tungsten_antimony"
+    if any(token in key for token in ("mlcc", "passive", "capacitor", "resistor")):
+        return "high_reliability_passives_mlcc_tantalum"
+    if any(token in key for token in ("lfp", "battery", "lithium", "copper", "freight", "logistics")):
+        return "critical_semiconductor_minerals"
+    return None
+
+
+def _live_news_adjustments(news_items: Iterable[Dict[str, Any]] | None) -> List[Dict[str, Any]]:
+    adjustments: List[Dict[str, Any]] = []
+    for item in list(news_items or []):
+        signals = _normalize_signal(item.get("signals"))
+        category = str(signals.get("category") or item.get("topic") or "")
+        text = f"{item.get('title') or ''} {item.get('summary') or ''}"
+        commodity_id = _category_to_commodity_id(category, text)
+        if not commodity_id:
+            continue
+        try:
+            severity = float(item.get("severity") or 0)
+        except Exception:
+            severity = 0.0
+        confidence = float(signals.get("source_confidence") or 0.65)
+        boost = max(1, min(8, round((severity / 100.0) * confidence * 10)))
+        adjustments.append({
+            "commodity_id": commodity_id,
+            "source": item.get("source") or "news",
+            "headline": item.get("title") or "Commodity signal",
+            "time_period": signals.get("time_period") or "latest news window",
+            "price_range": signals.get("price_range"),
+            "bom_exposure": signals.get("bom_exposure"),
+            "source_confidence": confidence,
+            "severity": severity,
+            "score_boost": boost,
+        })
+    return adjustments
+
+
+def build_commodity_trend_radar(news_items: Iterable[Dict[str, Any]] | None = None) -> Dict[str, Any]:
     rows = _trend_rows()
+    adjustments = _live_news_adjustments(news_items)
+    by_id = {row["commodity_id"]: row for row in rows}
+    for adj in adjustments:
+        row = by_id.get(adj["commodity_id"])
+        if not row:
+            continue
+        row.setdefault("live_news_confirmations", []).append(adj)
+        row["early_warning_score"] = min(100, int(row.get("early_warning_score") or 0) + int(adj["score_boost"]))
+        row["source_confidence"] = round(max(float(row.get("source_confidence") or 0), float(adj["source_confidence"])), 2)
+        if adj.get("price_range"):
+            row["price_range"] = str(adj["price_range"])
+        if adj.get("bom_exposure"):
+            bom = adj["bom_exposure"]
+            row["bom_exposure_summary"] = ", ".join(bom) if isinstance(bom, list) else str(bom)
+        row["stage"] = "live_news_confirmed_" + str(row.get("stage") or "weak_signal")
+        row["simple_ui_summary"] = f"{row['time_period']}: {row['commodity']} score {row['early_warning_score']}; {row['price_range']}; BOM exposure: {row['bom_exposure_summary']}."
+        row["evidence_hash"] = _hash_payload({
+            "commodity_id": row["commodity_id"],
+            "score": row["early_warning_score"],
+            "signals": row["weak_signals"],
+            "live_news_confirmations": row.get("live_news_confirmations", []),
+            "actions": row["recommended_actions"],
+            "source_confidence": row["source_confidence"],
+            "price_range": row["price_range"],
+            "bom_exposure_summary": row["bom_exposure_summary"],
+        })
+    rows.sort(key=lambda row: (int(row.get("early_warning_score") or 0), float(row.get("source_confidence") or 0)), reverse=True)
     top = rows[:3]
+    source_mix = sorted({str(adj.get("source") or "news") for adj in adjustments})
     return {
         "ok": True,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "title": "IT / Defense Commodity Trend Radar",
         "prediction_window": "coming 6-12 months",
         "principle": "Do not wait for mainstream shortage headlines. Watch weak signals from demand acceleration, supplier capacity allocation, price momentum, export controls, BOM exposure, and quote/lead-time changes.",
+        "dynamic_inputs": {
+            "latest_news_items_used": len(list(news_items or [])) if news_items is not None else 0,
+            "live_news_confirmations": len(adjustments),
+            "source_mix": source_mix,
+            "refresh_policy": "refresh radar whenever commodity news is ingested, then boost only matched commodities and keep proof hash updated",
+        },
         "scoring_model": {
             "early_warning_score": "weighted 0-100 score",
             "factors": [

@@ -434,3 +434,21 @@ def test_web_has_commodity_arrangement_desk() -> None:
     assert 'approval-ready commodity arrangements' in doc
     assert 'raw RSS feed' in doc
     assert 'quote_validity_window' in sample
+
+
+def test_web_has_simple_overall_status_and_dynamic_news_source_catalog() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+
+    assert 'Overall Supply Chain Status' in html
+    assert 'overallStatusPanel' in html
+    assert 'nextBestActionBox' in html
+    assert 'Dynamic News Source Coverage' in html
+    assert 'newsSourceCatalog' in html
+    assert 'function renderOverallStatus' in app_js
+    assert 'function renderNewsSourceCatalog' in app_js
+    assert '/operator/overall_status' in app_js
+    assert '/news/source-catalog?topic=commodities' in app_js
+    assert 'dynamic Commodity Trend Radar' in readme
+    assert 'docs/product/SIMPLE_OVERALL_STATUS_UI.md' in readme

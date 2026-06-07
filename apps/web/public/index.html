@@ -32,10 +32,14 @@
 
     @media (max-width:1250px){main{height:auto; min-height:0}.project-page{grid-template-columns:1fr}.project-side{position:static; max-height:none; overflow:visible}.summary-grid,.leader-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.project-main{grid-template-rows:auto}.board{max-height:none}.project-side{grid-template-rows:auto}.detail-stack{max-height:none; overflow:visible}.milestone-flow{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media (max-width:900px){.summary-grid,.leader-grid,.board,.flow-insight-grid,.milestone-flow,.trust-strip{grid-template-columns:1fr 1fr}.hero-strip{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.header-main{align-items:flex-start}.secondary-action{display:none!important}}
-    @media (max-width:620px){main{padding:10px}.summary-grid,.leader-grid,.board,.milestone-flow,.trust-strip,.integration-grid,.template-grid,.news-grid,.ontology-grid{grid-template-columns:1fr}.toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr}input,select{min-width:0; width:100%}.desktop-only{display:none}.brand-title{font-size:20px}}
+    @media (max-width:620px){main{padding:10px}.overall-status-head{grid-template-columns:1fr}.overall-status-grid,.next-action-box,.summary-grid,.leader-grid,.board,.milestone-flow,.trust-strip,.integration-grid,.template-grid,.news-grid,.ontology-grid{grid-template-columns:1fr}.toolbar,.filter-row,.selector-row{display:grid; grid-template-columns:1fr 1fr}input,select{min-width:0; width:100%}.desktop-only{display:none}.brand-title{font-size:20px}}
 
     .issue-rollup{border:1px dashed rgba(142,197,255,.35); border-radius:16px; padding:16px; background:rgba(17,28,49,.52); color:var(--muted); display:flex; flex-direction:column; gap:6px;}
     .issue-rollup strong{color:var(--text);}
+    .overall-status{display:grid; gap:12px; padding:14px; border:1px solid rgba(142,197,255,.28); border-radius:18px; background:linear-gradient(180deg,rgba(18,33,57,.96),rgba(10,18,32,.96)); box-shadow:var(--shadow)}
+    .overall-status-head{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center}
+    .overall-status-title{font-size:20px; font-weight:900; line-height:1.25}.overall-status-sub{font-size:12px; color:var(--muted); margin-top:4px}.overall-status-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px}.overall-chip{min-width:0; padding:10px; border:1px solid var(--line); border-radius:14px; background:#0b1425}.overall-chip strong{display:block; font-size:12px; color:var(--muted); font-weight:700}.overall-chip .value{font-size:clamp(15px,1.4vw,18px); font-weight:900; margin-top:4px; line-height:1.12; white-space:pre-line; overflow-wrap:anywhere; word-break:break-word}.overall-chip .small{display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}.next-action-box{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px}.next-action-box article{min-width:0; border:1px solid var(--line); border-radius:14px; background:#0b1425; padding:10px}.next-action-box p{margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere}
+
   </style>
 </head>
 <body>
@@ -91,6 +95,23 @@
       <div class="project-main">
         <div class="page active" id="pageProject" data-page="project-status">
         <section class="summary-grid" id="summaryGrid" aria-label="Major issues summary"></section>
+
+        <section class="overall-status" id="overallStatusPanel" aria-label="Overall supply chain status">
+          <div class="overall-status-head">
+            <div>
+              <div class="small">Overall Supply Chain Status</div>
+              <div class="overall-status-title" id="overallHeadline">Loading overall supply chain status…</div>
+              <div class="overall-status-sub" id="overallSubline">Are we OK? What changed? Who approves? What proof exists?</div>
+            </div>
+            <div class="tag-row" id="overallBadges"><span class="pill">Overall</span></div>
+          </div>
+          <div class="overall-status-grid" id="overallStatusGrid"></div>
+          <div class="next-action-box" id="nextBestActionBox">
+            <article><strong>Next action</strong><p>Loading recommendation…</p></article>
+            <article><strong>Approval</strong><p>Loading approval owner…</p></article>
+            <article><strong>Proof</strong><p>Loading evidence policy…</p></article>
+          </div>
+        </section>
 
         <section class="hero-strip">
           <div>
@@ -181,6 +202,12 @@
             <div class="section-title"><h2>IT / Defense Commodity Trend Radar</h2><span class="small">6-12 month early warning · weak signals before headlines</span></div>
             <div class="integration-flow">Prediction path: weak signals → demand acceleration → supply tightness → price momentum → export-control stress → BOM exposure → human-approved action. The agent watches memory, advanced packaging, critical semiconductor minerals, rare earth magnets, defense metals, and high-reliability passives before mainstream shortage news arrives.</div>
             <div class="integration-grid" id="commodityTrendRadar"><div class="empty">Commodity trend radar will load from the API.</div></div>
+          </section>
+
+          <section class="panel side-focus" aria-label="Dynamic commodity news source coverage">
+            <div class="section-title"><h2>Dynamic News Source Coverage</h2><span class="small">RSS/API/manual research → arrangement cards</span></div>
+            <div class="integration-flow">Dynamic source coverage explains where commodity signals came from and how they are converted into confidence, price range, BOM exposure, approval owner, and proof hash. The default UX still hides raw RSS/source tables unless the user drills down.</div>
+            <div class="integration-grid" id="newsSourceCatalog"><div class="empty">News source catalog will load from the API.</div></div>
           </section>
           <section class="panel side-focus" aria-label="Commodity news monitor">
             <div class="section-title"><h2>Live News for Commodity Arrangements</h2><span class="small" id="newsMeta">RSS / API-ready</span></div>

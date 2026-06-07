@@ -45,3 +45,23 @@ def test_commodity_trend_radar_api_and_api_mirror_are_available_without_db() -> 
     assert "BOM_exposure" in body["scoring_model"]["factors"]
     assert "source_confidence" in body["scoring_model"]["factors"]
     assert "operator_buttons" in body["ux_contract"]
+
+
+def test_commodity_trend_radar_boosts_matching_live_news() -> None:
+    data = build_commodity_trend_radar([
+        {
+            "topic": "commodities",
+            "source": "Channel Checks (test)",
+            "title": "DRAM allocation language returns",
+            "summary": "Server memory lead time tightens",
+            "severity": 90,
+            "signals": {"category": "dram", "source_confidence": 0.91, "price_range": "spot +4% to +9%", "bom_exposure": ["server_dram"]},
+        }
+    ])
+
+    memory = next(row for row in data["watchlist"] if row["commodity_id"] == "memory_hbm_dram_nand")
+    assert data["dynamic_inputs"]["latest_news_items_used"] == 1
+    assert data["dynamic_inputs"]["live_news_confirmations"] == 1
+    assert memory["early_warning_score"] > 92
+    assert memory["price_range"] == "spot +4% to +9%"
+    assert memory["live_news_confirmations"][0]["source"] == "Channel Checks (test)"

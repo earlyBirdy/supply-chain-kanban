@@ -215,6 +215,43 @@ AI agents are the brain and hands: they sense supplier, shipment, inventory, qua
 
 The main UI stays focused on one project-status page: summary KPIs, top major issues, E2E flow, AI Leader Dashboard, selected decision, and AI Agent Workbench. Semi-automated Sense -> Recommend -> Execute + Prove triage helps the user move from signal to action without hiding the approval gate.
 
+
+## Simple overall status UI
+
+Based on the updated dashboard direction, the default UI now starts with an **Overall Supply Chain Status** control-room panel before the detailed board. It answers five questions first: are we OK, what changed, what action is recommended, who approves it, and what proof will be attached.
+
+The simple operator flow is:
+
+```text
+Overall status
+  -> Next best action
+  -> Major issues only
+  -> Project E2E flow
+  -> AI Leader Dashboard
+  -> Drill down only when needed
+```
+
+The dashboard keeps ERP/MES/WMS/TMS records, raw RSS feeds, and model internals behind source references. The first screen shows health, major issues, approvals, ready/blocked actions, proof count, and news/radar signals. The next-action box shows issue, affected object, recommended action, approval owner, target system, and proof.
+
+Dynamic improvement loop:
+
+```text
+live news source catalog
+  -> Commodity Arrangement Desk
+  -> dynamic Commodity Trend Radar
+  -> dynamic autoresearch queue
+  -> human approval
+  -> governed writeback + EvidenceReceipt / BlockchainAnchor-ready proof
+```
+
+New UI/API contracts:
+
+- `/operator/overall_status` gives the simple control-room summary.
+- `/news/source-catalog` explains dynamic news/source coverage for commodity arrangement.
+- `/commodity_trends/` now refreshes radar scores when latest news rows match a commodity family.
+- `/agent_skills/` now exposes a dynamic autoresearch queue when live signals should improve prediction quality.
+- `docs/product/SIMPLE_OVERALL_STATUS_UI.md` documents the operator-first layout.
+
 ## Power Templates
 
 Power Templates show what the AI agent can do in realistic supply-chain situations:

@@ -27,6 +27,55 @@ class NewsItemIn(BaseModel):
 class NewsIngestRequest(BaseModel):
     items: List[NewsItemIn] = Field(default_factory=list)
 
+
+@router.get("/source-catalog")
+def commodity_news_source_catalog(topic: str = "commodities"):
+    """Explain dynamic source coverage used by commodity arrangements.
+
+    This is a UI contract: raw sources can be RSS/API/manual research today,
+    but the dashboard shows source confidence and business mapping rather than
+    a headline-first feed.
+    """
+
+    rows: List[Dict[str, Any]] = []
+    try:
+        rows = all(
+            """SELECT source, COUNT(*) AS item_count, MAX(fetched_at) AS latest_fetched_at, AVG(severity) AS avg_severity
+                 FROM news_items
+                 WHERE topic=:topic
+                 GROUP BY source
+                 ORDER BY item_count DESC, latest_fetched_at DESC
+                 LIMIT 12""",
+            topic=str(topic),
+        )
+    except Exception:
+        rows = []
+    if not rows:
+        rows = [
+            {"source": "Commodity Desk (demo)", "item_count": 1, "latest_fetched_at": None, "avg_severity": 84},
+            {"source": "Channel Checks (demo)", "item_count": 1, "latest_fetched_at": None, "avg_severity": 78},
+            {"source": "Logistics Brief (demo)", "item_count": 1, "latest_fetched_at": None, "avg_severity": 71},
+        ]
+    return {
+        "ok": True,
+        "topic": topic,
+        "title": "Dynamic live news sources for commodity arrangement",
+        "source_types": ["RSS", "market API", "supplier portal note", "manual analyst research", "ERP/MES exception context"],
+        "mapping_contract": [
+            "publisher/source",
+            "published time",
+            "source confidence",
+            "affected commodity/material",
+            "price range",
+            "BOM exposure",
+            "recommended arrangement",
+            "approval owner",
+            "evidence hash",
+        ],
+        "refresh_policy": "ingest/check-now updates news items, Commodity Arrangement Desk, Commodity Trend Radar, and dynamic autoresearch queue",
+        "sources": rows,
+    }
+
 @router.get("/items")
 def list_news_items(
     topic: str | None = None,

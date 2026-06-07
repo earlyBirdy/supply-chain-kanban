@@ -50,3 +50,22 @@ def test_commodity_arrangement_api_and_mirror_are_available_without_db() -> None
     assert body["cards"]
     assert body["cards"][0]["recommended_arrangement"]
     assert "source confidence" in " ".join(body["simple_ui_cards"]).lower()
+
+
+def test_commodity_arrangement_cards_include_dynamic_radar_context() -> None:
+    data = build_arrangement_packet([
+        {
+            "topic": "commodities",
+            "source": "Channel Checks (test)",
+            "title": "DRAM spot prices change",
+            "summary": "Buyer should review timing",
+            "severity": 78,
+            "signals": {"category": "dram", "arrangement": "review_buy_timing", "source_confidence": 0.74, "bom_exposure": ["server_dram"]},
+        }
+    ])
+
+    card = data["cards"][0]
+    assert data["dynamic_behavior"]["news_items_used"] == 1
+    assert card["radar_score"] is not None
+    assert card["latest_news_confirmation_count"] >= 1
+    assert "Commodity Trend Radar" in card["dynamic_refresh_reason"]

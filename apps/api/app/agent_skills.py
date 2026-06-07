@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterable, List
 
 
 def _hash_payload(payload: Dict[str, Any]) -> str:
@@ -97,7 +97,7 @@ _AUTO_RESEARCH_EXTENSIONS: List[Dict[str, Any]] = [
 ]
 
 
-def build_agent_skill_catalog() -> Dict[str, Any]:
+def build_agent_skill_catalog(live_signals: Iterable[Dict[str, Any]] | None = None) -> Dict[str, Any]:
     skills: List[Dict[str, Any]] = []
     for skill in _AGENT_SKILLS:
         enriched = dict(skill)
@@ -115,6 +115,17 @@ def build_agent_skill_catalog() -> Dict[str, Any]:
         enriched["extension_hash"] = _hash_payload(enriched)
         extensions.append(enriched)
 
+    live_rows = list(live_signals or [])
+    dynamic_research_queue = []
+    if live_rows:
+        dynamic_research_queue.append({
+            "queue_id": "dynamic_live_news_to_arrangement",
+            "label": "Live news → commodity arrangement tuning",
+            "live_signal_count": len(live_rows),
+            "trigger": "new commodity/news rows arrived and should update arrangement cards plus Commodity Trend Radar",
+            "operator_question": "Did the latest news change buy timing, buffer, LTA, alternate supplier, expedite, or allocation decision?",
+            "promotion_gate": "only promote mapping rules that improve approved-arrangement precision and reduce irrelevant headline alerts",
+        })
     return {
         "ok": True,
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -128,6 +139,12 @@ def build_agent_skill_catalog() -> Dict[str, Any]:
         "skill_lanes": ["sense", "map", "predict", "recommend", "approve", "execute", "prove", "research"],
         "skills": skills,
         "autoresearch_extensions": extensions,
+        "dynamic_auto_research": {
+            "live_signal_count": len(live_rows),
+            "queue": dynamic_research_queue,
+            "refresh_policy": "when live news changes, rebuild Commodity Trend Radar, regenerate arrangement cards, then open research only for measurable prediction improvement",
+            "human_stop_rule": "research may change score/summary; ERP/MES writeback still requires approval",
+        },
         "operating_loop": [
             "clarify business ask or ingest live signal",
             "map ERP/MES/WMS/TMS/news records to ontology objects",

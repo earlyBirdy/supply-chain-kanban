@@ -1,0 +1,45 @@
+{
+  "title": "Overall Supply Chain Status sample",
+  "health": "approval_needed",
+  "headline": "Supply chain is waiting for human approval.",
+  "status_cards": [
+    {
+      "label": "Health",
+      "value": "approval_needed",
+      "explain": "S&OP decision is waiting for manager approval"
+    },
+    {
+      "label": "Major issues",
+      "value": 4,
+      "explain": "Top high-risk/approval/blocked cases only"
+    },
+    {
+      "label": "Approvals",
+      "value": 2,
+      "explain": "Human gates before ERP/MES writeback"
+    },
+    {
+      "label": "Ready / blocked",
+      "value": "1 / 0",
+      "explain": "Actions ready versus blocked"
+    },
+    {
+      "label": "Proof",
+      "value": 8,
+      "explain": "Evidence receipts plus blockchain-ready proofs"
+    },
+    {
+      "label": "News/radar",
+      "value": "3 / 3",
+      "explain": "Live news rows used / top radar risks"
+    }
+  ],
+  "next_best_action": {
+    "issue": "DRAM buy timing review",
+    "affected_object": "server_dram / edge_ai_memory",
+    "recommended_action": "review_buy_timing",
+    "approval_owner": "commodity_manager",
+    "target_system": "ERP purchase plan after approval",
+    "proof": "sha256-demo-proof-hash"
+  }
+}
