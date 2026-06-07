@@ -441,6 +441,20 @@ Signal -> Kanban case -> Recommendation -> Approval -> Execution -> Receipt -> A
 Every feature must make that loop faster, safer, or easier for a supply-chain manager to explain.
 
 
+
+## Dashboard ontology enhancement
+
+The dashboard now includes an ontology enhancement path for ERP/MES + AI agent + blockchain proof + simple UX/UI:
+
+- **ERP/MES/WMS/TMS source mapping**: source records stay traceable through `SourceSystemConnector` and `SourceRecordReference` instead of becoming raw dashboard tables.
+- **Agent skills + autoresearch extension**: `/agent_skills/` exposes skills for clarify → map → convert news to risk → build decision packet → governed handoff, plus bounded research sprints for prediction improvement.
+- **Live news for commodity arrangements**: `/news/items` and `/news/check-now?topic=commodities` convert commodity headlines into risk signals with source confidence, time period, price range, BOM exposure, and recommended arrangements.
+- **Commodity Trend Radar**: `/commodity_trends/` ranks IT/Defense commodities with early-warning score, source confidence, price range, BOM exposure, approval gate, and proof hash.
+- **Blockchain-ready proof**: decisions keep `EvidenceReceipt`, `WritebackReceipt`, `BlockchainAnchor`, evidence hash, and decision hash as proof; blockchain is an evidence layer, not the operational database.
+- **Simple UX rule**: default view shows the top issue, affected object, recommended action, approval owner, target system, and proof. Raw ERP/MES records remain available through source references.
+
+See `docs/product/DASHBOARD_ONTOLOGY_ENHANCEMENT.md` for the implementation map.
+
 ## Hugging Face demo
 
 Public demo: https://huggingface.co/spaces/earlyBirdy/supply-chain-kanban

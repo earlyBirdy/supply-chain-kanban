@@ -1,0 +1,34 @@
+from __future__ import annotations
+
+from fastapi.testclient import TestClient
+
+from app.agent_skills import build_agent_skill_catalog
+from app.api_main import create_app
+
+
+def test_agent_skill_catalog_exposes_governed_skills_and_autoresearch() -> None:
+    data = build_agent_skill_catalog()
+
+    assert data["ok"] is True
+    assert "simple" in data["simple_ui_rule"].lower()
+    skill_ids = {row["skill_id"] for row in data["skills"]}
+    assert "source_map_erp_mes" in skill_ids
+    assert "commodity_news_to_risk" in skill_ids
+    assert "build_decision_packet" in skill_ids
+    assert all(len(row["skill_hash"]) == 64 for row in data["skills"])
+    extension_ids = {row["extension_id"] for row in data["autoresearch_extensions"]}
+    assert "commodity_arrangement_research" in extension_ids
+    assert "require human approval" in " ".join(data["operating_loop"])
+
+
+def test_agent_skills_api_and_api_mirror_are_available_without_db() -> None:
+    client = TestClient(create_app())
+
+    direct = client.get("/agent_skills/")
+    mirror = client.get("/api/agent_skills/")
+
+    assert direct.status_code == 200
+    assert mirror.status_code == 200
+    body = direct.json()
+    assert body["title"] == "Agent Skills + Autoresearch Extension Catalog"
+    assert body["skills"][0]["ux_surface"]

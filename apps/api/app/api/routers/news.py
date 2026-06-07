@@ -125,7 +125,7 @@ def check_now(request: Request, topic: str = "memory"):
             "published_at": now,
             "summary": "Demo live-news signal: port congestion and supplier confirmation gaps may require battery allocation rebalance and alternate routing.",
             "severity": 84,
-            "signals": {"category": "lfp_battery", "theme": "delay", "arrangement": "rebalance_allocation"},
+            "signals": {"category": "lfp_battery", "theme": "delay", "arrangement": "rebalance_allocation", "source_confidence": 0.78, "time_period": "current week", "price_range": "freight premium +4% to +9%", "bom_exposure": ["battery_cells_lfp", "EV launch packs"], "approval_owner": "ops_lead"},
         },
         {
             "topic": topic,
@@ -135,7 +135,7 @@ def check_now(request: Request, topic: str = "memory"):
             "published_at": now,
             "summary": "Multiple channel checks cite excess server DRAM inventory leaking into spot markets, creating a buy-timing review opportunity.",
             "severity": 78,
-            "signals": {"category": "dram", "theme": "price", "market": "spot", "arrangement": "review_buy_timing"},
+            "signals": {"category": "dram", "theme": "price", "market": "spot", "arrangement": "review_buy_timing", "source_confidence": 0.74, "time_period": "last 30 days", "price_range": "spot -3% to -8%, contract watch", "bom_exposure": ["server_dram", "edge_ai_memory"], "approval_owner": "commodity_manager"},
         },
         {
             "topic": topic,
@@ -145,7 +145,7 @@ def check_now(request: Request, topic: str = "memory"):
             "published_at": now,
             "summary": "Freight disruption may affect inbound ETA for constrained components; AI should compare buffer stock, alternate supplier, and expedite cost.",
             "severity": 71,
-            "signals": {"category": "copper_components", "theme": "lead_time", "arrangement": "buffer_or_expedite"},
+            "signals": {"category": "copper_components", "theme": "lead_time", "arrangement": "buffer_or_expedite", "source_confidence": 0.71, "time_period": "current quarter", "price_range": "expedite cost +6% to +15%", "bom_exposure": ["industrial_components", "power_harness"], "approval_owner": "supply_chain_manager"},
         },
     ]
 

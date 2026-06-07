@@ -1,8 +1,9 @@
 version: '1.0'
 name: SupplyChainOntology
-description: Canonical ontology contract for the Supply Chain AI Agent enterprise demo. It defines business objects, source-system
-  mappings, AI-agent decision packets, blockchain-ready evidence datasets, and simple UI views shared by human operators and
-  governed automation.
+description: Canonical ontology contract for the Supply Chain AI Agent enterprise
+  demo. It defines business objects, source-system mappings, AI-agent decision packets,
+  blockchain-ready evidence datasets, and simple UI views shared by human operators
+  and governed automation.
 contract:
   canonical: true
   revision: continuous-improvement
@@ -197,7 +198,8 @@ object_types:
         type: string
         optional: true
   ForecastPlan:
-    description: Demand-planning object that links customer forecast, ERP demand, constrained supply, and finance exposure.
+    description: Demand-planning object that links customer forecast, ERP demand,
+      constrained supply, and finance exposure.
     key: forecast_id
     properties:
       forecast_id:
@@ -226,7 +228,8 @@ object_types:
         - CSV
         - planner_override
   InventoryPosition:
-    description: Current and projected inventory view across ERP/WMS/MES for shortage, excess, and allocation reasoning.
+    description: Current and projected inventory view across ERP/WMS/MES for shortage,
+      excess, and allocation reasoning.
     key: inventory_position_id
     properties:
       inventory_position_id:
@@ -255,7 +258,8 @@ object_types:
         - MES
         - CSV
   PartnerPerformanceMetric:
-    description: Supplier, carrier, or factory performance KPI used by the AI agent to rank risk and recovery actions.
+    description: Supplier, carrier, or factory performance KPI used by the AI agent
+      to rank risk and recovery actions.
     key: metric_id
     properties:
       metric_id:
@@ -286,7 +290,8 @@ object_types:
         type: string
         optional: true
   NewsRiskSignal:
-    description: News-derived commodity, logistics, supplier, or geopolitical risk signal before the risk appears inside ERP/MES.
+    description: News-derived commodity, logistics, supplier, or geopolitical risk
+      signal before the risk appears inside ERP/MES.
     key: news_signal_id
     properties:
       news_signal_id:
@@ -311,7 +316,8 @@ object_types:
       observed_at:
         type: datetime
   AgentDecision:
-    description: Human-readable AI decision packet connecting evidence, recommendation, approval, and writeback.
+    description: Human-readable AI decision packet connecting evidence, recommendation,
+      approval, and writeback.
     key: decision_id
     properties:
       decision_id:
@@ -580,8 +586,8 @@ object_types:
       payload:
         type: object
   ExternalDataSource:
-    description: Named external source that feeds traceability evidence, such as ERP, WMS, IoT, supplier portal, news, or
-      audit data.
+    description: Named external source that feeds traceability evidence, such as ERP,
+      WMS, IoT, supplier portal, news, or audit data.
     key: source_id
     properties:
       source_id:
@@ -602,8 +608,8 @@ object_types:
         type: string
         optional: true
   TraceabilityEvent:
-    description: Case-linked physical or operating event observed from an external data source and validated before buyer-facing
-      use.
+    description: Case-linked physical or operating event observed from an external
+      data source and validated before buyer-facing use.
     key: event_id
     properties:
       event_id:
@@ -631,7 +637,8 @@ object_types:
         type: object
         optional: true
   EvidenceReceipt:
-    description: Buyer-facing proof summary derived from traceability events with validation status and evidence confidence.
+    description: Buyer-facing proof summary derived from traceability events with
+      validation status and evidence confidence.
     key: receipt_id
     properties:
       receipt_id:
@@ -653,7 +660,8 @@ object_types:
         type: object
         optional: true
   BlockchainAnchor:
-    description: Ledger proof stub for anchoring an EvidenceReceipt hash. It proves anchoring intent, not raw-world truth.
+    description: Ledger proof stub for anchoring an EvidenceReceipt hash. It proves
+      anchoring intent, not raw-world truth.
     key: anchor_id
     properties:
       anchor_id:
@@ -677,20 +685,22 @@ object_types:
         type: object
         optional: true
   CommodityRiskSignal:
-    description: Ontology-linked commodity risk signal created from news, market, supplier, price, policy, and BOM evidence;
-      not a headline-only feed.
+    description: Ontology-linked commodity risk signal created from news, market,
+      supplier, price, policy, and BOM evidence; not a headline-only feed.
     key: commodity_risk_id
     properties:
       commodity_risk_id:
         type: string
       commodity_family:
         type: string
-        description: 'Examples: memory, advanced_packaging, critical_minerals, rare_earth_magnets, defense_metals, high_reliability_passives.'
+        description: 'Examples: memory, advanced_packaging, critical_minerals, rare_earth_magnets,
+          defense_metals, high_reliability_passives.'
       materials:
         type: array
         items:
           type: string
-        description: Affected materials such as HBM, DDR5, DRAM, NAND, SSD, ABF substrate, gallium, germanium, tungsten, antimony.
+        description: Affected materials such as HBM, DDR5, DRAM, NAND, SSD, ABF substrate,
+          gallium, germanium, tungsten, antimony.
       risk_stage:
         type: string
         enum:
@@ -735,8 +745,8 @@ object_types:
       created_at:
         type: datetime
   EvidenceSource:
-    description: Source record used by a prediction packet with source confidence, extraction confidence, publish date, and
-      evidence-quality score.
+    description: Source record used by a prediction packet with source confidence,
+      extraction confidence, publish date, and evidence-quality score.
     key: source_id
     properties:
       source_id:
@@ -779,8 +789,8 @@ object_types:
         type: string
         optional: true
   PriceRangeSignal:
-    description: Price range / market movement signal for contract price, spot price, supplier quote, stock/ETF confirmation,
-      or FX exposure.
+    description: Price range / market movement signal for contract price, spot price,
+      supplier quote, stock/ETF confirmation, or FX exposure.
     key: price_signal_id
     properties:
       price_signal_id:
@@ -810,7 +820,8 @@ object_types:
       source_confidence:
         type: number
   ErpMesWmsTmsMetadataMap:
-    description: ERP/MES/WMS/TMS-compatible metadata block that preserves interconnection keys for writeback and audit.
+    description: ERP/MES/WMS/TMS-compatible metadata block that preserves interconnection
+      keys for writeback and audit.
     key: metadata_map_id
     properties:
       metadata_map_id:
@@ -875,28 +886,34 @@ object_types:
         type: string
         optional: true
   HumanContext5W:
-    description: 人事時地物 explanation context for planner-facing and audit-facing shortage predictions.
+    description: 人事時地物 explanation context for planner-facing and audit-facing shortage
+      predictions.
     key: human_context_id
     properties:
       human_context_id:
         type: string
       who_people_orgs:
         type: object
-        description: '人: suppliers, vendor IDs, affected customers, industries, approval owner.'
+        description: '人: suppliers, vendor IDs, affected customers, industries, approval
+          owner.'
       what_changed:
         type: object
-        description: '事: demand acceleration, supplier capacity shift, price movement, lead-time risk, quote-validity change.'
+        description: '事: demand acceleration, supplier capacity shift, price movement,
+          lead-time risk, quote-validity change.'
       when_timeline:
         type: object
-        description: '時: lookback period, weak-signal date, trend-formation date, headline-confirmation date, prediction window.'
+        description: '時: lookback period, weak-signal date, trend-formation date,
+          headline-confirmation date, prediction window.'
       where_locations:
         type: object
-        description: '地: supplier regions, plants, warehouses, logistics lanes, customer markets.'
+        description: '地: supplier regions, plants, warehouses, logistics lanes, customer
+          markets.'
       which_objects:
         type: object
         description: '物: materials, ERP material IDs, BOM IDs, SKUs, POs, WOs, lots/batches.'
   SupplyChainRiskReview:
-    description: Primary planner-facing Supply Chain Risk Review / S&OP Exception Report view for a shortage prediction.
+    description: Primary planner-facing Supply Chain Risk Review / S&OP Exception
+      Report view for a shortage prediction.
     key: risk_review_id
     properties:
       risk_review_id:
@@ -929,8 +946,8 @@ object_types:
         items:
           type: string
   RcaAppendix5Why8DLite:
-    description: Supporting RCA/corrective-action appendix. 5 Why and 8D-lite help explain root cause but are not the primary
-      supply-chain view.
+    description: Supporting RCA/corrective-action appendix. 5 Why and 8D-lite help
+      explain root cause but are not the primary supply-chain view.
     key: rca_appendix_id
     properties:
       rca_appendix_id:
@@ -941,11 +958,12 @@ object_types:
           type: object
       eight_d_lite:
         type: object
-        description: D1 owner/team, D2 problem, D3 containment, D4 root cause, D5 action, D6 validation, D7 recurrence prevention,
-          D8 evidence closure.
+        description: D1 owner/team, D2 problem, D3 containment, D4 root cause, D5
+          action, D6 validation, D7 recurrence prevention, D8 evidence closure.
   CommodityPredictionPacket:
-    description: Machine-readable shortage prediction packet linking planner summary, Supply Chain Risk Review, 人事時地物, ERP/MES/WMS/TMS
-      keys, sources, price ranges, AI prediction, and evidence hashes.
+    description: Machine-readable shortage prediction packet linking planner summary,
+      Supply Chain Risk Review, 人事時地物, ERP/MES/WMS/TMS keys, sources, price ranges,
+      AI prediction, and evidence hashes.
     key: prediction_id
     properties:
       prediction_id:
@@ -966,8 +984,9 @@ object_types:
         type: string
       planner_summary:
         type: string
-        description: For the last 6 months, memory showed rising AI demand, supplier capacity shift, price momentum, stock/ETF
-          confirmation, and BOM exposure. The news headline confirms a trend already detected earlier.
+        description: For the last 6 months, memory showed rising AI demand, supplier
+          capacity shift, price momentum, stock/ETF confirmation, and BOM exposure.
+          The news headline confirms a trend already detected earlier.
       risk_review_ref:
         type: string
         optional: true
@@ -1021,8 +1040,8 @@ object_types:
       action_receipt_id:
         type: string
   SourceSystemConnector:
-    description: ERP/MES/WMS/TMS/supplier/news/blockchain connector profile used to control read-only sync, approval-gated
-      writeback, trust tier, and field mapping.
+    description: ERP/MES/WMS/TMS/supplier/news/blockchain connector profile used to
+      control read-only sync, approval-gated writeback, trust tier, and field mapping.
     key: connector_id
     canonical_table: source_system_connectors
     properties:
@@ -1067,8 +1086,8 @@ object_types:
         type: string
         optional: true
   SourceRecordReference:
-    description: Stable pointer back to the original ERP/MES/WMS/TMS/news/blockchain source row so every ontology object remains
-      auditable and writeback-safe.
+    description: Stable pointer back to the original ERP/MES/WMS/TMS/news/blockchain
+      source row so every ontology object remains auditable and writeback-safe.
     key: source_ref_id
     canonical_table: source_record_references
     properties:
@@ -1106,8 +1125,8 @@ object_types:
         - pending
         - rejected
   BillOfMaterialsExposure:
-    description: BOM-level exposure that links a constrained resource or commodity risk to affected SKUs, plants, orders,
-      work orders, and revenue/customer commitments.
+    description: BOM-level exposure that links a constrained resource or commodity
+      risk to affected SKUs, plants, orders, work orders, and revenue/customer commitments.
     key: bom_exposure_id
     canonical_table: bom_exposures
     properties:
@@ -1153,8 +1172,8 @@ object_types:
           type: string
         optional: true
   CapacityConstraint:
-    description: MES/plant capacity issue such as line loading, yield loss, downtime, manpower, tooling, or quality hold that
-      changes available supply.
+    description: MES/plant capacity issue such as line loading, yield loss, downtime,
+      manpower, tooling, or quality hold that changes available supply.
     key: constraint_id
     canonical_table: capacity_constraints
     properties:
@@ -1197,8 +1216,8 @@ object_types:
         type: number
         optional: true
   SAndOPException:
-    description: Planner-facing exception report that summarizes signal, exposure, scenario options, owner, approval, and
-      follow-up triggers.
+    description: Planner-facing exception report that summarizes signal, exposure,
+      scenario options, owner, approval, and follow-up triggers.
     key: exception_id
     canonical_table: sandop_exceptions
     properties:
@@ -1244,7 +1263,8 @@ object_types:
         - executed
         - closed
   AgentRun:
-    description: Trace of one AI-agent automation cycle from sensing to recommendation and proof generation.
+    description: Trace of one AI-agent automation cycle from sensing to recommendation
+      and proof generation.
     key: agent_run_id
     canonical_table: agent_runs
     properties:
@@ -1286,8 +1306,8 @@ object_types:
       human_review_required:
         type: boolean
   WritebackReceipt:
-    description: Receipt created after an approved action writes to ERP/MES/WMS/TMS/supplier portal or creates a simulated
-      writeback in the demo.
+    description: Receipt created after an approved action writes to ERP/MES/WMS/TMS/supplier
+      portal or creates a simulated writeback in the demo.
     key: writeback_receipt_id
     canonical_table: writeback_receipts
     properties:
@@ -1331,8 +1351,8 @@ object_types:
         type: string
         optional: true
   SimpleUIView:
-    description: 'Human-facing UI contract for a role-based dashboard view: what question it answers, which ontology objects
-      it uses, and which action it enables.'
+    description: 'Human-facing UI contract for a role-based dashboard view: what question
+      it answers, which ontology objects it uses, and which action it enables.'
     key: view_id
     canonical_table: simple_ui_views
     properties:
@@ -1364,6 +1384,88 @@ object_types:
         - drill_down
         - timeline
         - matrix
+  AgentSkill:
+    description: Small, auditable AI-agent capability used by the dashboard to clarify
+      asks, map source records, convert live signals, build decision packets, or hand
+      off governed actions.
+    key: skill_id
+    properties:
+      skill_id:
+        type: string
+      label:
+        type: string
+      trigger:
+        type: string
+      inputs:
+        type: array
+        items:
+          type: string
+      outputs:
+        type: array
+        items:
+          type: string
+      ux_surface:
+        type: string
+      skill_hash:
+        type: string
+        optional: true
+  AutoresearchExperiment:
+    description: Bounded, measurable experiment for forecast, capacity, supplier,
+      inventory, or commodity-news prediction improvements. It is not allowed to change
+      production decisions without promotion evidence and human approval.
+    key: run_tag
+    properties:
+      run_tag:
+        type: string
+      hypothesis:
+        type: string
+      input_dataset:
+        type: string
+      baseline_metric:
+        type: object
+      candidate_metric:
+        type: object
+      operator_impact:
+        type: string
+      promotion_decision:
+        type: string
+        enum:
+        - reject
+        - keep
+        - promote
+      evidence_hash:
+        type: string
+      approved_by:
+        type: string
+        optional: true
+  SimpleUXDecisionCard:
+    description: Manager-facing simplified card that hides raw ERP/MES rows by default
+      while preserving source references, approval owner, target system, and proof.
+    key: ux_card_id
+    properties:
+      ux_card_id:
+        type: string
+      primary_question:
+        type: string
+      affected_objects:
+        type: array
+        items:
+          type: string
+      recommended_action:
+        type: string
+      approval_owner:
+        type: string
+      target_system:
+        type: string
+      proof_refs:
+        type: array
+        items:
+          type: string
+      source_record_refs:
+        type: array
+        items:
+          type: string
+        optional: true
 relationships:
 - name: Case_targets_Resource
   from: Case
@@ -1741,7 +1843,8 @@ action_types:
         - medium
         - high
   UpdateCardStatus:
-    description: Update a KanbanCard status using the canonical lifecycle model and policy guardrails.
+    description: Update a KanbanCard status using the canonical lifecycle model and
+      policy guardrails.
     catalog_ref: contracts/action_catalog.yaml#actions.UpdateCardStatus
     policy_ref: contracts/lifecycle_model.yaml#objects.kanban_card
     payload_schema:
@@ -1770,20 +1873,26 @@ action_types:
 governance:
   guardrails:
   - name: RequireHumanApprovalAboveThreshold
-    description: For risk_score >= 85, require explicit human approval before executing typed actions.
+    description: For risk_score >= 85, require explicit human approval before executing
+      typed actions.
   - name: TypedActionsOnly
-    description: Agents and humans must mutate operating state only through the action catalog; raw table writes are out of
-      contract.
+    description: Agents and humans must mutate operating state only through the action
+      catalog; raw table writes are out of contract.
 integration_model:
   strategy: read_only_first_then_approval_gated_writeback
   system_roles:
-    ERP: Purchase orders, sales orders, inventory balance, supplier/material master, and financial exposure.
-    MES: Production orders, yield, scrap, downtime, IQC/OQC quality holds, and line capacity.
+    ERP: Purchase orders, sales orders, inventory balance, supplier/material master,
+      and financial exposure.
+    MES: Production orders, yield, scrap, downtime, IQC/OQC quality holds, and line
+      capacity.
     WMS: Inbound/outbound stock movement, pick-pack status, and warehouse exceptions.
     TMS: Shipment ETA, carrier delay, route risk, and premium freight cost.
-    SupplierPortal: Confirmations, ASN, capacity promises, OTIF exceptions, and escalation tickets.
-    NewsMonitor: Commodity, logistics, supplier, and geopolitical signals converted into NewsRiskSignal objects.
-    BlockchainEvidence: Tamper-evident anchors for EvidenceReceipt hashes after approval/writeback, not the operational database.
+    SupplierPortal: Confirmations, ASN, capacity promises, OTIF exceptions, and escalation
+      tickets.
+    NewsMonitor: Commodity, logistics, supplier, and geopolitical signals converted
+      into NewsRiskSignal objects.
+    BlockchainEvidence: Tamper-evident anchors for EvidenceReceipt hashes after approval/writeback,
+      not the operational database.
   ai_agent_loop:
   - Sense ERP/MES/WMS/TMS/supplier/news signals.
   - Map facts into ontology objects and relationships.
@@ -1796,8 +1905,9 @@ integration_model:
   - Keep forecast, inventory, partner KPI, and IOP action cards on one page.
   - Explain each decision in CFO language: cost, risk, service, approval, proof.
   - Keep blockchain evidence visible but outside the default operational path.
-  metadata_rule: Every news, market, supplier, price, BOM, and AI prediction signal must preserve ERP/MES/WMS/TMS-compatible
-    keys for interconnection, approval-gated writeback, and audit.
+  metadata_rule: Every news, market, supplier, price, BOM, and AI prediction signal
+    must preserve ERP/MES/WMS/TMS-compatible keys for interconnection, approval-gated
+    writeback, and audit.
   planner_facing_layers:
     primary_view: Supply Chain Risk Review / S&OP Exception Report
     supporting_rca: 5 Why + 8D-lite appendix
@@ -1819,13 +1929,14 @@ integration_model:
   - action_receipt_id
   layers:
   - layer: 1. Source system connector
-    purpose: Read ERP/MES/WMS/TMS/supplier/news data without disrupting the system of record.
+    purpose: Read ERP/MES/WMS/TMS/supplier/news data without disrupting the system
+      of record.
     ontology_objects:
     - SourceSystemConnector
     - SourceRecordReference
   - layer: 2. Canonical business ontology
-    purpose: Normalize rows into orders, inventory, production, BOM exposure, partner KPIs, capacity constraints, and risk
-      cases.
+    purpose: Normalize rows into orders, inventory, production, BOM exposure, partner
+      KPIs, capacity constraints, and risk cases.
     ontology_objects:
     - Order
     - InventoryPosition
@@ -1835,7 +1946,8 @@ integration_model:
     - PartnerPerformanceMetric
     - Case
   - layer: 3. AI-agent automation
-    purpose: Sense, map, detect, predict, recommend, request approval, and produce a receipt.
+    purpose: Sense, map, detect, predict, recommend, request approval, and produce
+      a receipt.
     ontology_objects:
     - AgentRun
     - NewsRiskSignal
@@ -1849,14 +1961,15 @@ integration_model:
     - EvidenceReceipt
     - AuditEvent
   - layer: 5. Evidence + blockchain dataset
-    purpose: Keep operational data in the database while anchoring hashes/receipts for tamper-evident proof.
+    purpose: Keep operational data in the database while anchoring hashes/receipts
+      for tamper-evident proof.
     ontology_objects:
     - TraceabilityEvent
     - EvidenceReceipt
     - BlockchainAnchor
   - layer: 6. Simple user experience
-    purpose: Show top issues, next decision, affected object, action, approval owner, target system, and proof; hide raw tables
-      by default.
+    purpose: Show top issues, next decision, affected object, action, approval owner,
+      target system, and proof; hide raw tables by default.
     ontology_objects:
     - SimpleUIView
     - SAndOPException
@@ -1984,7 +2097,8 @@ integration_model:
     - writeback without receipt
     - evidence without source reference
   news_prediction_model:
-    purpose: Convert headlines and market feeds into ontology-linked risk signals instead of a news-only feed.
+    purpose: Convert headlines and market feeds into ontology-linked risk signals
+      instead of a news-only feed.
     minimum_packet_fields:
     - human_context
     - source_confidence
@@ -1996,9 +2110,11 @@ integration_model:
     - bom_exposure
     - recommended_actions
     - follow_up_triggers
-    memory_window: 6-12 month weak-signal window before mainstream shortage headlines when data is available.
+    memory_window: 6-12 month weak-signal window before mainstream shortage headlines
+      when data is available.
   blockchain_dataset_model:
-    operational_truth: Postgres/API tables remain the operational source of truth for the dashboard and approvals.
+    operational_truth: Postgres/API tables remain the operational source of truth
+      for the dashboard and approvals.
     anchored_dataset:
     - EvidenceReceipt
     - WritebackReceipt
@@ -2011,10 +2127,11 @@ integration_model:
     - action_receipt_id
     - timestamp
     - validation_status
-    rule: Anchor hashes/proofs only; do not make blockchain the default operational database.
+    rule: Anchor hashes/proofs only; do not make blockchain the default operational
+      database.
   simple_ui_experience:
-    home_question: What are the top major issues, what action is recommended, who must approve, which system changes, and
-      what proof is kept?
+    home_question: What are the top major issues, what action is recommended, who
+      must approve, which system changes, and what proof is kept?
     default_cards:
     - Major issues
     - AI Leader Dashboard
@@ -2038,3 +2155,22 @@ integration_model:
       cfo: revenue/cost exposure, approval policy, proof
       plant_manager: capacity, yield, quality hold, OQC release
       supplier_manager: OTIF, ASN, confirmation, escalation
+dashboard_enhancement_blueprint:
+  goal: Improve the supply-chain dashboard with ERP/MES integration, AI agent skills,
+    blockchain-ready proof, commodity/news radar, and simple UX/UI.
+  simple_ui_question: What is the top issue, what object is affected, what action
+    is recommended, who approves it, where will it write back, and what proof exists?
+  layers:
+  - ERP/MES/WMS/TMS/supplier/news source records
+  - canonical ontology and source references
+  - AI agent skills and bounded autoresearch extension
+  - Commodity Trend Radar and live news risk conversion
+  - human approval gate and governed writeback
+  - EvidenceReceipt, WritebackReceipt, BlockchainAnchor proof
+  new_runtime_endpoints:
+  - /agent_skills/
+  - /commodity_trends/
+  - /news/items
+  - /news/check-now
+  ux_default: Major issues first; drill down to source records only when the operator
+    asks for evidence or writeback details.

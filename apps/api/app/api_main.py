@@ -45,6 +45,7 @@ from .api.routers import (
     news,
     operator,
     commodity_trends,
+    agent_skills,
 )
 
 
@@ -204,6 +205,7 @@ def create_app() -> FastAPI:
         app.include_router(news.router, prefix=f"{prefix}/news", tags=["news"])
         app.include_router(operator.router, prefix=f"{prefix}/operator", tags=["operator"])
         app.include_router(commodity_trends.router, prefix=f"{prefix}/commodity_trends", tags=["commodity_trends"])
+        app.include_router(agent_skills.router, prefix=f"{prefix}/agent_skills", tags=["agent_skills"])
         app.include_router(demo.router, prefix=f"{prefix}/demo", tags=["demo"])
 
     _include_api("")

@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "sample_static",
+  "generated_at": "2026-06-07T01:10:38.451293+00:00",
   "title": "IT / Defense Commodity Trend Radar",
   "prediction_window": "coming 6-12 months",
   "principle": "Do not wait for mainstream shortage headlines. Watch weak signals from demand acceleration, supplier capacity allocation, price momentum, export controls, BOM exposure, and quote/lead-time changes.",
@@ -13,7 +13,10 @@
       "geopolitical_or_export_control_stress",
       "BOM_exposure",
       "supplier_lead_time_change",
-      "news_confirmation"
+      "news_confirmation",
+      "source_confidence",
+      "price_range",
+      "ERP_MES_BOM_exposure"
     ],
     "stage_model": [
       "weak_signal",
@@ -48,7 +51,19 @@
         "Run margin and customer-price scenario before quote renewal"
       ],
       "human_approval_gate": "CFO or supply-chain leader approval before purchase commit, price adjustment, or customer allocation change.",
-      "evidence_hash": "8c46e53cad394e2cd3743e19ade58859d3d6625345a3c01decde39f3a18d5688"
+      "source_confidence": 0.82,
+      "time_period": "last 6 months",
+      "price_range": "+8% to +22% contract/spot pressure",
+      "bom_exposure_summary": "AI servers, rugged edge AI, telecom and defense processing boards",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "468306b0d4835ca6f79b7181640ae6f62b4bb794eeceb2e9172a429b49ea040e"
     },
     {
       "commodity_id": "advanced_packaging_abf_cowos_interposer",
@@ -76,7 +91,19 @@
         "Reserve packaging slots for defense/high-margin programs first"
       ],
       "human_approval_gate": "Engineering + program approval before BOM substitution or priority allocation.",
-      "evidence_hash": "361b404a45744dc8897d8f8eedc817a1daa59f957fbbd10d44590183d7b95610"
+      "source_confidence": 0.78,
+      "time_period": "last 2 quarters",
+      "price_range": "+5% to +18% packaging slot premium",
+      "bom_exposure_summary": "GPU/accelerator boards, HPC modules, high-bandwidth networking ASICs",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "c188c8120a895d1e7c3b74617379f245c356d08bdaf36758ba86715091a0f4cf"
     },
     {
       "commodity_id": "critical_semiconductor_minerals",
@@ -104,7 +131,19 @@
         "Hold safety stock for long-lifecycle defense and telecom products"
       ],
       "human_approval_gate": "Compliance + engineering approval before alternate mineral source or qualified-part substitution.",
-      "evidence_hash": "941cd3e4c112b70ea2860b1421ad64f92b79f3290ed4f03fb54fdd6c5168e2c3"
+      "source_confidence": 0.76,
+      "time_period": "current quarter",
+      "price_range": "spot premiums vary by origin and license status",
+      "bom_exposure_summary": "RF, optics, photonics, satellite payloads, wide-bandgap power",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "9098e028aaaad21c10f4fb884b80ca84fb81c6db578720b341efe56034728a83"
     }
   ],
   "watchlist": [
@@ -134,7 +173,19 @@
         "Run margin and customer-price scenario before quote renewal"
       ],
       "human_approval_gate": "CFO or supply-chain leader approval before purchase commit, price adjustment, or customer allocation change.",
-      "evidence_hash": "8c46e53cad394e2cd3743e19ade58859d3d6625345a3c01decde39f3a18d5688"
+      "source_confidence": 0.82,
+      "time_period": "last 6 months",
+      "price_range": "+8% to +22% contract/spot pressure",
+      "bom_exposure_summary": "AI servers, rugged edge AI, telecom and defense processing boards",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "468306b0d4835ca6f79b7181640ae6f62b4bb794eeceb2e9172a429b49ea040e"
     },
     {
       "commodity_id": "advanced_packaging_abf_cowos_interposer",
@@ -162,7 +213,19 @@
         "Reserve packaging slots for defense/high-margin programs first"
       ],
       "human_approval_gate": "Engineering + program approval before BOM substitution or priority allocation.",
-      "evidence_hash": "361b404a45744dc8897d8f8eedc817a1daa59f957fbbd10d44590183d7b95610"
+      "source_confidence": 0.78,
+      "time_period": "last 2 quarters",
+      "price_range": "+5% to +18% packaging slot premium",
+      "bom_exposure_summary": "GPU/accelerator boards, HPC modules, high-bandwidth networking ASICs",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "c188c8120a895d1e7c3b74617379f245c356d08bdaf36758ba86715091a0f4cf"
     },
     {
       "commodity_id": "critical_semiconductor_minerals",
@@ -190,7 +253,19 @@
         "Hold safety stock for long-lifecycle defense and telecom products"
       ],
       "human_approval_gate": "Compliance + engineering approval before alternate mineral source or qualified-part substitution.",
-      "evidence_hash": "941cd3e4c112b70ea2860b1421ad64f92b79f3290ed4f03fb54fdd6c5168e2c3"
+      "source_confidence": 0.76,
+      "time_period": "current quarter",
+      "price_range": "spot premiums vary by origin and license status",
+      "bom_exposure_summary": "RF, optics, photonics, satellite payloads, wide-bandgap power",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "9098e028aaaad21c10f4fb884b80ca84fb81c6db578720b341efe56034728a83"
     },
     {
       "commodity_id": "rare_earth_magnets_dy_tb_ndpr",
@@ -218,7 +293,19 @@
         "Reserve supply for defense and safety-critical SKUs"
       ],
       "human_approval_gate": "Program + quality approval before motor, magnet, or actuator substitution.",
-      "evidence_hash": "4293a43ac069dfaa429d21155703bbf2265869dbc2ab9ea4e0e4fc444e9e0363"
+      "source_confidence": 0.75,
+      "time_period": "coming 3-12 months",
+      "price_range": "quote validity shortening; Dy/Tb surcharge watch",
+      "bom_exposure_summary": "motors, fans, pumps, drones, gimbals, robotics and actuation",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "e9c2b860d8b6690ee3d6bfebdb1adf940f4a351c2c2cedf710d95faee5ba677e"
     },
     {
       "commodity_id": "defense_metals_tungsten_antimony",
@@ -246,7 +333,19 @@
         "Ask suppliers for origin, refinery, and scrap-recovery exposure"
       ],
       "human_approval_gate": "Defense-program manager approval before allocation, safety stock, or alternate sourcing decision.",
-      "evidence_hash": "fe5520062751a09d57b4f32383c0cf2262ea69e06f232b1ca07ec21d094ccced"
+      "source_confidence": 0.73,
+      "time_period": "current quarter to 12 months",
+      "price_range": "processing/refinery premium watch",
+      "bom_exposure_summary": "defense mechanisms, cable materials, ruggedized assemblies and night-vision chains",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "24f3b0a2770ab0c0979c391697f127114018dde6b3da677c6e0b968778b5af45"
     },
     {
       "commodity_id": "high_reliability_passives_mlcc_tantalum",
@@ -274,8 +373,30 @@
         "Open engineering review for no-substitute defense BOM lines"
       ],
       "human_approval_gate": "Engineering approval before passive substitution; buyer approval before last-time-buy or buffer increase.",
-      "evidence_hash": "043c7f1615770232407fb64a361f3b8eecc491e394c4f4126acb2251b03fbcb0"
+      "source_confidence": 0.7,
+      "time_period": "coming 6-12 months",
+      "price_range": "+3% to +12% for selected high-reliability grades",
+      "bom_exposure_summary": "server power, avionics, medical, industrial controls and rugged gateways",
+      "arrangement_options": [
+        "buy_timing_review",
+        "buffer_or_safety_stock",
+        "long_term_agreement",
+        "alternate_supplier_or_substitution",
+        "customer_allocation_review"
+      ],
+      "proof_policy": "hash weak signals, actions, source confidence, price range, and approval gate before writeback",
+      "evidence_hash": "b24b298dde2595be7a1112541f4bfec84730bf95fc2e0eaedf169839d4a15030"
     }
+  ],
+  "simple_ui_cards": [
+    "Commodity",
+    "Early-warning score",
+    "Time period",
+    "Price range",
+    "BOM exposure",
+    "Recommended arrangement",
+    "Approval owner",
+    "Proof hash"
   ],
   "agent_action_loop": [
     "ingest weak signals",

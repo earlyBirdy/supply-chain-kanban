@@ -1865,6 +1865,119 @@
           ]
         }
       }
+    },
+    "AgentSkill": {
+      "description": "Small, auditable AI-agent capability used by the dashboard to clarify asks, map source records, convert live signals, build decision packets, or hand off governed actions.",
+      "key": "skill_id",
+      "properties": {
+        "skill_id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "trigger": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ux_surface": {
+          "type": "string"
+        },
+        "skill_hash": {
+          "type": "string",
+          "optional": true
+        }
+      }
+    },
+    "AutoresearchExperiment": {
+      "description": "Bounded, measurable experiment for forecast, capacity, supplier, inventory, or commodity-news prediction improvements. It is not allowed to change production decisions without promotion evidence and human approval.",
+      "key": "run_tag",
+      "properties": {
+        "run_tag": {
+          "type": "string"
+        },
+        "hypothesis": {
+          "type": "string"
+        },
+        "input_dataset": {
+          "type": "string"
+        },
+        "baseline_metric": {
+          "type": "object"
+        },
+        "candidate_metric": {
+          "type": "object"
+        },
+        "operator_impact": {
+          "type": "string"
+        },
+        "promotion_decision": {
+          "type": "string",
+          "enum": [
+            "reject",
+            "keep",
+            "promote"
+          ]
+        },
+        "evidence_hash": {
+          "type": "string"
+        },
+        "approved_by": {
+          "type": "string",
+          "optional": true
+        }
+      }
+    },
+    "SimpleUXDecisionCard": {
+      "description": "Manager-facing simplified card that hides raw ERP/MES rows by default while preserving source references, approval owner, target system, and proof.",
+      "key": "ux_card_id",
+      "properties": {
+        "ux_card_id": {
+          "type": "string"
+        },
+        "primary_question": {
+          "type": "string"
+        },
+        "affected_objects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommended_action": {
+          "type": "string"
+        },
+        "approval_owner": {
+          "type": "string"
+        },
+        "target_system": {
+          "type": "string"
+        },
+        "proof_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_record_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        }
+      }
     }
   },
   "relationships": [
@@ -2782,5 +2895,24 @@
         "supplier_manager": "OTIF, ASN, confirmation, escalation"
       }
     }
+  },
+  "dashboard_enhancement_blueprint": {
+    "goal": "Improve the supply-chain dashboard with ERP/MES integration, AI agent skills, blockchain-ready proof, commodity/news radar, and simple UX/UI.",
+    "simple_ui_question": "What is the top issue, what object is affected, what action is recommended, who approves it, where will it write back, and what proof exists?",
+    "layers": [
+      "ERP/MES/WMS/TMS/supplier/news source records",
+      "canonical ontology and source references",
+      "AI agent skills and bounded autoresearch extension",
+      "Commodity Trend Radar and live news risk conversion",
+      "human approval gate and governed writeback",
+      "EvidenceReceipt, WritebackReceipt, BlockchainAnchor proof"
+    ],
+    "new_runtime_endpoints": [
+      "/agent_skills/",
+      "/commodity_trends/",
+      "/news/items",
+      "/news/check-now"
+    ],
+    "ux_default": "Major issues first; drill down to source records only when the operator asks for evidence or writeback details."
   }
 }

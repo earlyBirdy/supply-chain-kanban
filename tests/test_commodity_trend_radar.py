@@ -20,6 +20,10 @@ def test_commodity_trend_radar_ranks_it_defense_shortage_watchlist() -> None:
     assert any(row["commodity_id"] == "defense_metals_tungsten_antimony" for row in data["watchlist"])
     assert any(row["commodity_id"] == "high_reliability_passives_mlcc_tantalum" for row in data["watchlist"])
     assert len(data["watchlist"][0]["evidence_hash"]) == 64
+    assert data["watchlist"][0]["source_confidence"] > 0.8
+    assert "price_range" in data["watchlist"][0]
+    assert "bom_exposure_summary" in data["watchlist"][0]
+    assert "Price range" in data["simple_ui_cards"]
     assert "require human approval" in data["agent_action_loop"]
 
 
@@ -35,3 +39,4 @@ def test_commodity_trend_radar_api_and_api_mirror_are_available_without_db() -> 
     assert body["title"] == "IT / Defense Commodity Trend Radar"
     assert body["top_watchlist"][0]["commodity"].startswith("Memory chips")
     assert "BOM_exposure" in body["scoring_model"]["factors"]
+    assert "source_confidence" in body["scoring_model"]["factors"]

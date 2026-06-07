@@ -176,12 +176,36 @@ def _trend_rows() -> List[Dict[str, Any]]:
             "human_approval_gate": "Engineering approval before passive substitution; buyer approval before last-time-buy or buffer increase.",
         },
     ]
+    source_profiles = {
+        "memory_hbm_dram_nand": {"source_confidence": 0.82, "time_period": "last 6 months", "price_range": "+8% to +22% contract/spot pressure", "bom_exposure": "AI servers, rugged edge AI, telecom and defense processing boards"},
+        "advanced_packaging_abf_cowos_interposer": {"source_confidence": 0.78, "time_period": "last 2 quarters", "price_range": "+5% to +18% packaging slot premium", "bom_exposure": "GPU/accelerator boards, HPC modules, high-bandwidth networking ASICs"},
+        "critical_semiconductor_minerals": {"source_confidence": 0.76, "time_period": "current quarter", "price_range": "spot premiums vary by origin and license status", "bom_exposure": "RF, optics, photonics, satellite payloads, wide-bandgap power"},
+        "rare_earth_magnets_dy_tb_ndpr": {"source_confidence": 0.75, "time_period": "coming 3-12 months", "price_range": "quote validity shortening; Dy/Tb surcharge watch", "bom_exposure": "motors, fans, pumps, drones, gimbals, robotics and actuation"},
+        "defense_metals_tungsten_antimony": {"source_confidence": 0.73, "time_period": "current quarter to 12 months", "price_range": "processing/refinery premium watch", "bom_exposure": "defense mechanisms, cable materials, ruggedized assemblies and night-vision chains"},
+        "high_reliability_passives_mlcc_tantalum": {"source_confidence": 0.70, "time_period": "coming 6-12 months", "price_range": "+3% to +12% for selected high-reliability grades", "bom_exposure": "server power, avionics, medical, industrial controls and rugged gateways"},
+    }
     for row in rows:
+        profile = source_profiles.get(row["commodity_id"], {})
+        row["source_confidence"] = profile.get("source_confidence", 0.7)
+        row["time_period"] = profile.get("time_period", row["time_horizon"])
+        row["price_range"] = profile.get("price_range", "watch supplier quote validity and spot/contract spread")
+        row["bom_exposure_summary"] = profile.get("bom_exposure", ", ".join(row.get("it_defense_exposure", [])[:2]))
+        row["arrangement_options"] = [
+            "buy_timing_review",
+            "buffer_or_safety_stock",
+            "long_term_agreement",
+            "alternate_supplier_or_substitution",
+            "customer_allocation_review",
+        ]
+        row["proof_policy"] = "hash weak signals, actions, source confidence, price range, and approval gate before writeback"
         row["evidence_hash"] = _hash_payload({
             "commodity_id": row["commodity_id"],
             "score": row["early_warning_score"],
             "signals": row["weak_signals"],
             "actions": row["recommended_actions"],
+            "source_confidence": row["source_confidence"],
+            "price_range": row["price_range"],
+            "bom_exposure_summary": row["bom_exposure_summary"],
         })
     return rows
 
@@ -205,11 +229,24 @@ def build_commodity_trend_radar() -> Dict[str, Any]:
                 "BOM_exposure",
                 "supplier_lead_time_change",
                 "news_confirmation",
+                "source_confidence",
+                "price_range",
+                "ERP_MES_BOM_exposure",
             ],
             "stage_model": ["weak_signal", "trend_formation", "mainstream_news_already_late"],
         },
         "top_watchlist": top,
         "watchlist": rows,
+        "simple_ui_cards": [
+            "Commodity",
+            "Early-warning score",
+            "Time period",
+            "Price range",
+            "BOM exposure",
+            "Recommended arrangement",
+            "Approval owner",
+            "Proof hash",
+        ],
         "agent_action_loop": [
             "ingest weak signals",
             "map signals to IT/Defense BOM exposure",

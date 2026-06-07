@@ -1,0 +1,143 @@
+{
+  "ok": true,
+  "generated_at": "2026-06-07T01:11:23.354199+00:00",
+  "title": "Agent Skills + Autoresearch Extension Catalog",
+  "principle": "Keep the dashboard simple for operators while giving the AI agent repeatable, auditable skills for research, risk prediction, approval, and proof.",
+  "skills": [
+    {
+      "skill_id": "clarify_operator_ask",
+      "label": "Clarify operator ask",
+      "trigger": "A planner, buyer, or executive asks an ambiguous supply-chain question.",
+      "inputs": [
+        "business_question",
+        "persona",
+        "SLA",
+        "affected_customer_or_program"
+      ],
+      "outputs": [
+        "primary_question",
+        "acceptance_criteria",
+        "owner",
+        "approval_path"
+      ],
+      "ux_surface": "Next Decision / AI Agent Workbench",
+      "skill_hash": "eaae4b301ff93a1dce216bdb0b9b00b11843b9a9ad3abb63a378815a608fcf74"
+    },
+    {
+      "skill_id": "source_map_erp_mes",
+      "label": "Map ERP/MES source records",
+      "trigger": "A card needs traceability to PO, WO, inventory, production, shipment, or supplier portal data.",
+      "inputs": [
+        "SourceSystemConnector",
+        "SourceRecordReference",
+        "field_mapping",
+        "trust_tier"
+      ],
+      "outputs": [
+        "ontology_object_refs",
+        "missing_fields",
+        "writeback_target",
+        "source_confidence"
+      ],
+      "ux_surface": "Connect Existing Systems",
+      "skill_hash": "815f485e16a2af168781a907301715b093804be0d47a52bcec6859762fb4e320"
+    },
+    {
+      "skill_id": "commodity_news_to_risk",
+      "label": "Convert live news into commodity risk",
+      "trigger": "Commodity, logistics, supplier, policy, or price signal arrives from RSS/API/manual research.",
+      "inputs": [
+        "headline",
+        "publisher",
+        "published_at",
+        "summary",
+        "structured_signals"
+      ],
+      "outputs": [
+        "NewsRiskSignal",
+        "CommodityRiskSignal",
+        "BillOfMaterialsExposure",
+        "recommended_arrangement"
+      ],
+      "ux_surface": "Live News for Commodity Arrangements",
+      "skill_hash": "9c37d80d25b883ba4069e68676095351f8d0fae3207662bff99ad4bbafe1327d"
+    },
+    {
+      "skill_id": "build_decision_packet",
+      "label": "Build governed decision packet",
+      "trigger": "Risk is high enough to need manager approval or external writeback.",
+      "inputs": [
+        "case",
+        "scenario",
+        "cost_impact",
+        "service_impact",
+        "risk_exposure"
+      ],
+      "outputs": [
+        "AgentDecision",
+        "approval_story",
+        "decision_hash",
+        "EvidenceReceipt"
+      ],
+      "ux_surface": "Decide / Simulate + Execute / Prove",
+      "skill_hash": "4ee4ae7d465bcfde3668cea8c625b484d25b7826fcd16edd44e368fe52e29d74"
+    },
+    {
+      "skill_id": "autoresearch_risk_sprint",
+      "label": "Autoresearch risk sprint",
+      "trigger": "The model needs a measurable improvement for forecast, supplier, inventory, or news-risk prediction.",
+      "inputs": [
+        "hypothesis",
+        "baseline_metric",
+        "candidate_rule_or_model",
+        "test_dataset"
+      ],
+      "outputs": [
+        "experiment_result",
+        "promotion_decision",
+        "model_confidence_delta",
+        "audit_note"
+      ],
+      "ux_surface": "Power Templates",
+      "skill_hash": "0f136ab8435eb055f6270ae0f466e0628378e60027d5abbbaa4e0133917904f0"
+    }
+  ],
+  "autoresearch_extensions": [
+    {
+      "extension_id": "commodity_arrangement_research",
+      "label": "Commodity arrangement research",
+      "goal": "Find early signals that should change buy timing, buffer targets, LTA strategy, or supplier allocation.",
+      "promotion_gate": "Earlier warning without increasing false-positive approval work.",
+      "metric": "days_of_warning_before_ERP_shortage",
+      "evidence_policy": "log hypothesis, dataset, baseline, candidate result, operator impact, and promote/reject decision",
+      "extension_hash": "1b5b39166bb6e4ab83fac9a422b5084c1adbb757445c87b673b70f82de99d567"
+    },
+    {
+      "extension_id": "forecast_capacity_gap_research",
+      "label": "Forecast-capacity gap research",
+      "goal": "Detect demand/capacity mismatches before customer commitment misses.",
+      "promotion_gate": "Lower forecast exception noise and better service-impact ranking.",
+      "metric": "weighted_forecast_exception_precision",
+      "evidence_policy": "log hypothesis, dataset, baseline, candidate result, operator impact, and promote/reject decision",
+      "extension_hash": "3d88eb20a3f1cb884681bb9c5ff39a20abbbffb97ff16265bdf62ba40cac1740"
+    },
+    {
+      "extension_id": "supplier_recovery_playbook_research",
+      "label": "Supplier recovery playbook research",
+      "goal": "Compare supplier ticket, expedite, allocation, substitute, and redesign paths using historical receipts.",
+      "promotion_gate": "Improves recovery recommendation precision and keeps human approval for external changes.",
+      "metric": "approved_recommendation_success_rate",
+      "evidence_policy": "log hypothesis, dataset, baseline, candidate result, operator impact, and promote/reject decision",
+      "extension_hash": "0357ab287b3cd30dc59f1acea5c9306d8cd3e2cfa557a40cdec454623b73e436"
+    }
+  ],
+  "operating_loop": [
+    "clarify business ask or ingest live signal",
+    "map ERP/MES/WMS/TMS/news records to ontology objects",
+    "detect risk and produce a human-readable decision packet",
+    "run bounded autoresearch only when a measurable prediction improvement is needed",
+    "require human approval before external-system change",
+    "write back through governed connector and attach EvidenceReceipt / BlockchainAnchor proof"
+  ],
+  "simple_ui_rule": "Simple default UI shows major issue, affected object, recommended action, approval owner, target system, and proof; raw ERP/MES tables stay behind source references."
+}
