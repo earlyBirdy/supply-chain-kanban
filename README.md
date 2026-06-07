@@ -487,3 +487,14 @@ curl -X POST http://localhost:8000/business_submission/run
 ```
 
 The safe default remains read-only monitoring. External-system writeback is simulated and approval-gated for the demo.
+
+
+## Commodity Arrangement Desk
+
+The dashboard now converts live news and Commodity Trend Radar signals into approval-ready commodity arrangement cards. Instead of showing raw headlines first, the UI shows commodity/material, source confidence, time period, price range, BOM exposure, ERP/MES fields to check, recommended arrangement, approval owner, governed writeback target, and evidence hash.
+
+```bash
+curl http://localhost:8000/news/commodity-arrangements?topic=commodities
+```
+
+This keeps live commodity research useful for planners: buy timing, buffer/safety stock, LTA, alternate supplier/substitution, expedite, and allocation decisions stay human-approved and proof-backed.

@@ -1,0 +1,29 @@
+{
+  "title": "Commodity Arrangement Desk sample",
+  "cards": [
+    {
+      "commodity_or_material": "dram",
+      "recommended_arrangement": "review_buy_timing",
+      "source_confidence": 0.74,
+      "time_period": "last 30 days",
+      "price_range": "spot -3% to -8%, contract watch",
+      "bom_exposure": ["server_dram", "edge_ai_memory"],
+      "approval_owner": "commodity_manager",
+      "erp_mes_fields_to_check": ["erp_material_ids", "open_purchase_orders", "work_orders", "plant_inventory", "supplier_confirmations", "quote_validity_window"],
+      "business_action": "Delay, split, or accelerate PO release after commodity manager review.",
+      "evidence_hash": "sample_hash_recomputed_by_api"
+    },
+    {
+      "commodity_or_material": "lfp_battery",
+      "recommended_arrangement": "rebalance_allocation",
+      "source_confidence": 0.78,
+      "time_period": "current week",
+      "price_range": "freight premium +4% to +9%",
+      "bom_exposure": ["battery_cells_lfp", "EV launch packs"],
+      "approval_owner": "ops_lead",
+      "erp_mes_fields_to_check": ["erp_material_ids", "open_purchase_orders", "work_orders", "plant_inventory", "supplier_confirmations", "quote_validity_window"],
+      "business_action": "Rebalance constrained supply across launch/customer priorities.",
+      "evidence_hash": "sample_hash_recomputed_by_api"
+    }
+  ]
+}

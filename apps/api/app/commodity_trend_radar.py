@@ -197,7 +197,33 @@ def _trend_rows() -> List[Dict[str, Any]]:
             "alternate_supplier_or_substitution",
             "customer_allocation_review",
         ]
-        row["proof_policy"] = "hash weak signals, actions, source confidence, price range, and approval gate before writeback"
+        row["arrangement_playbook"] = {
+            "first_action": row["recommended_actions"][0],
+            "approval_owner": row["human_approval_gate"].split(" approval", 1)[0],
+            "writeback_target": "ERP purchase plan / supplier portal / S&OP exception",
+            "ui_decision_copy": f"Review {row['commodity']} exposure, confirm source confidence, then approve the recommended arrangement before external writeback.",
+            "follow_up_triggers": [
+                "source confidence changes by ±10%",
+                "quoted price moves outside expected range",
+                "BOM exposure grows on committed customer orders",
+                "supplier lead time or allocation language changes",
+            ],
+        }
+        row["source_timeline"] = [
+            {"period": row["time_period"], "signal": row["weak_signals"][0], "confidence": row["source_confidence"]},
+            {"period": row["time_horizon"], "signal": row["weak_signals"][1], "confidence": max(row["source_confidence"] - 0.04, 0.5)},
+        ]
+        row["erp_mes_link_fields"] = [
+            "erp_material_ids",
+            "purchase_orders",
+            "work_orders",
+            "supplier_ids",
+            "plant_ids",
+            "inventory_positions",
+            "quote_validity_window",
+        ]
+        row["simple_ui_summary"] = f"{row['time_period']}: {row['commodity']} score {row['early_warning_score']}; {row['price_range']}; BOM exposure: {row['bom_exposure_summary']}."
+        row["proof_policy"] = "hash weak signals, actions, source confidence, price range, BOM exposure, approval gate, and arrangement playbook before writeback"
         row["evidence_hash"] = _hash_payload({
             "commodity_id": row["commodity_id"],
             "score": row["early_warning_score"],
@@ -232,8 +258,15 @@ def build_commodity_trend_radar() -> Dict[str, Any]:
                 "source_confidence",
                 "price_range",
                 "ERP_MES_BOM_exposure",
+                "arrangement_playbook",
+                "follow_up_triggers",
             ],
             "stage_model": ["weak_signal", "trend_formation", "mainstream_news_already_late"],
+        },
+        "ux_contract": {
+            "default_view": "show top 3 commodity decisions first; collapse raw headlines and source tables behind evidence links",
+            "operator_buttons": ["Review exposure", "Open approval", "Create supplier task", "Create proof packet"],
+            "never_show_first": ["raw RSS list", "raw ERP/MES table dump", "hash-only proof without business summary"],
         },
         "top_watchlist": top,
         "watchlist": rows,
@@ -246,6 +279,7 @@ def build_commodity_trend_radar() -> Dict[str, Any]:
             "Recommended arrangement",
             "Approval owner",
             "Proof hash",
+            "Next follow-up trigger",
         ],
         "agent_action_loop": [
             "ingest weak signals",
@@ -254,5 +288,15 @@ def build_commodity_trend_radar() -> Dict[str, Any]:
             "recommend approved supplier, buffer, LTA, redesign, or substitution action",
             "require human approval",
             "create evidence receipt with trend hash",
+        ],
+        "arrangement_summary": [
+            {
+                "commodity_id": row["commodity_id"],
+                "recommended_arrangement": row["arrangement_options"][0],
+                "approval_owner": row["arrangement_playbook"]["approval_owner"],
+                "summary": row["simple_ui_summary"],
+                "evidence_hash": row["evidence_hash"],
+            }
+            for row in top
         ],
     }

@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from ...config import DEV_MODE
+from ...commodity_arrangements import build_arrangement_packet
 from ...db import all, one, q
 
 router = APIRouter()
@@ -74,6 +75,31 @@ def list_news_alerts(topic: str | None = None, limit: int = 50):
             lim=limit,
         )
     return {"ok": True, "alerts": rows}
+
+@router.get("/commodity-arrangements")
+def list_commodity_arrangements(topic: str = "commodities", limit: int = 20):
+    """Return UX-ready commodity arrangement cards from current news signals.
+
+    This endpoint intentionally returns business decision cards rather than a raw
+    headline feed. If the DB is not available or has no rows, deterministic demo
+    cards are returned so the dashboard remains useful in local/HF demos.
+    """
+
+    limit = max(1, min(int(limit), 50))
+    rows: List[Dict[str, Any]] = []
+    try:
+        rows = all(
+            """SELECT item_id, fetched_at, published_at, topic, source, title, url, summary, severity, signals, case_id
+                 FROM news_items
+                 WHERE topic=:topic
+                 ORDER BY severity DESC, fetched_at DESC
+                 LIMIT :lim""",
+            topic=str(topic),
+            lim=limit,
+        )
+    except Exception:
+        rows = []
+    return build_arrangement_packet(rows)
 
 @router.post("/ingest")
 def ingest_news(request: Request, req: NewsIngestRequest):

@@ -187,6 +187,11 @@
             <div class="integration-flow">News is not shown as headlines. News is converted into ontology-linked risk signals. Commodity, supplier, logistics, and geopolitical risk signals are preserved with source confidence and ERP/MES-compatible metadata. The AI agent maps each event to affected commodities, suppliers, logistics lanes, financial exposure, source confidence, time period, price range, BOM exposure, and recommended approval-gated actions. News is converted into ontology-linked commodity risk signals and mapped to affected materials, BOM exposure, suppliers, industries, price risk, lead-time risk, and approval-gated actions.</div>
             <div class="news-grid" id="commodityNews"><div class="empty">News signals will appear here after sync.</div></div>
           </section>
+          <section class="panel side-focus" aria-label="Commodity arrangement decision desk">
+            <div class="section-title"><h2>Commodity Arrangement Desk</h2><span class="small">Buy timing · buffer · LTA · alternate supplier · allocation</span></div>
+            <div class="integration-flow">The UX shows approval-ready commodity arrangements instead of raw headlines: source confidence, time period, price range, BOM exposure, ERP/MES fields to check, approval owner, recommended business action, and evidence hash.</div>
+            <div class="news-grid" id="commodityArrangementDesk"><div class="empty">Commodity arrangement cards will load from live news + radar signals.</div></div>
+          </section>
         </div>
 
       </div>
@@ -242,6 +247,6 @@
       </section>
     </div>
   </main>
-  <script src="/app.js?v=0.33"></script>
+  <script src="/app.js?v=0.34"></script>
 </body>
 </html>

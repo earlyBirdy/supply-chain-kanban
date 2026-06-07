@@ -71,3 +71,12 @@ Who must approve?
 Which system will be updated?
 What receipt/proof will be attached?
 ```
+
+
+## Commodity Arrangement Desk
+
+The next dashboard improvement adds a dedicated arrangement desk so live news and Commodity Trend Radar signals become approval-ready cards instead of raw headlines. Each card shows source confidence, time period, price range, BOM exposure, ERP/MES fields to check, recommended arrangement, approval owner, governed writeback target, and evidence hash.
+
+New reference: `docs/product/COMMODITY_ARRANGEMENT_DESK.md`.
+
+New sample: `data/sample_inputs/commodity_arrangement_cards_sample.json`.

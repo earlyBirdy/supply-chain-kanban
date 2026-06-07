@@ -113,7 +113,7 @@ def test_web_uses_normal_page_flow_to_avoid_overlapping_blocks() -> None:
     assert 'overflow:visible' in html
     assert 'location = /app.js' in nginx
     assert 'Cache-Control "no-store, max-age=0"' in nginx
-    assert '<script src="/app.js?v=0.33"></script>' in html
+    assert '<script src="/app.js?v=0.34"></script>' in html
 
 def test_web_removes_confusing_visible_status_copy() -> None:
     html = (ROOT / 'apps/web/public/index.html').read_text()
@@ -227,7 +227,7 @@ def test_web_project_status_shows_top_major_issues_not_full_backlog() -> None:
     assert 'function majorIssueCards' in app_js
     assert 'lower-priority signals grouped' in app_js
     assert 'Showing top ${MAJOR_ISSUE_LIMIT} major issues' in app_js
-    assert '<script src="/app.js?v=0.33"></script>' in html
+    assert '<script src="/app.js?v=0.34"></script>' in html
 
 
 def test_hugging_face_space_demo_contract() -> None:
@@ -278,7 +278,7 @@ def test_agent_skills_and_autoresearch_playbook_contract() -> None:
 
     assert 'skill-driven triage' in html
     assert 'bounded risk experiments' in html
-    assert '<script src="/app.js?v=0.33"></script>' in html
+    assert '<script src="/app.js?v=0.34"></script>' in html
     assert 'Agent Skill Playbook' in app_js
     assert 'Autoresearch Sandbox' in app_js
     assert 'Agent skill triage' in app_js
@@ -415,3 +415,22 @@ def test_ontology_contract_and_api_mirror_include_prediction_packet_metadata() -
 
     assert 'CommodityPredictionPacket_has_ERP_MES_WMS_TMS_Metadata' in contract_yaml
     assert 'CommodityPredictionPacket_has_ERP_MES_WMS_TMS_Metadata' in api_yaml
+
+
+def test_web_has_commodity_arrangement_desk() -> None:
+    html = (ROOT / 'apps/web/public/index.html').read_text()
+    app_js = (ROOT / 'apps/web/public/app.js').read_text()
+    readme = (ROOT / 'README.md').read_text()
+    doc = (ROOT / 'docs/product/COMMODITY_ARRANGEMENT_DESK.md').read_text()
+    sample = (ROOT / 'data/sample_inputs/commodity_arrangement_cards_sample.json').read_text()
+
+    assert 'Commodity Arrangement Desk' in html
+    assert 'source confidence, time period, price range, BOM exposure, ERP/MES fields to check' in html
+    assert 'function renderCommodityArrangementDesk' in app_js
+    assert '/news/commodity-arrangements?topic=commodities&limit=10' in app_js
+    assert 'commodityArrangementDesk' in app_js
+    assert 'Commodity Arrangement Desk' in readme
+    assert 'curl http://localhost:8000/news/commodity-arrangements?topic=commodities' in readme
+    assert 'approval-ready commodity arrangements' in doc
+    assert 'raw RSS feed' in doc
+    assert 'quote_validity_window' in sample

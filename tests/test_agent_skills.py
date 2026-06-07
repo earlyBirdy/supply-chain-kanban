@@ -18,6 +18,9 @@ def test_agent_skill_catalog_exposes_governed_skills_and_autoresearch() -> None:
     assert all(len(row["skill_hash"]) == 64 for row in data["skills"])
     extension_ids = {row["extension_id"] for row in data["autoresearch_extensions"]}
     assert "commodity_arrangement_research" in extension_ids
+    assert "live_news_arrangement_research" in extension_ids
+    assert "commodity_arrangement_card" in data["ux_contract"]
+    assert "open commodity arrangement card" in data["operator_quick_actions"]
     assert "require human approval" in " ".join(data["operating_loop"])
 
 
